@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<!-- Referrer Policy调整致不蒜子单页面统计出错:https://senorui.top/posts/c33f.html -->
+<meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"luckyfbb.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在此之前，我对树有了一定的了解，这一次我将对图做一个学习总结，涉及到构建图&#x2F;搜索算法。感兴趣就点它点它点它！！！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解锁图的相关知识">
+<meta property="og:url" content="https://luckyfbb.github.io/2020/05/28/%E5%9B%BE/index.html">
+<meta property="og:site_name" content="LuckyFBB&#39;s Blog">
+<meta property="og:description" content="在此之前，我对树有了一定的了解，这一次我将对图做一个学习总结，涉及到构建图&#x2F;搜索算法。感兴趣就点它点它点它！！！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/first.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/second.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/three.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/array.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/list.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/search.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/bfs.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/graph/dfs.png">
+<meta property="article:published_time" content="2020-05-28T15:15:32.000Z">
+<meta property="article:modified_time" content="2020-05-28T15:15:32.000Z">
+<meta property="article:author" content="LuckyFBB">
+<meta property="article:tag" content="LuckyFBB, 前端, 博客, 基础总结, JavaScript, React, React Hooks">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://luckyfbb.github.io/image/graph/first.png">
+
+<link rel="canonical" href="https://luckyfbb.github.io/2020/05/28/%E5%9B%BE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>解锁图的相关知识 | LuckyFBB's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LuckyFBB's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://luckyfbb.github.io/2020/05/28/%E5%9B%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="LuckyFBB">
+      <meta itemprop="description" content="时间久了，问题也多了">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LuckyFBB's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          解锁图的相关知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-28 23:15:32" itemprop="dateCreated datePublished" datetime="2020-05-28T23:15:32+08:00">2020-05-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在此之前，我对树有了一定的了解，这一次我将对图做一个学习总结，涉及到构建图/搜索算法。感兴趣就点它点它点它！！！</p>
+<span id="more"></span>
+<h3 id="图"><a href="#图" class="headerlink" title="图"></a>图</h3><p>图是由若干给定的点及连接两点的线所构成的图形，这种图形通常用来描述某些事物之间的某种特定关系，用点代表事物，用连接两点的线表示相应两个事物间具有这种关系。</p>
+<p>其实树也可以看作是图，只是相对来说比较特殊而已。</p>
+<p>树中的元素被称为节点，图中的元素被称为顶点(vertex)。图中的某个顶点都可以和任意其他顶点建立连接关系，把建立的这种关系叫做边(edge)。与顶点相连接的边的条数叫做顶点的度。</p>
+<p>在图中，有<strong>无向图</strong>与<strong>有向图</strong>之分，如果边有方向的话，就是有向图，反之则为无向图。</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/first.png" alt="无向图"></div>
+
+<div style="margin: auto;width:500px;"><img src="/image/graph/second.png" alt="无向图"></div>
+
+<p>在无向图中，有度的概念，表示为一个顶点有多少条边。在有向图中，会把度分为<strong>入度</strong>和<strong>出度</strong>。入度表示有多少边指向这个顶点；出度表示有多少条边是以这个顶点为起点指向其他顶点。</p>
+<p>还有一种图，叫做<strong>带权图</strong>，在带权图中每条边都有一个权重。</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/three.png" alt="无向图"></div>
+
+<h4 id="存储方法"><a href="#存储方法" class="headerlink" title="存储方法"></a>存储方法</h4><h5 id="邻接矩阵存储方法"><a href="#邻接矩阵存储方法" class="headerlink" title="邻接矩阵存储方法"></a>邻接矩阵存储方法</h5><p>图的最直观一种存储方式就是邻接矩阵。<br>邻接矩阵的底层是一个二维数组。对于无向图来说，如果顶点 i 和顶点 j 之间有边，就把 A[i][j]和 A[j][i]标记为 1；对于有向图来说，如果顶点 i 到顶点 j 之间，有一条箭头从顶点 i 指向顶点 j 的边，就把 A[i][j]标记为 1；对于带权图来说，数组中对应的存储相应的权重。</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/array.png" alt="无向图"></div>
+
+<p>虽然这种存储方式简单、直观，但是比较浪费存储空间。尤其是对于无向图来说，A[i][j]为 1 的话，那么 A[j][i]也为 1。实际上，只需要存储一个就行了，等用于浪费了一般的存储空间。</p>
+<h5 id="邻接表存储方法"><a href="#邻接表存储方法" class="headerlink" title="邻接表存储方法"></a>邻接表存储方法</h5><p>在表示上，邻接表看起来有点像散列表。每个顶点，都对应了一条链表，链表中存储的是这个顶点与相连接的其他顶点。</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/list.png" alt="邻接表"></div>
+
+<h3 id="构建图"><a href="#构建图" class="headerlink" title="构建图"></a>构建图</h3><p>上面有介绍到，图有好几种存储方法，我在这次的代码实现中采用的是邻接表的方式。采用的图为无向图作为示例。</p>
+<p>图的构建，可以分成添加顶点和添加边两个步骤。<br>当我们添加完了顶点之后，需要为每个顶点创建一个字典类(Map)来存储与当前节点相连接的顶点。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Graph</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">vertices = []</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.vertices = vertices; <span class="comment">//用来存储顶点</span></span><br><span class="line">    <span class="built_in">this</span>.adjList = <span class="keyword">new</span> <span class="built_in">Map</span>(); <span class="comment">//用来存储边</span></span><br><span class="line">    <span class="built_in">this</span>.vertices.length &amp;&amp; <span class="built_in">this</span>.__buildGraph(); <span class="comment">//如果直接传入顶点数组的话，添加每个顶点的边集合</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//添加顶点</span></span><br><span class="line">  <span class="function"><span class="title">addVertex</span>(<span class="params">v</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.vertices.push(v);</span><br><span class="line">    <span class="built_in">this</span>.adjList.set(v, []);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//添加边</span></span><br><span class="line">  <span class="function"><span class="title">addEdge</span>(<span class="params">v, w</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.adjList.get(v).push(w);</span><br><span class="line">    <span class="built_in">this</span>.adjList.get(w).push(v);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//如果传入了参数，构建成图</span></span><br><span class="line">  <span class="function"><span class="title">__buildGraph</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.vertices.forEach(<span class="function">(<span class="params">item</span>) =&gt;</span> <span class="built_in">this</span>.adjList.set(item, []));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//example</span></span><br><span class="line">  <span class="keyword">let</span> graph =<span class="keyword">new</span> Graph([<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;B&#x27;</span>,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;D&#x27;</span>,<span class="string">&#x27;E&#x27;</span>,<span class="string">&#x27;F&#x27;</span>,<span class="string">&#x27;G&#x27;</span>,<span class="string">&#x27;H&#x27;</span>]);</span><br><span class="line">  <span class="comment">//逐一加入边</span></span><br><span class="line">  graph.addEdge(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;B&quot;</span>);</span><br><span class="line">  graph.addEdge(<span class="string">&quot;A&quot;</span>, <span class="string">&quot;C&quot;</span>);</span><br><span class="line">  graph.addEdge(<span class="string">&quot;B&quot;</span>, <span class="string">&quot;D&quot;</span>);</span><br><span class="line">  graph.addEdge(<span class="string">&quot;B&quot;</span>, <span class="string">&quot;E&quot;</span>);</span><br><span class="line">  graph.addEdge(<span class="string">&quot;E&quot;</span>, <span class="string">&quot;F&quot;</span>);</span><br><span class="line">  graph.addEdge(<span class="string">&quot;C&quot;</span>, <span class="string">&quot;G&quot;</span>);</span><br><span class="line">  graph.addEdge(<span class="string">&quot;G&quot;</span>, <span class="string">&quot;H&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这一段代码就已经将图类创建好了，如图：</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/search.png" alt="邻接表"></div>
+
+<p>为了直观的将邻接表展示出来，我们为 Graph 添加 toString 方法，能够展示出与每个顶点连接的其他的顶点。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">toString</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> s = <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="built_in">this</span>.vertices.forEach(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">    s += <span class="string">`<span class="subst">$&#123;item&#125;</span>-&gt;`</span>;</span><br><span class="line">    <span class="keyword">let</span> neighbors = <span class="built_in">this</span>.adjList.get(item);</span><br><span class="line">    neighbors.forEach(<span class="function">(<span class="params">neighbor</span>) =&gt;</span> &#123;</span><br><span class="line">      s += <span class="string">`<span class="subst">$&#123;neighbor&#125;</span> `</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">    s += <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当对上图执行这个方法之后，打印出这样的字符串。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">A-&gt;B C</span><br><span class="line">B-&gt;A D E</span><br><span class="line">C-&gt;A G</span><br><span class="line">D-&gt;B</span><br><span class="line">E-&gt;B F</span><br><span class="line">F-&gt;E</span><br><span class="line">G-&gt;C H</span><br><span class="line">H-&gt;G</span><br></pre></td></tr></table></figure>
+<h3 id="搜索算法"><a href="#搜索算法" class="headerlink" title="搜索算法"></a>搜索算法</h3><p>接下来的搜索算法将以上图作为示例。</p>
+<p>在本次实现搜索算法的时候，我们为每个节点添加三种状态：</p>
+<ol>
+<li>白色：尚未被访问</li>
+<li>灰色：被访问但是未被探索</li>
+<li>黑色：被访问切被探索</li>
+</ol>
+<p>因为我们为节点添加了三种状态，所以在执行算法之前，我们需要对每个顶点进行初始化，添加 initializeColor 函数。全部初始化为白色，未访问状态。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">__initializeColor</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> color = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="built_in">this</span>.vertices.length; i++) &#123;</span><br><span class="line">    color[<span class="built_in">this</span>.vertices[i]] = <span class="string">&quot;white&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="广度优先搜索"><a href="#广度优先搜索" class="headerlink" title="广度优先搜索"></a>广度优先搜索</h4><p>广度优先搜索(Breadth-First Search)，简称 BFS。简单来说，就是层层推进的搜索策略。</p>
+<p>需要借助<strong>队列(queue)</strong>，先访问顶点并入队，接着它的邻接顶点，如果邻接顶点之前尚未被访问过，就分别入队，然后再分别访问邻接顶点的邻接顶点，一层层的递进，直到当前队列为空。</p>
+<p>针对于上图，以’A’做为第一个访问顶点，它的访问顺序就是下图所展示的：</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/bfs.png" alt="示意图"></div>
+
+<p>代码实现：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">bfs</span>(<span class="params">v, cb</span>)</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> color = <span class="built_in">this</span>.__initializeColor();</span><br><span class="line">  <span class="keyword">const</span> queue = [];</span><br><span class="line">  queue.push(v);</span><br><span class="line">  <span class="keyword">while</span> (queue.length) &#123;</span><br><span class="line">    <span class="keyword">const</span> curr = queue.shift(); <span class="comment">//获取到当前的节点</span></span><br><span class="line">    color[curr] = <span class="string">&quot;grey&quot;</span>; <span class="comment">//当前节点被访问，设置为grey</span></span><br><span class="line">    <span class="keyword">const</span> neighbors = <span class="built_in">this</span>.adjList.get(curr); <span class="comment">//拿到当前节点的所有边</span></span><br><span class="line">    neighbors.forEach(<span class="function">(<span class="params">neighbor</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (color[neighbor] === <span class="string">&quot;white&quot;</span>) &#123;</span><br><span class="line">        <span class="comment">//如果探索到的子节点是尚未被访问过，就变为grey并且加入队列</span></span><br><span class="line">        color[neighbor] = <span class="string">&quot;grey&quot;</span>;</span><br><span class="line">        queue.push(neighbor);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    color[curr] = <span class="string">&quot;black&quot;</span>; <span class="comment">//节点完成搜索和探索的过程，直接变黑</span></span><br><span class="line">    cb &amp;&amp; cb(curr); <span class="comment">//如果有callback，就对当前节点执行callback</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="深度优先搜索"><a href="#深度优先搜索" class="headerlink" title="深度优先搜索"></a>深度优先搜索</h4><p>深度优先搜索(Depth-First Search)，简称 DFS。</p>
+<p>简单来说，就是一条路走到无路可走了，然后回退到上一个岔路口，选择另一条路继续走，直到找到出口。</p>
+<p>针对于上图，以’A’做为第一个访问顶点，它的访问顺序就是下图所展示的：</p>
+<div style="margin: auto;width:500px;"><img src="/image/graph/dfs.png" alt="示意图"></div>
+
+<p>代码实现：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">dfs</span>(<span class="params">v, cb</span>)</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> color = <span class="built_in">this</span>.__initializeColor();</span><br><span class="line">  <span class="built_in">this</span>.__dfsVisit(v, color, cb);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">__dfsVisit</span>(<span class="params">v, color, cb</span>)</span> &#123;</span><br><span class="line">  color[v] = <span class="string">&quot;grey&quot;</span>;</span><br><span class="line">  cb &amp;&amp; cb(v);</span><br><span class="line">  <span class="keyword">const</span> neighbors = <span class="built_in">this</span>.adjList.get(v);</span><br><span class="line">  neighbors.forEach(<span class="function">(<span class="params">neighbor</span>) =&gt;</span> &#123;</span><br><span class="line">    color[neighbor] === <span class="string">&quot;white&quot;</span> &amp;&amp; <span class="built_in">this</span>.__dfsVisit(neighbor, color, cb);</span><br><span class="line">  &#125;);</span><br><span class="line">  color[v] = <span class="string">&quot;black&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在此，已经将无向图的两种搜索算法总结出来，有向图和权重图都是类似的。在学习完图之后，大多的数据结构都已经有了一定的基础。接下来将是算法思想的学习，敬请期待。</p>
+<p><strong>相关链接</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/LuckyFBB/data_structure/blob/master/graph/graph.js">图的详细代码</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/08/%E6%88%91%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9/" rel="prev" title="我不知道的文件指纹">
+      <i class="fa fa-chevron-left"></i> 我不知道的文件指纹
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/29/V8%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/" rel="next" title="V8的垃圾回收机制">
+      V8的垃圾回收机制 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">存储方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.1.</span> <span class="nav-text">邻接矩阵存储方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%82%BB%E6%8E%A5%E8%A1%A8%E5%AD%98%E5%82%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.1.2.</span> <span class="nav-text">邻接表存储方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E5%9B%BE"><span class="nav-number">2.</span> <span class="nav-text">构建图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">搜索算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2"><span class="nav-number">3.1.</span> <span class="nav-text">广度优先搜索</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2"><span class="nav-number">3.2.</span> <span class="nav-text">深度优先搜索</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="LuckyFBB"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">LuckyFBB</p>
+  <div class="site-description" itemprop="description">时间久了，问题也多了</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LuckyFBB</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+    <span class="post-count">| 博客共75.8k字</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

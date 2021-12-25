@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<!-- Referrer Policy调整致不蒜子单页面统计出错:https://senorui.top/posts/c33f.html -->
+<meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"luckyfbb.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="淡黄的长裙，蓬松的头发牵着我的手去看那新写出博客">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我不知道的文件指纹">
+<meta property="og:url" content="https://luckyfbb.github.io/2020/04/08/%E6%88%91%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9/index.html">
+<meta property="og:site_name" content="LuckyFBB&#39;s Blog">
+<meta property="og:description" content="淡黄的长裙，蓬松的头发牵着我的手去看那新写出博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash0.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash1.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash2.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash3.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash6.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash7.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash4.png">
+<meta property="og:image" content="https://luckyfbb.github.io/image/webpack/hash5.png">
+<meta property="article:published_time" content="2020-04-08T13:37:18.000Z">
+<meta property="article:modified_time" content="2020-04-08T13:37:18.000Z">
+<meta property="article:author" content="LuckyFBB">
+<meta property="article:tag" content="Webpack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://luckyfbb.github.io/image/webpack/hash0.png">
+
+<link rel="canonical" href="https://luckyfbb.github.io/2020/04/08/%E6%88%91%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>我不知道的文件指纹 | LuckyFBB's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LuckyFBB's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://luckyfbb.github.io/2020/04/08/%E6%88%91%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="LuckyFBB">
+      <meta itemprop="description" content="时间久了，问题也多了">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LuckyFBB's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          我不知道的文件指纹
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-08 21:37:18" itemprop="dateCreated datePublished" datetime="2020-04-08T21:37:18+08:00">2020-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>淡黄的长裙，蓬松的头发<br>牵着我的手去看那新写出博客</p>
+<span id="more"></span>
+<p>在目前常用的 webpack 中，有这样的一段代码</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">entry</span>: &#123;</span><br><span class="line">    <span class="attr">index</span>: <span class="string">&quot;./src/index.js&quot;</span>,</span><br><span class="line">    <span class="attr">demo</span>: <span class="string">&quot;./src/demo.js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">output</span>: &#123;</span><br><span class="line">    <span class="attr">path</span>: path.resolve(__dirname, <span class="string">&quot;dist&quot;</span>),</span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&quot;[name].[hash].js&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>作为小白，着实不是很懂其中[hash]这个变量的作用是啥，会对我们在项目打包的过程中，提供什么样子的帮助。<br>在经过一系列的科学上网查询资料之后，对这个东西有了新的认识。</p>
+<h4 id="文件指纹"><a href="#文件指纹" class="headerlink" title="文件指纹"></a>文件指纹</h4><p>文件中的 hash，其实是文件指纹的一种，是前端资源实现增量更新最常用的方案。<br>那什么又是文件指纹呢？</p>
+<ul>
+<li>打包之后输出文件名的后缀</li>
+<li>通常用于版本管理</li>
+</ul>
+<h4 id="compilation-和-compiler"><a href="#compilation-和-compiler" class="headerlink" title="compilation 和 compiler"></a>compilation 和 compiler</h4><p>在我们正式了解几种常见的文件指纹之前，我们需要对 webpack 打包会生成的 compilation 和 compiler 对象有一个了解。(<a target="_blank" rel="noopener" href="https://www.webpackjs.com/contribute/writing-a-plugin/#compiler-%E5%92%8C-compilation">官方文档</a>)</p>
+<ul>
+<li>compiler<br>compiler 对象代表了完整的 webpack 环境配置。这个对象在启动 webpack 时被一次性建立，并配置好所有可操作的设置，包括 options，loader 和 plugin。当在 webpack 环境中应用一个插件时，插件将收到此 compiler 对象的引用。可以使用它来访问 webpack 的主环境。</li>
+<li>compilation<br>compilation 对象代表了一次资源版本构建。当运行 webpack 开发环境中间件时，每当检测到一个文件变化，就会创建一个新的 compilation，从而生成一组新的编译资源。一个 compilation 对象表现了当前的模块资源、编译生成资源、变化的文件、以及被跟踪依赖的状态信息。compilation 对象也提供了很多关键时机的回调，以供插件做自定义处理时选择使用。</li>
+</ul>
+<p>对于两者，简单来说，compiler 对象代表的是不变的 webpack 环境，是针对 webpack 的；而 compilation 对象针对的是随时可变的项目文件，只要文件有改动，compilation 就会被重新创建。</p>
+<h4 id="hash-chunkhash-contenthash"><a href="#hash-chunkhash-contenthash" class="headerlink" title="hash/chunkhash/contenthash"></a>hash/chunkhash/contenthash</h4><h5 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h5><p>在文档中找到了几个处关于 hash 的定义：</p>
+<ul>
+<li>Using the unique hash generated for every build;</li>
+<li>[hash] in this parameter will be replaced with an hash of the compilation</li>
+<li>The hash of the module identifier<br>翻译来说就是，随着每一次构建会创建 compilation，然后 hash 值就会被更新</li>
+</ul>
+<p>当我们构建一次，看到 dist 目录如下图：</p>
+<div style="width: 200px; margin: auto"><img src="/image/webpack/hash0.png" alt=""></div><br>当我们对 demo.js 随意进行修改，会发现 dist 目录变为下图：<br><div style="width: 200px; margin: auto"><img src="/image/webpack/hash1.png" alt=""></div>
+
+<p>虽然我们只是对 demo 文件就行了一次修改，但是两个文件的文件名都发生了修改，这并不是我们想要的效果，所以有了 chunkhash 的出现。</p>
+<h5 id="chunkhash"><a href="#chunkhash" class="headerlink" title="chunkhash"></a>chunkhash</h5><p>刚我们说到，修改文件的时候，chunkhash 能够做到不同时修改文件名。这就和他的相关定义有关系了。</p>
+<ul>
+<li>Using hashes based on each chunks’ content<br>基于每个 chunk 的内容而生成的 hash。</li>
+</ul>
+<p>那在 webpack 中，chunk 又是什么呢？简单来说，我们可以将它理解成为模块。所以说对于不同的模块来说，每一次构建生成的 hash 值都是不一样的。</p>
+<p>当我们把上述的代码改为如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">entry</span>: &#123;</span><br><span class="line">    <span class="attr">index</span>: <span class="string">&quot;./src/index.js&quot;</span>,</span><br><span class="line">    <span class="attr">demo</span>: <span class="string">&quot;./src/demo.js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">output</span>: &#123;</span><br><span class="line">    <span class="attr">path</span>: path.resolve(__dirname, <span class="string">&quot;dist&quot;</span>),</span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&quot;[name].[chunkhash].js&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>再进行一次构建，我们的 dist 目录如下图</p>
+<div style="width: 200px; margin: auto"><img src="/image/webpack/hash2.png" alt=""></div><br>和 hash 进行一样的操作，我们仅修改 demo 文件，dist 目录如下图<br><br><div style="width: 200px; margin: auto"><img src="/image/webpack/hash3.png" alt=""></div>
+
+<p>只有 demo 的文件名发生了改变，index 的文件名还是和之前是一样的。</p>
+<p>当然在我们的页面中，除了若干的 JS 资源，也有很多的 CSS 资源，也会存在某个页面同时引用 JS 和 CSS 资源。我们使用 mini-css-extract-plugin 提取 css 文件的时候同样使用 chunkhash，进行如下的实验。</p>
+<p>我们需要把 webpack 的配置进行修改，如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">entry</span>: &#123;</span><br><span class="line">    <span class="attr">index</span>: <span class="string">&quot;./src/index.js&quot;</span>,</span><br><span class="line">    <span class="attr">demo</span>: <span class="string">&quot;./src/demo.js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">output</span>: &#123;</span><br><span class="line">    <span class="attr">path</span>: path.resolve(__dirname, <span class="string">&quot;dist&quot;</span>),</span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&quot;[name].[chunkhash].js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">module</span>: &#123;</span><br><span class="line">    <span class="attr">rules</span>: [</span><br><span class="line">      &#123; <span class="attr">test</span>: <span class="regexp">/\.css$/</span>, use: [MiniCssExtractPlugin.loader, <span class="string">&quot;css-loader&quot;</span>] &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">plugins</span>: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      <span class="attr">filename</span>: <span class="string">&quot;[name].[chunkhash].css&quot;</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>我们在 index.js 中引用了 index.css，进行一次构建，dist 目录如下：</p>
+<div style="width: 200px; margin: auto"><img src="/image/webpack/hash6.png" alt=""></div>
+
+<p>然后我们对 index.js 进行修改，再一次构建，dist 目录如下：</p>
+<div style="width: 200px; margin: auto"><img src="/image/webpack/hash7.png" alt=""></div>
+
+<p>问题出现了，虽然只是修改了index.js，但是css文件也跟着js文件发生了改变，因为两者是基于同一个chunk内容构建的，所以chunkhash是相同的。但是最理想的状态是我们尚未修改css，是不是可以做到css文件并不会随之改变。接下来介绍的contenthash可以做到。</p>
+<h5 id="contenthash"><a href="#contenthash" class="headerlink" title="contenthash"></a>contenthash</h5><p>contenthash 会根据文件内容来定义 hash，如果文件内容不改变，contenthash 值则不会改变。</p>
+<p>假设在一个页面中引用了 JS 资源，同时也引用了 CSS 资源。我们对某个 JS 资源进行修改，由于当前得 CSS 资源也是使用的 chunkhash，导致未修改 CSS 的情况构建出来的 CSS 文件也发生了改变。</p>
+<p>让我们把 webpack 的配置代码改为如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">entry</span>: &#123;</span><br><span class="line">    <span class="attr">index</span>: <span class="string">&quot;./src/index.js&quot;</span>,</span><br><span class="line">    <span class="attr">demo</span>: <span class="string">&quot;./src/demo.js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">output</span>: &#123;</span><br><span class="line">    <span class="attr">path</span>: path.resolve(__dirname, <span class="string">&quot;dist&quot;</span>),</span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&quot;[name].[chunkhash].js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">module</span>: &#123;</span><br><span class="line">    <span class="attr">rules</span>: [</span><br><span class="line">      &#123; <span class="attr">test</span>: <span class="regexp">/\.css$/</span>, use: [MiniCssExtractPlugin.loader, <span class="string">&quot;css-loader&quot;</span>] &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">plugins</span>: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      <span class="attr">filename</span>: <span class="string">&quot;[name].[contenthash].css&quot;</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>然后执行一次构建，dist 目录如下：</p>
+<div style="width: 200px; margin: auto"><img src="/image/webpack/hash4.png" alt=""></div>
+
+<p>然后我们对引用了 css 的 js 进行修改，然后再次构建，dist 目录如下：</p>
+<p><div style="width: 200px; margin: auto"><img src="/image/webpack/hash5.png" alt=""></div><br>发现与之前不同的点仅仅只是js文件发生了变化，css文件和上一次还是保持一致的。</p>
+<p><strong>总结来说：</strong></p>
+<ul>
+<li>JS资源使用chunkhash</li>
+<li>抽离的CSS资源使用contenthash</li>
+</ul>
+<p><strong>参考链接</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://jkfhto.github.io/2019-10-18/webpack/webpack-%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9%E7%AD%96%E7%95%A5%EF%BC%9Achunkhash%E3%80%81contenthash%E5%92%8Chash/">参考1</a></li>
+<li><a target="_blank" rel="noopener" href="https://imweb.io/topic/5b6f224a3cb5a02f33c013ba">参考2</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/zuopf769/webpack-learning/blob/master/Webpack%E4%B8%AD%E7%9A%84%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9/README.md">参考3</a></li>
+</ul>
+<p>就当是一场梦，醒了很久还是很感动，终于在更新了。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/11/%E9%9D%A2%E7%BB%8F/" rel="prev" title="面经">
+      <i class="fa fa-chevron-left"></i> 面经
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/28/%E5%9B%BE/" rel="next" title="解锁图的相关知识">
+      解锁图的相关知识 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9"><span class="nav-number">1.</span> <span class="nav-text">文件指纹</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#compilation-%E5%92%8C-compiler"><span class="nav-number">2.</span> <span class="nav-text">compilation 和 compiler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hash-chunkhash-contenthash"><span class="nav-number">3.</span> <span class="nav-text">hash&#x2F;chunkhash&#x2F;contenthash</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#hash"><span class="nav-number">3.1.</span> <span class="nav-text">hash</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#chunkhash"><span class="nav-number">3.2.</span> <span class="nav-text">chunkhash</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#contenthash"><span class="nav-number">3.3.</span> <span class="nav-text">contenthash</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="LuckyFBB"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">LuckyFBB</p>
+  <div class="site-description" itemprop="description">时间久了，问题也多了</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LuckyFBB</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+    <span class="post-count">| 博客共75.8k字</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

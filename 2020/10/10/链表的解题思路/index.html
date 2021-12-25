@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<!-- Referrer Policy调整致不蒜子单页面统计出错:https://senorui.top/posts/c33f.html -->
+<meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"luckyfbb.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="之前一直有断断续续在学习一些数据结构的知识，在前文中也有过一些总结，一直以来刷 leetcode 也是属于瞎刷，不能够很好的总结题型与解决方案。在此之后，准备按着数据结构类型和算法刷题。在刷完二叉树之后，着手开始链表的刷题，也会在此篇博文中进行记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="链表的解题思路">
+<meta property="og:url" content="https://luckyfbb.github.io/2020/10/10/%E9%93%BE%E8%A1%A8%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/index.html">
+<meta property="og:site_name" content="LuckyFBB&#39;s Blog">
+<meta property="og:description" content="之前一直有断断续续在学习一些数据结构的知识，在前文中也有过一些总结，一直以来刷 leetcode 也是属于瞎刷，不能够很好的总结题型与解决方案。在此之后，准备按着数据结构类型和算法刷题。在刷完二叉树之后，着手开始链表的刷题，也会在此篇博文中进行记录。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://luckyfbb.github.io/image/linked_list_sycle.png">
+<meta property="article:published_time" content="2020-10-10T07:38:23.000Z">
+<meta property="article:modified_time" content="2020-12-23T09:43:38.000Z">
+<meta property="article:author" content="LuckyFBB">
+<meta property="article:tag" content="链表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://luckyfbb.github.io/image/linked_list_sycle.png">
+
+<link rel="canonical" href="https://luckyfbb.github.io/2020/10/10/%E9%93%BE%E8%A1%A8%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>链表的解题思路 | LuckyFBB's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LuckyFBB's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://luckyfbb.github.io/2020/10/10/%E9%93%BE%E8%A1%A8%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="LuckyFBB">
+      <meta itemprop="description" content="时间久了，问题也多了">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LuckyFBB's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          链表的解题思路
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-10 15:38:23" itemprop="dateCreated datePublished" datetime="2020-10-10T15:38:23+08:00">2020-10-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-23 17:43:38" itemprop="dateModified" datetime="2020-12-23T17:43:38+08:00">2020-12-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>之前一直有断断续续在学习一些数据结构的知识，在前文中也有过一些总结，一直以来刷 leetcode 也是属于瞎刷，不能够很好的总结题型与解决方案。在此之后，准备按着数据结构类型和算法刷题。<br>在刷完二叉树之后，着手开始链表的刷题，也会在此篇博文中进行记录。</p>
+<span id="more"></span>
+<p>在<a href="https://luckyfbb.github.io/2019/03/22/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E9%93%BE%E8%A1%A8/">前文</a>中介绍了链表的相关知识，可以进行查看阅读。</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><p>对于删除节点类的题型，无外乎是获得当前需要删除的节点 curr，然后改变前序节点 prev 的指向，<strong>prev.next = curr.next</strong>，从而达到删除 curr 的效果。</p>
+<h3 id="利用哨兵简化难度"><a href="#利用哨兵简化难度" class="headerlink" title="利用哨兵简化难度"></a>利用哨兵简化难度</h3><p>引入一个哨兵节点 pivot，使得 pivot.next = head。哨兵结点是不存储数据的。因为哨兵结点一直存在，所以插入第一个结点和插入其他结点，删除最后一个结点和删除其他结点，都可以统一为相同的代码实现逻辑了。</p>
+<h3 id="快慢指针"><a href="#快慢指针" class="headerlink" title="快慢指针"></a>快慢指针</h3><p>快慢指针一般分为两种，一种是快指针速度为慢指针两倍，一种是快指针比慢指针快 N 步。使用快慢指针还能解决链表是否有环的问题。</p>
+<h3 id="边界问题"><a href="#边界问题" class="headerlink" title="边界问题"></a>边界问题</h3><ul>
+<li>如果链表为空时，代码是否能正常工作？</li>
+<li>如果链表只包含一个结点时，代码是否能正常工作？</li>
+<li>如果链表只包含两个结点时，代码是否能正常工作？</li>
+<li>代码逻辑在处理头结点和尾结点的时候，是否能正常工作？</li>
+</ul>
+<h2 id="删除节点-1"><a href="#删除节点-1" class="headerlink" title="删除节点"></a>删除节点</h2><h3 id="移除链表元素"><a href="#移除链表元素" class="headerlink" title="移除链表元素"></a>移除链表元素</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">删除链表中等于给定值 val 的所有节点。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;2-&gt;6-&gt;3-&gt;4-&gt;5-&gt;6, val = 6</span><br><span class="line">输出: 1-&gt;2-&gt;3-&gt;4-&gt;5</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-lvinked-list-elements/">leetcode</a></p>
+<p>分析：遍历链表，找到当前的需要删除的节点 curr，并且使用 prev 记录为需删除节点的前序节点，然后使用 prev.next = curr.next，改变 prev 后续指针的指向，从而达到删除的目的。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> removeElements = <span class="function"><span class="keyword">function</span> (<span class="params">head, val</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (head === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> head;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (head !== <span class="literal">null</span> &amp;&amp; head.val === val) &#123;</span><br><span class="line">    head = head.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> pre = head;</span><br><span class="line">  <span class="keyword">while</span> (pre !== <span class="literal">null</span> &amp;&amp; pre.next !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> cur = pre.next;</span><br><span class="line">    <span class="keyword">if</span> (cur.val !== val) &#123;</span><br><span class="line">      pre = cur;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    pre.next = cur.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> head;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 96 ms, faster than 65.34% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除排序链表中的重复元素"><a href="#删除排序链表中的重复元素" class="headerlink" title="删除排序链表中的重复元素"></a>删除排序链表中的重复元素</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个排序链表，删除所有重复的元素，使得每个元素只出现一次。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;1-&gt;2</span><br><span class="line">输出: 1-&gt;2</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;1-&gt;2-&gt;3-&gt;3</span><br><span class="line">输出: 1-&gt;2-&gt;3</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list">leetcode</a><br>分析：如果两个元素相同，则将 curr.next 指向 curr.next.next</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> deleteDuplicates = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> curr = head;</span><br><span class="line">  <span class="keyword">while</span> (curr &amp;&amp; curr.next) &#123;</span><br><span class="line">    <span class="keyword">if</span> (curr.val !== curr.next.val) &#123;</span><br><span class="line">      curr = curr.next;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    curr.next = curr.next.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> head;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 88 ms, faster than 74.09% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除排序链表中的重复元素-II"><a href="#删除排序链表中的重复元素-II" class="headerlink" title="删除排序链表中的重复元素 II"></a>删除排序链表中的重复元素 II</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个排序链表，删除所有含有重复数字的节点，只保留原始链表中 没有重复出现 的数字。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;2-&gt;3-&gt;3-&gt;4-&gt;4-&gt;5</span><br><span class="line">输出: 1-&gt;2-&gt;5</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;1-&gt;1-&gt;2-&gt;3</span><br><span class="line">输出: 2-&gt;3</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii">leetcode</a></p>
+<p>分析：此题为上一题的加强版，我们采用双指针的方式来解决这个问题。首先设置一个哨兵节点 pivot 指向整个 head。设置 prev 指向哨兵节点，设置 curr 指向 head 节点。然后遍历整个 head 节点，如果 curr 和 curr.next 的值相同，需要跳过所有相同节点的操作，所以有了第二个 while 循环，拿到最后一个相同节点后，prev.next 指向 curr；如果两者不相等，prev 和 curr 都分别指向自身下一个节点。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> deleteDuplicates = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode(-<span class="literal">Infinity</span>);</span><br><span class="line">  pivot.next = head;</span><br><span class="line">  <span class="keyword">let</span> prev = pivot;</span><br><span class="line">  <span class="keyword">let</span> curr = head;</span><br><span class="line">  <span class="keyword">while</span> (curr &amp;&amp; curr.next) &#123;</span><br><span class="line">    <span class="keyword">if</span> (curr.val === curr.next.val) &#123;</span><br><span class="line">      <span class="keyword">let</span> val = curr.val;</span><br><span class="line">      <span class="keyword">while</span> (curr &amp;&amp; curr.val === val) &#123;</span><br><span class="line">        curr = curr.next;</span><br><span class="line">      &#125;</span><br><span class="line">      prev.next = curr;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      prev = prev.next;</span><br><span class="line">      curr = curr.next;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> pivot.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 80 ms, faster than 87.14% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除链表的倒数第-n-个节点"><a href="#删除链表的倒数第-n-个节点" class="headerlink" title="删除链表的倒数第 n 个节点"></a>删除链表的倒数第 n 个节点</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">给定一个链表: 1-&gt;2-&gt;3-&gt;4-&gt;5, 和 n = 2.</span><br><span class="line"></span><br><span class="line">当删除了倒数第二个节点后，链表变为 1-&gt;2-&gt;3-&gt;5.</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list">leetcode</a></p>
+<ul>
+<li>分析 1：转换为删除正数第(<strong>length-n+1</strong>)个节点。先获取到 length，然后转换 length 为正数节点。一直找到需删除节点的前序节点，然后采用固定公式。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> removeNthFromEnd = <span class="function"><span class="keyword">function</span> (<span class="params">head, n</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode(-<span class="number">1</span>);</span><br><span class="line">  pivot.next = head;</span><br><span class="line">  <span class="keyword">let</span> length = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">let</span> temp = head;</span><br><span class="line">  <span class="keyword">while</span> (temp) &#123;</span><br><span class="line">    temp = temp.next;</span><br><span class="line">    length++;</span><br><span class="line">  &#125;</span><br><span class="line">  length -= n;</span><br><span class="line">  temp = pivot;</span><br><span class="line">  <span class="keyword">while</span> (length != <span class="number">0</span>) &#123;</span><br><span class="line">    length--;</span><br><span class="line">    temp = temp.next;</span><br><span class="line">  &#125;</span><br><span class="line">  temp.next = temp.next.next;</span><br><span class="line">  <span class="keyword">return</span> pivot.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 92 ms, faster than 26.06% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>分析 2：采用快慢指针。使得 fast 在 slow 前的 n 个位置，当 fast 到达链表尾节点时，slow.next 指向当前需删除的节点。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> removeNthFromEnd = <span class="function"><span class="keyword">function</span> (<span class="params">head, n</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode(-<span class="number">1</span>);</span><br><span class="line">  pivot.next = head;</span><br><span class="line">  <span class="keyword">let</span> fast = pivot;</span><br><span class="line">  <span class="keyword">let</span> slow = pivot;</span><br><span class="line">  <span class="keyword">while</span> (n !== <span class="number">0</span>) &#123;</span><br><span class="line">    n--;</span><br><span class="line">    fast = fast.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (fast.next !== <span class="literal">null</span>) &#123;</span><br><span class="line">    fast = fast.next;</span><br><span class="line">    slow = slow.next;</span><br><span class="line">  &#125;</span><br><span class="line">  slow.next = slow.next.next;</span><br><span class="line">  <span class="keyword">return</span> pivot.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 88 ms, faster than 36.59% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h2 id="翻转链表"><a href="#翻转链表" class="headerlink" title="翻转链表"></a>翻转链表</h2><h3 id="反转链表"><a href="#反转链表" class="headerlink" title="反转链表"></a>反转链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">反转一个单链表。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;NULL</span><br><span class="line">输出: 5-&gt;4-&gt;3-&gt;2-&gt;1-&gt;NULL</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-linked-list/">leetcode</a><br>分析：设置哨兵节点 null，将当前节点的指针指向上一个节点，然后更新当前节点和下一个节点的值即顺移，重复以上动作直到当前节点为尾节点的节点 null</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> reverseList = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> prev = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">let</span> curr = head;</span><br><span class="line">  <span class="keyword">while</span> (curr) &#123;</span><br><span class="line">    <span class="keyword">const</span> next = curr.next;</span><br><span class="line">    curr.next = prev;</span><br><span class="line">    prev = curr;</span><br><span class="line">    curr = next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> prev;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="反转链表-II"><a href="#反转链表-II" class="headerlink" title="反转链表 II"></a>反转链表 II</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">反转从位置 m 到 n 的链表。请使用一趟扫描完成反转。</span><br><span class="line">说明:</span><br><span class="line">1 ≤ m ≤ n ≤ 链表长度。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line">输入: 1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;NULL, m = 2, n = 4</span><br><span class="line">输出: 1-&gt;4-&gt;3-&gt;2-&gt;5-&gt;NULL</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-linked-list-ii">leetcode</a><br>分析：只需要对 m 到 n 之间的元素进行翻转。翻转的思路和上一题一样，但是需要取到 m-n 之间的元素。所以调用了两次 while 循环，获取到 m-n 之间的元素</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> reverseBetween = <span class="function"><span class="keyword">function</span> (<span class="params">head, m, n</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode();</span><br><span class="line">  pivot.next = head;</span><br><span class="line">  <span class="keyword">let</span> temp = pivot;</span><br><span class="line">  <span class="keyword">let</span> length = n - m;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; m - <span class="number">1</span>; i++) &#123;</span><br><span class="line">    temp = temp.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> prev = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">let</span> curr = temp.next;</span><br><span class="line">  <span class="keyword">while</span> (length &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> next = curr.next;</span><br><span class="line">    curr.next = prev;</span><br><span class="line">    prev = curr;</span><br><span class="line">    curr = next;</span><br><span class="line">    length--;</span><br><span class="line">  &#125;</span><br><span class="line">  temp.next.next = curr;</span><br><span class="line">  temp.next = prev;</span><br><span class="line">  <span class="keyword">return</span> pivot.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 72 ms, faster than 86.55% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="两两交换链表中的节点"><a href="#两两交换链表中的节点" class="headerlink" title="两两交换链表中的节点"></a>两两交换链表中的节点</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。</span><br><span class="line"></span><br><span class="line">你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line">给定 1-&gt;2-&gt;3-&gt;4, 你应该返回 2-&gt;1-&gt;4-&gt;3.</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/swap-nodes-in-pairs">leetcode</a><br>分析：加入哨兵节点，惯用的思路。分别设置 start 和 end 两个节点为要交换的节点，start 为当前遍历节点的后续节点，end 为 start 的后续节点。当前节点的后续节点和后后续两者中有一个为空时则终止循环。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> swapPairs = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode();</span><br><span class="line">  pivot.next = head;</span><br><span class="line">  <span class="keyword">let</span> temp = pivot;</span><br><span class="line">  <span class="keyword">while</span> (temp.next &amp;&amp; temp.next.next) &#123;</span><br><span class="line">    <span class="keyword">const</span> start = temp.next;</span><br><span class="line">    <span class="keyword">const</span> end = start.next;</span><br><span class="line">    temp.next = end;</span><br><span class="line">    start.next = end.next;</span><br><span class="line">    end.next = start;</span><br><span class="line">    temp = start;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> pivot.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 68 ms, faster than 94.77% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h2 id="合并链表"><a href="#合并链表" class="headerlink" title="合并链表"></a>合并链表</h2><h3 id="合并两个有序链表"><a href="#合并两个有序链表" class="headerlink" title="合并两个有序链表"></a>合并两个有序链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 </span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：1-&gt;2-&gt;4, 1-&gt;3-&gt;4</span><br><span class="line">输出：1-&gt;1-&gt;2-&gt;3-&gt;4-&gt;4</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/merge-two-sorted-lists">leetcode</a><br>分析 1：如果 l1 或者 l2 一开始就是空链表 ，那么没有任何操作需要合并，所以我们只需要返回非空链表。否则，我们要判断 l1 和 l2 哪一个链表的头节点的值更小，然后递归地决定下一个添加到结果里的节点。如果两个链表有一个为空，递归结束。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> mergeTwoLists = <span class="function"><span class="keyword">function</span> (<span class="params">l1, l2</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (l1 == <span class="literal">null</span>) <span class="keyword">return</span> l2;</span><br><span class="line">  <span class="keyword">if</span> (l2 == <span class="literal">null</span>) <span class="keyword">return</span> l1;</span><br><span class="line">  <span class="keyword">if</span> (l1.val &lt; l2.val) &#123;</span><br><span class="line">    l1.next = mergeTwoLists(l1.next, l2);</span><br><span class="line">    <span class="keyword">return</span> l1;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    l2.next = mergeTwoLists(l1, l2.next);</span><br><span class="line">    <span class="keyword">return</span> l2;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 88 ms, faster than 72.02% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<p>分析 2：<br>当 l1 和 l2 都不是空链表时，判断 l1 和 l2 哪一个链表的头节点的值更小，将较小值的节点添加到结果里，当一个节点被添加到结果里之后，将对应链表中的节点向后移一位。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> mergeTwoLists = <span class="function"><span class="keyword">function</span> (<span class="params">l1, l2</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> res = <span class="keyword">new</span> ListNode(<span class="literal">null</span>);</span><br><span class="line">  <span class="keyword">let</span> prev = res;</span><br><span class="line">  <span class="keyword">while</span> (l1 &amp;&amp; l2) &#123;</span><br><span class="line">    <span class="keyword">if</span> (l1.val &gt;= l2.val) &#123;</span><br><span class="line">      prev.next = l2;</span><br><span class="line">      l2 = l2.next;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      prev.next = l1;</span><br><span class="line">      l1 = l1.next;</span><br><span class="line">    &#125;</span><br><span class="line">    prev = prev.next;</span><br><span class="line">  &#125;</span><br><span class="line">  prev.next = l1 ? l1 : l2;</span><br><span class="line">  <span class="keyword">return</span> res.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 84 ms, faster than 86.76% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="合并-K-个升序链表"><a href="#合并-K-个升序链表" class="headerlink" title="合并 K 个升序链表"></a>合并 K 个升序链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给你一个链表数组，每个链表都已经按升序排列。</span><br><span class="line"></span><br><span class="line">请你将所有链表合并到一个升序链表中，返回合并后的链表。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：lists = [[1,4,5],[1,3,4],[2,6]]</span><br><span class="line">输出：[1,1,2,3,4,4,5,6]</span><br><span class="line">解释：链表数组如下：</span><br><span class="line">[</span><br><span class="line">  1-&gt;4-&gt;5,</span><br><span class="line">  1-&gt;3-&gt;4,</span><br><span class="line">  2-&gt;6</span><br><span class="line">]</span><br><span class="line">将它们合并到一个有序链表中得到。</span><br><span class="line">1-&gt;1-&gt;2-&gt;3-&gt;4-&gt;4-&gt;5-&gt;6</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：lists = []</span><br><span class="line">输出：[]</span><br><span class="line">示例 3：</span><br><span class="line"></span><br><span class="line">输入：lists = [[]]</span><br><span class="line">输出：[]</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/merge-k-sorted-lists">leetcode</a></p>
+<p>分析：作为上一题的衍生题，可以把多个链表都转换为两个链表的计算，当 lists 中只有一个链表时就返回结果，否则就把两个链表进行合并。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> mergeKLists = <span class="function"><span class="keyword">function</span> (<span class="params">lists</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (lists.length === <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (lists.length &gt; <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> a = lists.shift();</span><br><span class="line">    <span class="keyword">let</span> b = lists.shift();</span><br><span class="line">    lists.push(mergeTwoLists(a, b));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> lists[<span class="number">0</span>];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> mergeTwoLists = <span class="function"><span class="keyword">function</span> (<span class="params">l1, l2</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (l1 == <span class="literal">null</span>) <span class="keyword">return</span> l2;</span><br><span class="line">  <span class="keyword">if</span> (l2 == <span class="literal">null</span>) <span class="keyword">return</span> l1;</span><br><span class="line">  <span class="keyword">if</span> (l1.val &lt; l2.val) &#123;</span><br><span class="line">    l1.next = mergeTwoLists(l1.next, l2);</span><br><span class="line">    <span class="keyword">return</span> l1;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    l2.next = mergeTwoLists(l1, l2.next);</span><br><span class="line">    <span class="keyword">return</span> l2;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 108 ms, faster than 79.26% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="两数相加"><a href="#两数相加" class="headerlink" title="两数相加"></a>两数相加</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。</span><br><span class="line"></span><br><span class="line">如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。</span><br><span class="line"></span><br><span class="line">您可以假设除了数字 0 之外，这两个数都不会以 0 开头。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：(2 -&gt; 4 -&gt; 3) + (5 -&gt; 6 -&gt; 4)</span><br><span class="line">输出：7 -&gt; 0 -&gt; 8</span><br><span class="line">原因：342 + 465 = 807</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/add-two-numbers">leetcode</a></p>
+<p>分析：位于链表同一位置的两数相加，需要注意进位的情况。如果所有节点遍历遍历完毕，存在进位情况，需要新增节点。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> addTwoNumbers = <span class="function"><span class="keyword">function</span> (<span class="params">l1, l2</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode();</span><br><span class="line">  <span class="keyword">let</span> curr = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">let</span> carry = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (l1 || l2) &#123;</span><br><span class="line">    <span class="keyword">const</span> num1 = l1 ? l1.val : <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">const</span> num2 = l2 ? l2.val : <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">const</span> sum = num1 + num2 + carry;</span><br><span class="line">    <span class="keyword">if</span> (!pivot) &#123;</span><br><span class="line">      pivot = curr = <span class="keyword">new</span> ListNode(sum % <span class="number">10</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      curr.next = <span class="keyword">new</span> ListNode(sum % <span class="number">10</span>);</span><br><span class="line">      curr = curr.next;</span><br><span class="line">    &#125;</span><br><span class="line">    carry = <span class="built_in">Math</span>.floor(sum / <span class="number">10</span>);</span><br><span class="line">    l1 = l1 ? l1.next : <span class="string">&quot;&quot;</span>;</span><br><span class="line">    l2 = l2 ? l2.next : <span class="string">&quot;&quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  carry &gt; <span class="number">0</span> ? (curr.next = <span class="keyword">new</span> ListNode(carry)) : <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="keyword">return</span> pivot;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 132 ms, faster than 73.04% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="两数相加-II"><a href="#两数相加-II" class="headerlink" title="两数相加 II"></a>两数相加 II</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给你两个 非空 链表来代表两个非负整数。数字最高位位于链表开始位置。它们的每个节点只存储一位数字。将这两数相加会返回一个新的链表。</span><br><span class="line"></span><br><span class="line">你可以假设除了数字 0 之外，这两个数字都不会以零开头。</span><br><span class="line"></span><br><span class="line">进阶：</span><br><span class="line"></span><br><span class="line">如果输入链表不能修改该如何处理？换句话说，你不能对列表中的节点进行翻转。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：(7 -&gt; 2 -&gt; 4 -&gt; 3) + (5 -&gt; 6 -&gt; 4)</span><br><span class="line">输出：7 -&gt; 8 -&gt; 0 -&gt; 7</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/add-two-numbers-ii/">leetcode</a><br>分析：该题是上一题的衍生题型，是从尾部开始计算然后向前进位。先分别用栈把两个链表存储起来，然后对于链表的顶部数据进行计算，如果需要进位就 carry 加入下一位运算。循环截至，遍历 stack，输出链表。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> addTwoNumbers = <span class="function"><span class="keyword">function</span> (<span class="params">l1, l2</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> stack1 = [];</span><br><span class="line">  <span class="keyword">const</span> stack2 = [];</span><br><span class="line">  <span class="keyword">const</span> stack = [];</span><br><span class="line">  <span class="keyword">let</span> carry = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (l1) &#123;</span><br><span class="line">    stack1.push(l1.val);</span><br><span class="line">    l1 = l1.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (l2) &#123;</span><br><span class="line">    stack2.push(l2.val);</span><br><span class="line">    l2 = l2.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (stack1.length || stack2.length) &#123;</span><br><span class="line">    <span class="keyword">let</span> num1 = stack1.length ? stack1.pop() : <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">let</span> num2 = stack2.length ? stack2.pop() : <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">let</span> sum = num1 + num2 + carry;</span><br><span class="line">    stack.push(sum % <span class="number">10</span>);</span><br><span class="line">    carry = <span class="built_in">Math</span>.floor(sum / <span class="number">10</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  carry ? stack.push(carry) : <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="keyword">let</span> pivot = <span class="keyword">new</span> ListNode(<span class="literal">null</span>);</span><br><span class="line">  <span class="keyword">let</span> curr = pivot;</span><br><span class="line">  <span class="keyword">while</span> (stack.length) &#123;</span><br><span class="line">    curr.next = <span class="keyword">new</span> ListNode(stack.pop());</span><br><span class="line">    curr = curr.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> pivot.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 140 ms, faster than 53.90% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h2 id="拆分链表"><a href="#拆分链表" class="headerlink" title="拆分链表"></a>拆分链表</h2><h3 id="奇偶链表"><a href="#奇偶链表" class="headerlink" title="奇偶链表"></a>奇偶链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个单链表，把所有的奇数节点和偶数节点分别排在一起。请注意，这里的奇数节点和偶数节点指的是节点编号的奇偶性，而不是节点的值的奇偶性。</span><br><span class="line"></span><br><span class="line">请尝试使用原地算法完成。你的算法的空间复杂度应为 O(1)，时间复杂度应为 O(nodes)，nodes 为节点总数。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;NULL</span><br><span class="line">输出: 1-&gt;3-&gt;5-&gt;2-&gt;4-&gt;NULL</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: 2-&gt;1-&gt;3-&gt;5-&gt;6-&gt;4-&gt;7-&gt;NULL</span><br><span class="line">输出: 2-&gt;3-&gt;6-&gt;7-&gt;1-&gt;5-&gt;4-&gt;NULL</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/odd-even-linked-list">leetcode</a></p>
+<p>分析：对于奇偶数来说都是指向下下一个节点，node.next = node.next.next，得到一条奇数节点和偶数节点，奇数节点.next = 偶数链头</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> oddEvenList = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!head) <span class="keyword">return</span> head;</span><br><span class="line">  <span class="keyword">let</span> odd = head;</span><br><span class="line">  <span class="keyword">let</span> even = head.next;</span><br><span class="line">  <span class="keyword">let</span> headEven = even;</span><br><span class="line">  <span class="keyword">while</span> (even &amp;&amp; even.next) &#123;</span><br><span class="line">    odd.next = odd.next.next;</span><br><span class="line">    even.next = even.next.next;</span><br><span class="line">    odd = odd.next;</span><br><span class="line">    even = even.next;</span><br><span class="line">  &#125;</span><br><span class="line">  odd.next = headEven;</span><br><span class="line">  <span class="keyword">return</span> head;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 84 ms, faster than 89.51% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="分隔链表"><a href="#分隔链表" class="headerlink" title="分隔链表"></a>分隔链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个链表和一个特定值 x，对链表进行分隔，使得所有小于 x 的节点都在大于或等于 x 的节点之前。</span><br><span class="line"></span><br><span class="line">你应当保留两个分区中每个节点的初始相对位置。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">输入: head = 1-&gt;4-&gt;3-&gt;2-&gt;5-&gt;2, x = 3</span><br><span class="line">输出: 1-&gt;2-&gt;2-&gt;4-&gt;3-&gt;5</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/partition-list">leetcode</a><br>分析: 思维与上一题大同小异，分别采用两条链表来存储小于 x 和大于等于 x 的值。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> partition = <span class="function"><span class="keyword">function</span> (<span class="params">head, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!head) <span class="keyword">return</span> head;</span><br><span class="line">  <span class="keyword">let</span> smallerHead = <span class="keyword">new</span> ListNode(<span class="literal">null</span>);</span><br><span class="line">  <span class="keyword">let</span> biggerHead = <span class="keyword">new</span> ListNode(<span class="literal">null</span>);</span><br><span class="line">  <span class="keyword">let</span> smaller = smallerHead;</span><br><span class="line">  <span class="keyword">let</span> bigger = biggerHead;</span><br><span class="line">  <span class="keyword">while</span> (head) &#123;</span><br><span class="line">    <span class="keyword">if</span> (head.val &lt; x) &#123;</span><br><span class="line">      smaller.next = <span class="keyword">new</span> ListNode(head.val);</span><br><span class="line">      smaller = smaller.next;</span><br><span class="line">      smaller.next = <span class="literal">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      bigger.next = <span class="keyword">new</span> ListNode(head.val);</span><br><span class="line">      bigger = bigger.next;</span><br><span class="line">      bigger.next = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    head = head.next;</span><br><span class="line">  &#125;</span><br><span class="line">  smaller.next = biggerHead.next;</span><br><span class="line">  <span class="keyword">return</span> smallerHead.next;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 84 ms, faster than 72.32% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h2 id="环"><a href="#环" class="headerlink" title="环"></a>环</h2><h3 id="环形链表"><a href="#环形链表" class="headerlink" title="环形链表"></a>环形链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。 为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。注意：pos 不作为参数进行传递，仅仅是为了标识链表的实际情况。</span><br><span class="line"></span><br><span class="line">如果链表中存在环，则返回 true 。 否则，返回 false 。</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/linked-list-cycle">leetcode</a><br>分析 1：快慢指针法。从链表头开始，快指针每次走两步，慢指针每次走一步，如果节点值相同，说明有环。如果不同，继续循环。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> hasCycle = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> fast = head;</span><br><span class="line">  <span class="keyword">let</span> slow = head;</span><br><span class="line">  <span class="keyword">while</span> (fast &amp;&amp; fast.next &amp;&amp; fast.next.next) &#123;</span><br><span class="line">    fast = fast.next.next;</span><br><span class="line">    slow = slow.next;</span><br><span class="line">    <span class="keyword">if</span> (fast === slow) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 84 ms, faster than 74.06% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<p>分析 2：借助哈希表。哈希表存储曾经遍历过的节点，遍历每一个节点，都查看哈希表是否存在当前节点，如果存在，则说明链表有环；如果不存在，则存入哈希表，并继续遍历下一节点。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> hasCycle = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">while</span> (head) &#123;</span><br><span class="line">    <span class="keyword">if</span> (map.has(head)) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    map.set(head, <span class="literal">true</span>);</span><br><span class="line">    head = head.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 76 ms, faster than 96.70% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="环形链表-II"><a href="#环形链表-II" class="headerlink" title="环形链表 II"></a>环形链表 II</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/linked-list-cycle-ii/">leetcode</a></p>
+<p>分析 1：快慢指针法。和上一题的方法一样，从链表头开始，快指针每次走两步，慢指针每次走一步。<br><img src="/image/linked_list_sycle.png" alt=""><br>D：头节点到入环点的距离<br>S1：从入环点到首次相遇点的距离<br>S2：从首次相遇点到入环点的距离<br>相遇时，慢指针走的 D+S1，快指针走的距离 D+n(S1+S2)+S1。快指针是慢指针的两倍。并且假设 n 为 1 时，会得到 D=S2。<br>所以当在第一次相遇之后，从链表头部和相遇点继续以步速相同前进，两者相遇时就是入环点。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> detectCycle = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> fast = head;</span><br><span class="line">  <span class="keyword">let</span> slow = head;</span><br><span class="line">  <span class="keyword">while</span> (fast &amp;&amp; fast.next &amp;&amp; fast.next.next) &#123;</span><br><span class="line">    fast = fast.next.next;</span><br><span class="line">    slow = slow.next;</span><br><span class="line">    <span class="keyword">if</span> (slow === fast) &#123;</span><br><span class="line">      slow = head;</span><br><span class="line">      <span class="keyword">while</span> (slow !== fast) &#123;</span><br><span class="line">        slow = slow.next;</span><br><span class="line">        fast = fast.next;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> slow;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 84 ms, faster than 87.83% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<p>分析 2：借助哈希表。思路同上一题。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> detectCycle = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">while</span> (head) &#123;</span><br><span class="line">    <span class="keyword">if</span> (map.has(head)) <span class="keyword">return</span> head;</span><br><span class="line">    map.set(head, <span class="literal">true</span>);</span><br><span class="line">    head = head.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 80 ms, faster than 95.47% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="回文链表"><a href="#回文链表" class="headerlink" title="回文链表"></a>回文链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">请判断一个链表是否为回文链表。</span><br><span class="line"></span><br><span class="line">示例 1:                          示例 2:</span><br><span class="line"></span><br><span class="line">输入: 1-&gt;2                       输入: 1-&gt;2-&gt;2-&gt;1</span><br><span class="line">输出: false                      输出: true</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/palindrome-linked-list/">leetcode</a><br>分析 1：先获得链表长度，然后把前面部分链表翻转，最后对前后两段链表进行比较。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> isPalindrome = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!head) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  <span class="keyword">const</span> length = getLength(head);</span><br><span class="line">  <span class="keyword">let</span> [left, right] = reseveHalf(head, length);</span><br><span class="line">  <span class="keyword">while</span> (left &amp;&amp; right) &#123;</span><br><span class="line">    <span class="keyword">if</span> (left.val !== right.val) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    left = left.next;</span><br><span class="line">    right = right.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> !left &amp;&amp; !right;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> reseveHalf = <span class="function">(<span class="params">head, length</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> half = <span class="built_in">Math</span>.floor(length / <span class="number">2</span>);</span><br><span class="line">  <span class="keyword">let</span> prev = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">let</span> curr = head;</span><br><span class="line">  <span class="keyword">while</span> (half--) &#123;</span><br><span class="line">    <span class="keyword">const</span> next = curr.next;</span><br><span class="line">    curr.next = prev;</span><br><span class="line">    prev = curr;</span><br><span class="line">    curr = next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> length % <span class="number">2</span> === <span class="number">0</span> ? [prev, curr] : [prev, curr.next];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> getLength = <span class="function">(<span class="params">head</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> curr = head;</span><br><span class="line">  <span class="keyword">let</span> length = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (curr) &#123;</span><br><span class="line">    length++;</span><br><span class="line">    curr = curr.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> length;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 92 ms, faster than 35.24% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<p>分析 2: 遍历链表放入数组，然后通过数组判断。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> isPalindrome = <span class="function"><span class="keyword">function</span> (<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (head === <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  <span class="keyword">let</span> ll = head;</span><br><span class="line">  <span class="keyword">const</span> arr = [ll.val];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (ll.next !== <span class="literal">null</span>) &#123;</span><br><span class="line">    ll = ll.next;</span><br><span class="line">    arr.push(ll.val);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> low = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">let</span> high = arr.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (low &lt; high) &#123;</span><br><span class="line">    <span class="keyword">if</span> (arr[low] === arr[high]) &#123;</span><br><span class="line">      low++;</span><br><span class="line">      high--;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 76 ms, faster than 93.50% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<h3 id="相交链表"><a href="#相交链表" class="headerlink" title="相交链表"></a>相交链表</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">编写一个程序，找到两个单链表相交的起始节点。</span><br><span class="line"></span><br><span class="line">输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3</span><br><span class="line">输出：Reference of the node with value = 8</span><br><span class="line">输入解释：相交节点的值为 8 （注意，如果两个链表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。</span><br><span class="line"></span><br><span class="line">输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1</span><br><span class="line">输出：Reference of the node with value = 2</span><br><span class="line">输入解释：相交节点的值为 2 （注意，如果两个链表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists">leetcode</a><br>分析 1：先遍历 headA 并打上标记，再遍历 headB 寻找标记。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> getIntersectionNode = <span class="function"><span class="keyword">function</span> (<span class="params">headA, headB</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (headA) &#123;</span><br><span class="line">    headA.flag = <span class="literal">true</span>;</span><br><span class="line">    headA = headA.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (headB) &#123;</span><br><span class="line">    <span class="keyword">if</span> (headB.flag) <span class="keyword">return</span> headB;</span><br><span class="line">    z;</span><br><span class="line">    headB = headB.next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//Runtime: 96 ms, faster than 94.80% of JavaScript</span></span><br></pre></td></tr></table></figure>
+<p>分析 2：双指针法。初始化两个指针 pA 和 pB 分别指向 headA 和 headB，每次 pA 和 pB 各走一步，当 pA 触底后变轨到 headB，同理，当 pB 触底后变轨到 headA。这样就只需遍历(A 的非公共部分+B 的非公共部分+AB 的公共部分)</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> getIntersectionNode = <span class="function"><span class="keyword">function</span> (<span class="params">headA, headB</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> pA = headA;</span><br><span class="line">  <span class="keyword">var</span> pB = headB;</span><br><span class="line">  <span class="keyword">while</span> (pA !== pB) &#123;</span><br><span class="line">    pB = pB ? pB.next : headA;</span><br><span class="line">    pA = pA ? pA.next : headB;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> pA;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%93%BE%E8%A1%A8/" rel="tag"># 链表</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/20/Promise%E7%9A%84%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%9E%E7%8E%B0/" rel="prev" title="Promise的分析与实现">
+      <i class="fa fa-chevron-left"></i> Promise的分析与实现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/24/%E6%A0%88-%E9%98%9F%E5%88%97%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" rel="next" title="栈/队列的解题思路">
+      栈/队列的解题思路 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="nav-number">1.</span> <span class="nav-text">解题思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">删除节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E5%93%A8%E5%85%B5%E7%AE%80%E5%8C%96%E9%9A%BE%E5%BA%A6"><span class="nav-number">1.2.</span> <span class="nav-text">利用哨兵简化难度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88"><span class="nav-number">1.3.</span> <span class="nav-text">快慢指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%B9%E7%95%8C%E9%97%AE%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">边界问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9-1"><span class="nav-number">2.</span> <span class="nav-text">删除节点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%BB%E9%99%A4%E9%93%BE%E8%A1%A8%E5%85%83%E7%B4%A0"><span class="nav-number">2.1.</span> <span class="nav-text">移除链表元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0"><span class="nav-number">2.2.</span> <span class="nav-text">删除排序链表中的重复元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0-II"><span class="nav-number">2.3.</span> <span class="nav-text">删除排序链表中的重复元素 II</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%93%BE%E8%A1%A8%E7%9A%84%E5%80%92%E6%95%B0%E7%AC%AC-n-%E4%B8%AA%E8%8A%82%E7%82%B9"><span class="nav-number">2.4.</span> <span class="nav-text">删除链表的倒数第 n 个节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8"><span class="nav-number">3.</span> <span class="nav-text">翻转链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8"><span class="nav-number">3.1.</span> <span class="nav-text">反转链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8-II"><span class="nav-number">3.2.</span> <span class="nav-text">反转链表 II</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E4%B8%A4%E4%BA%A4%E6%8D%A2%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9"><span class="nav-number">3.3.</span> <span class="nav-text">两两交换链表中的节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E9%93%BE%E8%A1%A8"><span class="nav-number">4.</span> <span class="nav-text">合并链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8"><span class="nav-number">4.1.</span> <span class="nav-text">合并两个有序链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%88%E5%B9%B6-K-%E4%B8%AA%E5%8D%87%E5%BA%8F%E9%93%BE%E8%A1%A8"><span class="nav-number">4.2.</span> <span class="nav-text">合并 K 个升序链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E6%95%B0%E7%9B%B8%E5%8A%A0"><span class="nav-number">4.3.</span> <span class="nav-text">两数相加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E6%95%B0%E7%9B%B8%E5%8A%A0-II"><span class="nav-number">4.4.</span> <span class="nav-text">两数相加 II</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%86%E5%88%86%E9%93%BE%E8%A1%A8"><span class="nav-number">5.</span> <span class="nav-text">拆分链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%87%E5%81%B6%E9%93%BE%E8%A1%A8"><span class="nav-number">5.1.</span> <span class="nav-text">奇偶链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E9%9A%94%E9%93%BE%E8%A1%A8"><span class="nav-number">5.2.</span> <span class="nav-text">分隔链表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF"><span class="nav-number">6.</span> <span class="nav-text">环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8"><span class="nav-number">6.1.</span> <span class="nav-text">环形链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-II"><span class="nav-number">6.2.</span> <span class="nav-text">环形链表 II</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">7.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9E%E6%96%87%E9%93%BE%E8%A1%A8"><span class="nav-number">7.1.</span> <span class="nav-text">回文链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A8"><span class="nav-number">7.2.</span> <span class="nav-text">相交链表</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="LuckyFBB"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">LuckyFBB</p>
+  <div class="site-description" itemprop="description">时间久了，问题也多了</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LuckyFBB</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+    <span class="post-count">| 博客共75.8k字</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

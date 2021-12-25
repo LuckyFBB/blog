@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<!-- Referrer Policy调整致不蒜子单页面统计出错:https://senorui.top/posts/c33f.html -->
+<meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"luckyfbb.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="学习JavaScript数据结构与算法之字典、散列表篇章。前端小白简单的学习笔记。 在集合、字典、散列表中可以存储不重复的值。集合中感兴趣的是值的本身，我们将每个值作为元素来储存。在字典中，采用[键，值]的方式来储存数据。散列表和字典存储数据的方式差不多。但是在实现上略微不同。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构之字典和散列表">
+<meta property="og:url" content="https://luckyfbb.github.io/2019/03/24/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E5%AD%97%E5%85%B8%E5%92%8C%E6%95%A3%E5%88%97%E8%A1%A8/index.html">
+<meta property="og:site_name" content="LuckyFBB&#39;s Blog">
+<meta property="og:description" content="学习JavaScript数据结构与算法之字典、散列表篇章。前端小白简单的学习笔记。 在集合、字典、散列表中可以存储不重复的值。集合中感兴趣的是值的本身，我们将每个值作为元素来储存。在字典中，采用[键，值]的方式来储存数据。散列表和字典存储数据的方式差不多。但是在实现上略微不同。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/12814322-e59692372b1d590e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/600">
+<meta property="article:published_time" content="2019-03-24T03:34:49.000Z">
+<meta property="article:modified_time" content="2019-12-10T10:10:02.000Z">
+<meta property="article:author" content="LuckyFBB">
+<meta property="article:tag" content="LuckyFBB, 前端, 博客, 基础总结, JavaScript, React, React Hooks">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/12814322-e59692372b1d590e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/600">
+
+<link rel="canonical" href="https://luckyfbb.github.io/2019/03/24/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E5%AD%97%E5%85%B8%E5%92%8C%E6%95%A3%E5%88%97%E8%A1%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>数据结构之字典和散列表 | LuckyFBB's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LuckyFBB's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://luckyfbb.github.io/2019/03/24/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E5%AD%97%E5%85%B8%E5%92%8C%E6%95%A3%E5%88%97%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="LuckyFBB">
+      <meta itemprop="description" content="时间久了，问题也多了">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LuckyFBB's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构之字典和散列表
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-24 11:34:49" itemprop="dateCreated datePublished" datetime="2019-03-24T11:34:49+08:00">2019-03-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-10 18:10:02" itemprop="dateModified" datetime="2019-12-10T18:10:02+08:00">2019-12-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>学习JavaScript数据结构与算法之字典、散列表篇章。前端小白简单的学习笔记。</p>
+<p>在集合、字典、散列表中可以存储不重复的值。集合中感兴趣的是值的本身，我们将每个值作为元素来储存。在字典中，采用[键，值]的方式来储存数据。散列表和字典存储数据的方式差不多。但是在实现上略微不同。<span id="more"></span></p>
+<h4 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h4><h5 id="创建一个字典"><a href="#创建一个字典" class="headerlink" title="创建一个字典"></a>创建一个字典</h5><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Dictionary</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> items = &#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.has = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;    <span class="comment">//判断该字典中是否含有key，如果某个键值存在于这个字典中，则返回true，反之则返回false。</span></span><br><span class="line">    <span class="keyword">return</span> key <span class="keyword">in</span> items</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.set = <span class="function"><span class="keyword">function</span> (<span class="params">key, value</span>) </span>&#123;     <span class="comment">//向字典中添加新元素或者更新一个已有的值</span></span><br><span class="line">    items[key] = value</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.remove = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;        <span class="comment">//通过使用键值来从字典中移除键值对应的数据值</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.has(key)) &#123;         <span class="comment">//判断是否存在当前键值</span></span><br><span class="line">      <span class="keyword">delete</span> items[key]</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.get = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;        <span class="comment">//通过键值查找特定的数值并返回</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>.has(key) ? items[key] : <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.values = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;        <span class="comment">//将字典所包含的所有数值以数组形式返回</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Object</span>.values(items)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.size = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;                <span class="comment">//返回字典所包含元素的数量。与数组的length属性类似</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Object</span>.keys(items).length</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.keys = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;              <span class="comment">//将字典所包含的所有键名以数组形式返回</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Object</span>.keys(items)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.clear = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;             <span class="comment">//将这个字典中的所有元素全部删除</span></span><br><span class="line">    items = &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.getItems = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> items</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="散列表"><a href="#散列表" class="headerlink" title="散列表"></a>散列表</h4><p>散列表的作用就是尽可能快的在数据结构中找到一个值。在之前的数据结构中，使用get方法获取一个值，需要遍历整个数据结构。但是使用散列表的话，就能够知道值得具体位置，从而快速获取到该值。</p>
+<p>散列表的作用就是给一个值，然后返回该值在表中的地址。</p>
+<h5 id="创建一个散列表"><a href="#创建一个散列表" class="headerlink" title="创建一个散列表"></a>创建一个散列表</h5><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">HashTable</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> table = []</span><br><span class="line">  <span class="keyword">var</span> loseloseHashCode = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;         <span class="comment">//散列函数</span></span><br><span class="line">    <span class="keyword">var</span> hash = <span class="number">0</span>                                  <span class="comment">//储存hash值</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; key.length; i++) &#123;</span><br><span class="line">      hash += key.charCodeAt(i)                   <span class="comment">//获得每个字符的ascii码值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> hash % <span class="number">39</span>                              <span class="comment">//为了使储存的地址值小一点，会采用hash值和任意值取余数</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.put = <span class="function"><span class="keyword">function</span> (<span class="params">key, value</span>) </span>&#123;              <span class="comment">//向散列表增加一个新的项（也能更新散列表）。</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    table[position] = value</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.get = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;                     <span class="comment">//返回根据键值检索到的特定的值</span></span><br><span class="line">    <span class="keyword">return</span> table[loseloseHashCode(key)]</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.remove = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;                  <span class="comment">//根据键值从散列表中移除值</span></span><br><span class="line">    table[loseloseHashCode(key)] = <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="散列表的冲突处理"><a href="#散列表的冲突处理" class="headerlink" title="散列表的冲突处理"></a>散列表的冲突处理</h5><p>有时候，一些键会有相同的散列值。不同的值在散列表中对应相同位置的时候，我们称其为冲突。</p>
+<ol>
+<li>分离连接<br>分离链接法包括为散列表的每一个位置创建一个链表并将元素储存在里面。它是解决冲突最简单的方法，但是需要开辟新的空间。</li>
+</ol>
+<p><img src="https://upload-images.jianshu.io/upload_images/12814322-e59692372b1d590e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/600" alt="image.png"><br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">HashTable</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> table = []</span><br><span class="line">  <span class="keyword">var</span> loseloseHashCode = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;         <span class="comment">//散列函数</span></span><br><span class="line">    <span class="keyword">var</span> hash = <span class="number">0</span>                                  <span class="comment">//储存hash值</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; key.length; i++) &#123;</span><br><span class="line">      hash += key.charCodeAt(i)                   <span class="comment">//获得每个字符的ascii码值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> hash % <span class="number">39</span>                              <span class="comment">//为了使储存的地址值小一点，会采用hash值和任意值取余数</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> ValuePair = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;                   <span class="comment">//创建一个新类来辅助表示要加入链表的值</span></span><br><span class="line">    <span class="built_in">this</span>.key = key</span><br><span class="line">    <span class="built_in">this</span>.value = value</span><br><span class="line">    <span class="built_in">this</span>.toString = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">&#x27;[ &#x27;</span> + <span class="built_in">this</span>.key + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">this</span>.value + <span class="string">&#x27; ]&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.put = <span class="function"><span class="keyword">function</span> (<span class="params">key, value</span>) </span>&#123;              <span class="comment">//向散列表增加一个新的项（也能更新散列表）。</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    <span class="keyword">if</span> (table[position] === <span class="literal">undefined</span>) &#123;          <span class="comment">//判断当前地址中是否被占据</span></span><br><span class="line">      table[position] = <span class="keyword">new</span> LinkedList()          <span class="comment">//没有的话，创建一个链表</span></span><br><span class="line">    &#125;</span><br><span class="line">    table[position].append(<span class="keyword">new</span> ValuePair(key, value))  <span class="comment">//向链表中添加一个值</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.get = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;                     <span class="comment">//返回根据键值检索到的特定的值</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    <span class="keyword">if</span> (table[position]) &#123;                        <span class="comment">//当前位置存在元素</span></span><br><span class="line">      <span class="keyword">var</span> current = table[position].getHead()     <span class="comment">//获取到当前链表的头部</span></span><br><span class="line">      <span class="keyword">while</span> (current) &#123;</span><br><span class="line">        <span class="keyword">if</span> (current.element.key === key) &#123;        <span class="comment">//判断当前节点的key</span></span><br><span class="line">          <span class="keyword">return</span> current.element.value</span><br><span class="line">        &#125;</span><br><span class="line">        current = current.next</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.remove = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;                  <span class="comment">//根据键值从散列表中移除值</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    <span class="keyword">if</span> (table[position]) &#123;</span><br><span class="line">      <span class="keyword">var</span> current = table[position].getHead()     <span class="comment">//获取链表头部</span></span><br><span class="line">      <span class="keyword">while</span> (current) &#123;</span><br><span class="line">        <span class="keyword">if</span> (current.element.key === key) &#123;</span><br><span class="line">          table[position].remove(current.element)    <span class="comment">//移除当前节点</span></span><br><span class="line">          <span class="keyword">if</span> (table[position].isEmpty()) &#123;        <span class="comment">//移除节点之后，当前链表为空，则设置为undefined</span></span><br><span class="line">            table[position] = <span class="literal">undefined</span></span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        current = current.next</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li>线性探查<br>当想向表中某个位置加入一个新元素的时候，如果索引为index的位置已经被占据了，就尝试index+1的位置。如果index+1的位置也被占据了，就尝试index+2的位置，以此类推。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">HashTable</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> table = []</span><br><span class="line">  <span class="keyword">var</span> loseloseHashCode = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;         <span class="comment">//散列函数</span></span><br><span class="line">    <span class="keyword">var</span> hash = <span class="number">0</span>                                  <span class="comment">//储存hash值</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; key.length; i++) &#123;</span><br><span class="line">      hash += key.charCodeAt(i)                   <span class="comment">//获得每个字符的ascii码值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> hash % <span class="number">39</span>                              <span class="comment">//为了使储存的地址值小一点，会采用hash值和任意值取余数</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">var</span> ValuePair = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;                   <span class="comment">//创建一个新类来辅助表示要加入链表的值</span></span><br><span class="line">    <span class="built_in">this</span>.key = key</span><br><span class="line">    <span class="built_in">this</span>.value = value</span><br><span class="line">    <span class="built_in">this</span>.toString = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">&#x27;[ &#x27;</span> + <span class="built_in">this</span>.key + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">this</span>.value + <span class="string">&#x27; ]&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.put = <span class="function"><span class="keyword">function</span> (<span class="params">key, value</span>) </span>&#123;              <span class="comment">//向散列表增加一个新的项（也能更新散列表）</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    <span class="keyword">if</span> (table[position] === <span class="literal">undefined</span>) &#123;          <span class="comment">//当前地址没有数据，直接赋值</span></span><br><span class="line">      table[position] === <span class="keyword">new</span> ValuePair(key, value)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">var</span> index = ++position                      <span class="comment">//下一个地支值</span></span><br><span class="line">      <span class="keyword">while</span> (table[index] != <span class="literal">undefined</span>) &#123;         <span class="comment">//找到从当前position出发，第一个不为undefined的值</span></span><br><span class="line">        index++</span><br><span class="line">      &#125;</span><br><span class="line">      table[position] === <span class="keyword">new</span> ValuePair(key, value)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.get = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;                     <span class="comment">//返回根据键值检索到的特定的值</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    <span class="keyword">if</span> (table[position]) &#123;</span><br><span class="line">      <span class="keyword">if</span> (table[position].key === key) &#123;          <span class="comment">//找到相同key值，返回value</span></span><br><span class="line">        <span class="keyword">return</span> table[position].value</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> index = ++position                    <span class="comment">//否则继续往下寻找</span></span><br><span class="line">        <span class="keyword">while</span> (table[index] === <span class="literal">undefined</span> || table[index].key != key) &#123;</span><br><span class="line">          index++</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (table[index].key === key) &#123;</span><br><span class="line">          <span class="keyword">return</span> table[index].value</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">this</span>.remove = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;                  <span class="comment">//根据键值从散列表中移除值</span></span><br><span class="line">    <span class="keyword">var</span> position = loseloseHashCode(key)          <span class="comment">//计算出hash值，也就是存放新项的地址</span></span><br><span class="line">    <span class="keyword">if</span> (table[position]) &#123;</span><br><span class="line">      <span class="keyword">if</span> (table[position].key === key) &#123;          <span class="comment">//找到相同key值，返回value</span></span><br><span class="line">        table[position] = <span class="literal">undefined</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> index = ++position                    <span class="comment">//否则继续往下寻找</span></span><br><span class="line">        <span class="keyword">while</span> (table[index] === <span class="literal">undefined</span> || table[index].key != key) &#123;</span><br><span class="line">          index++</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (table[index].key === key) &#123;</span><br><span class="line">          table[position] = <span class="literal">undefined</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="创建更好的散列函数"><a href="#创建更好的散列函数" class="headerlink" title="创建更好的散列函数"></a>创建更好的散列函数</h5><p>我们实现的“lose lose”散列函数并不是一个表现良好的散列函数，它会产生太多的冲突。如果我们使用这个函数的话，会产生各种各样的冲突。</p>
+<p>比较常用的散列函数<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> djb2HashCode = <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> hash = <span class="number">5381</span>                                <span class="comment">//初始化hash值</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; key.length; i++) &#123;         <span class="comment">//迭代key值</span></span><br><span class="line">    hash = hash * <span class="number">33</span> + key.charCodeAt(i)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> hash % <span class="number">1013</span>                             <span class="comment">//返回最后的hash值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>至此，字典和散列表的基本使用方法已经总结完毕。接下来会是树的学习。👍</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/23/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E9%9B%86%E5%90%88/" rel="prev" title="数据结构之集合">
+      <i class="fa fa-chevron-left"></i> 数据结构之集合
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/11/%E9%9D%A2%E7%BB%8F/" rel="next" title="面经">
+      面经 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E5%85%B8"><span class="nav-number">1.</span> <span class="nav-text">字典</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%AD%97%E5%85%B8"><span class="nav-number">1.1.</span> <span class="nav-text">创建一个字典</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%A3%E5%88%97%E8%A1%A8"><span class="nav-number">2.</span> <span class="nav-text">散列表</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%95%A3%E5%88%97%E8%A1%A8"><span class="nav-number">2.1.</span> <span class="nav-text">创建一个散列表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%A3%E5%88%97%E8%A1%A8%E7%9A%84%E5%86%B2%E7%AA%81%E5%A4%84%E7%90%86"><span class="nav-number">2.2.</span> <span class="nav-text">散列表的冲突处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%9B%B4%E5%A5%BD%E7%9A%84%E6%95%A3%E5%88%97%E5%87%BD%E6%95%B0"><span class="nav-number">2.3.</span> <span class="nav-text">创建更好的散列函数</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="LuckyFBB"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">LuckyFBB</p>
+  <div class="site-description" itemprop="description">时间久了，问题也多了</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LuckyFBB</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+    <span class="post-count">| 博客共75.8k字</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

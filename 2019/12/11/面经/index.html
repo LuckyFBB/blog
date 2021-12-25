@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<!-- Referrer Policy调整致不蒜子单页面统计出错:https://senorui.top/posts/c33f.html -->
+<meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"luckyfbb.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="仅此记录一下，面试被问及的问题，简单的归纳一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面经">
+<meta property="og:url" content="https://luckyfbb.github.io/2019/12/11/%E9%9D%A2%E7%BB%8F/index.html">
+<meta property="og:site_name" content="LuckyFBB&#39;s Blog">
+<meta property="og:description" content="仅此记录一下，面试被问及的问题，简单的归纳一下。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-11T02:31:59.000Z">
+<meta property="article:modified_time" content="2021-05-23T12:13:48.000Z">
+<meta property="article:author" content="LuckyFBB">
+<meta property="article:tag" content="面经">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://luckyfbb.github.io/2019/12/11/%E9%9D%A2%E7%BB%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>面经 | LuckyFBB's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LuckyFBB's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">路漫漫其修远兮</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://luckyfbb.github.io/2019/12/11/%E9%9D%A2%E7%BB%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="LuckyFBB">
+      <meta itemprop="description" content="时间久了，问题也多了">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LuckyFBB's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          面经
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-11 10:31:59" itemprop="dateCreated datePublished" datetime="2019-12-11T10:31:59+08:00">2019-12-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-23 20:13:48" itemprop="dateModified" datetime="2021-05-23T20:13:48+08:00">2021-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>仅此记录一下，面试被问及的问题，简单的归纳一下。</p>
+<span id="more"></span>
+<h3 id="微店-2020-04-15"><a href="#微店-2020-04-15" class="headerlink" title="微店 2020.04.15"></a>微店 2020.04.15</h3><ul>
+<li>css 权重(id 选择器和多个类选择器，谁权重高)</li>
+<li>垂直居中</li>
+<li>BFC</li>
+<li>url 输入</li>
+<li>js 和 css 阻塞(defer/async)</li>
+<li>缓存(如何解决资源缓存问题)</li>
+<li>JS 的异步方法</li>
+<li>Promise 的状态</li>
+<li>React 如何更改数据，setState 同步还是异步</li>
+<li>Webpack 的打包流程(如何找到模块的依赖模块)</li>
+<li>二分查找(复杂度)</li>
+</ul>
+<h3 id="上上签-2021-04-13"><a href="#上上签-2021-04-13" class="headerlink" title="上上签 2021.04.13"></a>上上签 2021.04.13</h3><ul>
+<li>url 输入到展示</li>
+<li>url 的要素</li>
+<li>缓存</li>
+<li>tcp 三次握手四次挥手</li>
+<li>http1.0/http1.1 区别</li>
+<li>https</li>
+<li>闭包</li>
+<li>原型链</li>
+<li>三栏布局</li>
+<li><img style={width:500px !important}/> 如何展示 300px</li>
+<li>10w 条数据，如何处理展示</li>
+<li>webpack 指纹/tree shaking</li>
+<li>跨域</li>
+<li>Object.definedProperty 数据绑定失效调用什么 api</li>
+<li>TS 泛型/接口/断言</li>
+</ul>
+<h3 id="亲宝宝-2021-03-31"><a href="#亲宝宝-2021-03-31" class="headerlink" title="亲宝宝 2021.03.31"></a>亲宝宝 2021.03.31</h3><ul>
+<li>基本数据类型(栈和堆的区别)</li>
+<li>垂直居中</li>
+<li>隐藏元素</li>
+<li>分层，如何触发下面一个 div</li>
+<li>箭头函数和函数区别</li>
+<li>Promise 、async/await</li>
+<li>webpack sourceMap</li>
+<li>移动端适配，vw、vh 的实现</li>
+</ul>
+<h3 id="诺诺网-2021-03-29-Offer"><a href="#诺诺网-2021-03-29-Offer" class="headerlink" title="诺诺网 2021.03.29 Offer"></a>诺诺网 2021.03.29 Offer</h3><h4 id="一面"><a href="#一面" class="headerlink" title="一面"></a>一面</h4><ul>
+<li>HTML5 新特性</li>
+<li>CSS3 属性</li>
+<li>AngularJS 和 React</li>
+<li>继承</li>
+<li>diff 算法</li>
+<li>路由拦截</li>
+</ul>
+<h4 id="二面"><a href="#二面" class="headerlink" title="二面"></a>二面</h4><ul>
+<li>http/https</li>
+<li>http headers</li>
+</ul>
+<h3 id="飞象企服-2021-03-26"><a href="#飞象企服-2021-03-26" class="headerlink" title="飞象企服 2021.03.26"></a>飞象企服 2021.03.26</h3><h4 id="一面-1"><a href="#一面-1" class="headerlink" title="一面"></a>一面</h4><ul>
+<li>基本数据类型和引用数据类型</li>
+<li>闭包(数据放在哪里)</li>
+<li>原型链</li>
+<li>继承</li>
+<li>ES6 解决异步的方案(Promise/async 如何实现异步变同步/与 generator 的区别)</li>
+<li>事件循环(微任务和宏任务的执行顺序)</li>
+<li>浏览器的消息队列</li>
+<li>GPU 的特点</li>
+<li>HTML 渲染流程(构建树和构建树的两个功能)</li>
+<li>重排和重绘</li>
+<li>Hooks 对于 Class 的优势/区别</li>
+<li>HTTP(304/301/302，如何解决队头阻塞)</li>
+<li>HTTP2.0 特性</li>
+<li>前端优化</li>
+</ul>
+<h3 id="海心智慧-2020-03-26"><a href="#海心智慧-2020-03-26" class="headerlink" title="海心智慧 2020.03.26"></a>海心智慧 2020.03.26</h3><h4 id="一面-电话"><a href="#一面-电话" class="headerlink" title="一面(电话)"></a>一面(电话)</h4><ul>
+<li>webpack</li>
+<li>useMemo</li>
+<li>useEffect(模拟生命周期/模拟实现的与 componentDidMount)</li>
+<li>生命周期(为什么 17 删除某些周期)</li>
+<li>HOC</li>
+<li>fiber 架构</li>
+<li>盒模型</li>
+<li>CSS3 新特性</li>
+<li>flex 布局(3*3 实现，常用属性值)</li>
+<li>删除数据第二个元素</li>
+<li>数组去重</li>
+<li>react 和 angularJS 的区别</li>
+<li>为什么用 react 不用 JQ</li>
+<li>移动端和 PC 端的区别</li>
+</ul>
+<h3 id="来未来-2021-03-23-Offer"><a href="#来未来-2021-03-23-Offer" class="headerlink" title="来未来 2021.03.23 Offer"></a>来未来 2021.03.23 Offer</h3><h4 id="一面-电话-1"><a href="#一面-电话-1" class="headerlink" title="一面(电话)"></a>一面(电话)</h4><ul>
+<li>react hook 和 class 的区别</li>
+<li>HTML 语义化的理解</li>
+<li>DOCTYPE</li>
+<li>行内元素、块级元素</li>
+<li>垂直水平居中</li>
+<li>盒模型</li>
+<li>原型与原型链</li>
+<li>继承</li>
+<li>数组去重</li>
+<li>URL 到展示</li>
+<li>如何使用 chrome 定位渲染问题</li>
+</ul>
+<h4 id="笔试"><a href="#笔试" class="headerlink" title="笔试"></a>笔试</h4><ul>
+<li>实现受控和非受控的 Input 组件</li>
+<li>千分位格式化</li>
+<li>树形结构打印</li>
+</ul>
+<h4 id="二面-现场"><a href="#二面-现场" class="headerlink" title="二面(现场)"></a>二面(现场)</h4><ul>
+<li>JSBridge</li>
+<li>Form 表单和异步提交</li>
+<li>打包之后部署到哪</li>
+<li>hooks 如何实现原生周期</li>
+</ul>
+<h3 id="道富-2019-12-11-电话"><a href="#道富-2019-12-11-电话" class="headerlink" title="道富 2019.12.11(电话)"></a>道富 2019.12.11(电话)</h3><ul>
+<li>Object.defineProperty 和 Proxy 实现双向绑定的区别</li>
+<li>AngularJS 双向绑定</li>
+<li>React Hooks 函数</li>
+<li>useMemo 和 useCallback 的使用场景</li>
+<li>HTML 语义化标签</li>
+<li>nth-child 和 nth-type-child 区别</li>
+<li>字符串方法</li>
+<li>JS 基本类型</li>
+<li>事件循环</li>
+<li>Promise A+规范</li>
+<li>BFC</li>
+<li>移动端 1px 处理</li>
+</ul>
+<h3 id="个推-2019-12-09"><a href="#个推-2019-12-09" class="headerlink" title="个推 2019.12.09"></a>个推 2019.12.09</h3><ul>
+<li>函数式编程特点</li>
+<li>Hooks 相对于 Class 组件的优势</li>
+<li>事件循环，微任务有哪些</li>
+<li>Promise A+规范</li>
+<li>Object.defineProperty 和 Proxy 实现双向绑定的区别</li>
+<li>路由模式的实现</li>
+<li>Webpack 的优化</li>
+<li>JS 和 CSS 实现动画的优缺点</li>
+</ul>
+<h3 id="招商银行-2019-03-06-电话面"><a href="#招商银行-2019-03-06-电话面" class="headerlink" title="招商银行 2019.03.06(电话面)"></a>招商银行 2019.03.06(电话面)</h3><ul>
+<li>用现在的项目描述一下自己的能力(大概简单介绍了一下自己的项目经历)</li>
+<li>对 Java/数据库有了解吗(以前简单的学过)</li>
+<li>隐藏元素</li>
+<li>session 和 cookie(把 session 和 sessionStorage 搞错了)</li>
+<li>性能优化(讲了几个小的知识点)</li>
+<li>web 安全(讲了 CSRF/XSS)</li>
+<li>浏览器兼容性(回答得不是很好)</li>
+<li>有什么点是我没有问到的，但是你了解的，可以聊一下</li>
+</ul>
+<p>问题不是很多，只有不到 20 分钟的时间。每一个回答之后，面试官都是说可以。听不出来任何的语气，但是聊的还是挺开心的。</p>
+<h3 id="珍爱网-2019-03-05-视频"><a href="#珍爱网-2019-03-05-视频" class="headerlink" title="珍爱网 2019.03.05(视频)"></a>珍爱网 2019.03.05(视频)</h3><blockquote>
+<p>基础</p>
+</blockquote>
+<ul>
+<li>function 常用的传值类型(基本类型，引用类型)；几种基本类型，有什么引用类型？</li>
+<li>ES6 有什么特性？(聊了如下知识点)<ul>
+<li>let/const 不会变量提升，const 定义常量(引申 const obj 添加值和进行复制)</li>
+<li>class 继承(继承的关键字，构造函数中的关键字)</li>
+<li>模块化(export 和 export default 的区别)</li>
+<li>map/filter/reduce 等 api</li>
+<li>数值解析</li>
+<li>模板字符串</li>
+<li>…扩展符</li>
+<li>promise</li>
+<li>generator</li>
+</ul>
+</li>
+<li>事件委托，什么时候会使用？阻止冒泡的方法。</li>
+<li>cookie 的保护处理(大概是想问 web 安全的知识)。但是这一块比较薄弱，讲了一下跨站请求伪造。</li>
+</ul>
+<blockquote>
+<p>react</p>
+</blockquote>
+<ul>
+<li>父子组件/兄弟组件的通信</li>
+<li>为什么 react 里面使用 map 而不是用 foreach</li>
+<li>高阶组件了解吗?</li>
+</ul>
+<blockquote>
+<p>算法</p>
+</blockquote>
+<ul>
+<li>100 匹马中，挑选出跑的最快的 10 匹马，每次最多 10 匹马比赛，如何设计。</li>
+</ul>
+<blockquote>
+<p>总结</p>
+</blockquote>
+<p>公司用 vue 比较多，因为我比较熟悉 react 所以问的 react 相关技术栈。整个面试时间大概在 40 分钟的样子，面试时间很准时。整个过程比较流畅，但是题主在某些问题上达答得不是很好，面试官也赶时间没有聊太久，某一些题的回答也让他比较满意。</p>
+<h3 id="个推-2019-01-18"><a href="#个推-2019-01-18" class="headerlink" title="个推 2019.01.18"></a>个推 2019.01.18</h3><blockquote>
+<p>笔试</p>
+</blockquote>
+<ul>
+<li>什么时候 display: inline-block 会产生间隙?如何解决？</li>
+<li>如何把 span 元素放到距离浏览器顶部 20px 左边 200px?</li>
+<li>什么时候会产生 CSS 阻塞?什么时候会产生 JS 阻塞?</li>
+<li>写出下列代码结果</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> x = [<span class="number">1</span>, <span class="number">2</span>];</span><br><span class="line"><span class="keyword">let</span> &#123; ...y &#125; = x;</span><br><span class="line"><span class="built_in">console</span>.log(y); <span class="comment">//&#123;0: 1, 1: 2&#125;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>什么情况下发生重绘/回流</li>
+<li>JS 如何实现继承，如何避免原型链上数据共享?</li>
+<li>一道关于事件机制的输出问题。(setTimeout, promise, then)</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span> (<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">  resolve();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">3</span>);</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">5</span>); <span class="comment">//2 3 5 4 1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>实现二分查找，已经算法复杂度。</li>
+</ul>
+<blockquote>
+<p>一面</p>
+</blockquote>
+<p>一面是两个哥哥来面试的，一个看起来比较严肃，一个小哥看起来白净温和一些。第一次经历两个老哥同时面试，心里丝毫没有波澜是不可能的。</p>
+<ul>
+<li>简单的自我介绍。主要讲了一下自己的实习经历以及使用的技术栈。</li>
+<li>因为看到我简历上面写了三个技术栈，询问了一下我对三大框架的看法。(纯属瞎扯</li>
+<li>就面试题的事件机制的问题，展开了提问。讲了一下同步/异步任务，宏任务/微任务。然后问了 resolve()之后的值是否会打印?在 promise 里面添加 return 的效果。(回答得一塌糊涂</li>
+<li>输入 url 到页面展示的过程。在整个过程之中，有什么可以优化的点?(请求那一块不太熟悉，讲了一下重绘/回流，结合了一下项目</li>
+<li>ES6 里面用过的方法。(let/const, Object 新增方法, 扩展符, Promise, class, module)</li>
+<li>promise 里面都用过什么方法。(没办法，我太菜了，只能讲一下 then,catch,all)。然后问了一下什么样的异常能够在内部捕获到(当时全场寂静，面试官也会过了)。聊到了 promise.all，发送多条请求的，然后发生异常什么的。(然后我结合实际项目将可以对这个使用)。接着又被面试官问到，all 的一个弊端就是必须全部 resolve 返回，会出现超时的情况怎么处理之类的。被面试官普及到了 race 这个方法。</li>
+<li>讨论了一下 sort 排序里面使用的是什么排序方法。</li>
+<li>问了一下 css 选择器的问题，经常使用的选择器。然后选择器的匹配方式(先匹配哪一个)。+/&gt;/~分别是什么选择器。</li>
+<li>项目中使用了 localstorage/sessionstorage，问了一下两者的区别。打开一个新的标签页 sessionstorage 会不会失效之类的。他们储存的大小是多少。</li>
+<li>看我博客里面写了节流和防抖，问了一下这两个区别(回答的并不是很清楚)，瞎扯一下项目中为什么会使用这两个概念。</li>
+<li>手写合并两个有序数组(感觉像是归并排序最后一步)。</li>
+<li>未来的职业规划，以及想问他们的问题。</li>
+</ul>
+<p>大概是我能够想起来的一面内容，很多问题都没回答上来，遇到一些不会的问题，他们也会回答一下。大概面试了一个小时的样子，虽然感觉不是很好，还是让我稍等一下。</p>
+<blockquote>
+<p>二面</p>
+</blockquote>
+<p>二面面官来的时候，一不小心看到他的工牌，发现他好像我之前在 boss 直聘上看到发不过岗位的一个哥哥。好像还是什么前端大经理之类的。</p>
+<ul>
+<li>简单的自我介绍，自然重点还是技术栈和实习经历。</li>
+<li>问了一下为什么重第一家实习公司辞职，貌似他觉得那家公司还不错。</li>
+<li>HTTP 协议了解吗？不敢回答特别直接，把自己了解的请求头/请求方式/缓存机制讲了一下。</li>
+<li>数据结构和算法了解嘛？(学过都忘了)链表和数组的区别。</li>
+<li>使用过较多的技术栈(都是浅薄的学习)，react 有什么好处。讲了一下虚拟 DOM，diff 算法，key 的重要性。</li>
+<li>数组去重(原生)。如果数组里面有对象怎么去重。(最后转化为判断两个对象是否相等)。</li>
+<li>问了 event loop/ES6 都用过什么。(悄悄说之前问过了)</li>
+<li>未来的职业规划，以及想问他的问题。</li>
+</ul>
+<p>二面蛮多小的问题都没记起来，脑袋不够用了。但是面试官还是很好的，有时候问题回答不上来，都是面带笑意回答我。面完之后，他让我稍等一下，他就走了。过了四五分钟之后，回来告诉我 hr 现在不在，之后联系我。讲话途中有别电话叫走了，回来之后又说一次 hr 不在。问了一下最早什么时候能够去实习。大致结束了。</p>
+<blockquote>
+<p>总结</p>
+</blockquote>
+<p>其实笔试体验不太好，中途换了两次会议室，在此期间还把水弄到身上了。大概整个过程从 1.40 到了 4.10 的样子，笔试+两个面试，面到衣服都干了。口干舌燥。</p>
+<p>技术上面来说，蛮多的都是自己平时又看到的，然后面试官当时打开博客和 git 一边看一边问的，有些写到博客上的东西理解并不是很透彻，也算是给自己挖坑了。但是觉得 git 上的东西应该有一点加分。维护好 git 还是很重要的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E7%BB%8F/" rel="tag"># 面经</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/24/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E5%AD%97%E5%85%B8%E5%92%8C%E6%95%A3%E5%88%97%E8%A1%A8/" rel="prev" title="数据结构之字典和散列表">
+      <i class="fa fa-chevron-left"></i> 数据结构之字典和散列表
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/08/%E6%88%91%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84%E6%96%87%E4%BB%B6%E6%8C%87%E7%BA%B9/" rel="next" title="我不知道的文件指纹">
+      我不知道的文件指纹 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AE%E5%BA%97-2020-04-15"><span class="nav-number">1.</span> <span class="nav-text">微店 2020.04.15</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8A%E7%AD%BE-2021-04-13"><span class="nav-number">2.</span> <span class="nav-text">上上签 2021.04.13</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%B2%E5%AE%9D%E5%AE%9D-2021-03-31"><span class="nav-number">3.</span> <span class="nav-text">亲宝宝 2021.03.31</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BA%E8%AF%BA%E7%BD%91-2021-03-29-Offer"><span class="nav-number">4.</span> <span class="nav-text">诺诺网 2021.03.29 Offer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E9%9D%A2"><span class="nav-number">4.1.</span> <span class="nav-text">一面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E9%9D%A2"><span class="nav-number">4.2.</span> <span class="nav-text">二面</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A3%9E%E8%B1%A1%E4%BC%81%E6%9C%8D-2021-03-26"><span class="nav-number">5.</span> <span class="nav-text">飞象企服 2021.03.26</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E9%9D%A2-1"><span class="nav-number">5.1.</span> <span class="nav-text">一面</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%B7%E5%BF%83%E6%99%BA%E6%85%A7-2020-03-26"><span class="nav-number">6.</span> <span class="nav-text">海心智慧 2020.03.26</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E9%9D%A2-%E7%94%B5%E8%AF%9D"><span class="nav-number">6.1.</span> <span class="nav-text">一面(电话)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A5%E6%9C%AA%E6%9D%A5-2021-03-23-Offer"><span class="nav-number">7.</span> <span class="nav-text">来未来 2021.03.23 Offer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E9%9D%A2-%E7%94%B5%E8%AF%9D-1"><span class="nav-number">7.1.</span> <span class="nav-text">一面(电话)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%94%E8%AF%95"><span class="nav-number">7.2.</span> <span class="nav-text">笔试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E9%9D%A2-%E7%8E%B0%E5%9C%BA"><span class="nav-number">7.3.</span> <span class="nav-text">二面(现场)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%93%E5%AF%8C-2019-12-11-%E7%94%B5%E8%AF%9D"><span class="nav-number">8.</span> <span class="nav-text">道富 2019.12.11(电话)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AA%E6%8E%A8-2019-12-09"><span class="nav-number">9.</span> <span class="nav-text">个推 2019.12.09</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C-2019-03-06-%E7%94%B5%E8%AF%9D%E9%9D%A2"><span class="nav-number">10.</span> <span class="nav-text">招商银行 2019.03.06(电话面)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8F%8D%E7%88%B1%E7%BD%91-2019-03-05-%E8%A7%86%E9%A2%91"><span class="nav-number">11.</span> <span class="nav-text">珍爱网 2019.03.05(视频)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AA%E6%8E%A8-2019-01-18"><span class="nav-number">12.</span> <span class="nav-text">个推 2019.01.18</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="LuckyFBB"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">LuckyFBB</p>
+  <div class="site-description" itemprop="description">时间久了，问题也多了</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LuckyFBB</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+    <span class="post-count">| 博客共75.8k字</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
