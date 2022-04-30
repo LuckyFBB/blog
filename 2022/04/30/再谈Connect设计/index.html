@@ -22,18 +22,21 @@
     var CONFIG = {"hostname":"luckyfbb.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="时间久了，问题也多了">
+  <meta name="description" content="阅读本文前，请先阅读前文数据流前篇 在前文中，已经初步实现了React-Redux，但是组件的更新存在一些问题，因此在本文中会逐步解决该问题。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="再谈Connect设计">
 <meta property="og:url" content="https://luckyfbb.github.io/2022/04/30/%E5%86%8D%E8%B0%88Connect%E8%AE%BE%E8%AE%A1/index.html">
 <meta property="og:site_name" content="LuckyFBB&#39;s Blog">
-<meta property="og:description" content="时间久了，问题也多了">
+<meta property="og:description" content="阅读本文前，请先阅读前文数据流前篇 在前文中，已经初步实现了React-Redux，但是组件的更新存在一些问题，因此在本文中会逐步解决该问题。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://user-images.githubusercontent.com/38368040/161436788-83925945-4c39-4257-9285-74675e8e6754.png">
 <meta property="article:published_time" content="2022-04-30T07:22:03.000Z">
-<meta property="article:modified_time" content="2022-04-30T07:22:03.783Z">
+<meta property="article:modified_time" content="2022-04-30T07:39:09.979Z">
 <meta property="article:author" content="LuckyFBB">
-<meta property="article:tag" content="LuckyFBB, 前端, 博客, 基础总结, JavaScript, React, React Hooks">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="React-Redux">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/38368040/161436788-83925945-4c39-4257-9285-74675e8e6754.png">
 
 <link rel="canonical" href="https://luckyfbb.github.io/2022/04/30/%E5%86%8D%E8%B0%88Connect%E8%AE%BE%E8%AE%A1/">
 
@@ -186,11 +189,28 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-04-30 15:22:03" itemprop="dateCreated datePublished" datetime="2022-04-30T15:22:03+08:00">2022-04-30</time>
+              <time title="创建时间：2022-04-30 15:22:03 / 修改时间：15:39:09" itemprop="dateCreated datePublished" datetime="2022-04-30T15:22:03+08:00">2022-04-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -201,7 +221,32 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <p>阅读本文前，请先阅读前文<a href="https://luckyfbb.github.io/2022/02/23/React%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E6%B5%81%E7%AE%A1%E7%90%86/">数据流前篇</a></p>
+<p>在前文中，已经初步实现了React-Redux，但是组件的更新存在一些问题，因此在本文中会逐步解决该问题。<br><span id="more"></span></p>
+<h2 id="回顾以及引入问题"><a href="#回顾以及引入问题" class="headerlink" title="回顾以及引入问题"></a>回顾以及引入问题</h2><p>在之前的设计中，我们使用 useReducer 获得了一个强制更新函数(<code>forceComponentUpdateDispatch</code>)，然后在<code>store.subscribe</code>回调函数中执行</p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> connect = <span class="function">(<span class="params">mapStateToProps, mapDispatchToProps</span>) =&gt;</span> <span class="function">(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">  WrappedComponent</span></span></span><br><span class="line"><span class="params"><span class="function"></span>) =&gt;</span> <span class="function">(<span class="params">props</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; ...wrapperProps &#125; = props;</span><br><span class="line">  <span class="keyword">const</span> context = useContext(ReactReduxContext);</span><br><span class="line">  <span class="keyword">const</span> &#123; store &#125; = context; <span class="comment">// 解构出store</span></span><br><span class="line">  <span class="keyword">const</span> state = store.getState(); <span class="comment">// 拿到state</span></span><br><span class="line">  <span class="comment">//使用useReducer得到一个强制更新函数</span></span><br><span class="line">  <span class="keyword">const</span> [, forceComponentUpdateDispatch] = useReducer(<span class="function">(<span class="params">count</span>) =&gt;</span> count + <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="comment">// 订阅state的变化，当state变化的时候执行回调</span></span><br><span class="line">  store.subscribe(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    forceComponentUpdateDispatch();</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="comment">// 执行mapStateToProps和mapDispatchToProps</span></span><br><span class="line">  <span class="keyword">const</span> stateProps = mapStateToProps?.(state);</span><br><span class="line">  <span class="keyword">const</span> dispatchProps = mapDispatchToProps?.(store.dispatch);</span><br><span class="line">  <span class="comment">// 组装最终的props</span></span><br><span class="line">  <span class="keyword">const</span> actualChildProps = <span class="built_in">Object</span>.assign(</span><br><span class="line">    &#123;&#125;,</span><br><span class="line">    stateProps,</span><br><span class="line">    dispatchProps,</span><br><span class="line">    wrapperProps</span><br><span class="line">  );</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">WrappedComponent</span> &#123;<span class="attr">...actualChildProps</span>&#125; /&gt;</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>上述代码已经实现了 store 中数据改变时，对应使用 connect 包裹的组件能够获得对应数据，但是存在一个更新顺序的问题。</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/161436788-83925945-4c39-4257-9285-74675e8e6754.png" alt="connect"></p>
+<p>在前文中，我们提及到 React 是单向数据流，props 都是父组件传递给子组件的。一旦我们引入了 redux 后，假设父子组件都会引用了同一个变量<code>count</code>，子组件根本不会从父组件拿该参数，而是直接从 redux 中读取，这使得 React 的原本<strong>父→子</strong>的单向数据流被打破了。</p>
+<p>再说到更新问题，在 React 中，如果一个共同变量变化了，那必然是父组件先更新，再把数据传给子组件做更新。但是 redux 里，数据变成 <strong>redux→父</strong>，<strong>redux→子</strong>，父子组件完全根据 redux 的数据做独立更新，不能完全保证父组件先更新，子组件再更新。react-redux 为了保证更新顺序引入了一个监听者类<code>Subscription</code></p>
+<h2 id="Subscription类"><a href="#Subscription类" class="headerlink" title="Subscription类"></a>Subscription类</h2><p><code>Subscription</code>需要做什么？<a target="_blank" rel="noopener" href="https://codesandbox.io/s/upgrade-mini-react-redux-45h0df?file=/src/mini-react-redux/Subscription.js">线上代码</a></p>
+<ol>
+<li>实现发布订阅，处理所有state的回调</li>
+<li>需要判断当前连接 redux 的组件是否为第一个连接 redux 的组件，如果当前组件就是连接 redux的根组件，它<code>state</code>回调直接注册到 redux store；同时创建一个<code>Subscription</code>实例(<code>subscription</code>)并且通过<code>context</code>传递给子级</li>
+<li>如果当前组件不是根组件，说明已经有组件注册到了 redux store 了，那在子组件中可以拿到通过<code>context</code>传递的<code>subscription</code>(由于是父组件的监听类又称为<code>parentSub</code>)，那么当前子组件的回调会注册到<code>parentSub</code>上。并且会新建一个<code>Subscription</code>实例，在<code>context</code>上继续传递，那么当前组件的子组件回调会注册到当前组件的<code>Subscription</code>实例上</li>
+<li>当<code>state</code>变化了，根组件注册到 redux store 的回调会更新根组件，根组件会手动更新子组件的回调，子组件的回调执行更新子组件，子组件会执行<code>subscription</code>上注册的回调，触发孙子组件更新…这样子就实现了一层一层的组件更新，保证了<strong>父→子</strong>的更新顺序</li>
+</ol>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">Subscription</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">store, parentSub</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.store = store;</span><br><span class="line">    <span class="built_in">this</span>.parentSub = parentSub;</span><br><span class="line">    <span class="built_in">this</span>.listeners = [];</span><br><span class="line">    <span class="built_in">this</span>.handleChangeWrapper = <span class="built_in">this</span>.handleChangeWrapper.bind(<span class="built_in">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//当前组件注册</span></span><br><span class="line">  <span class="function"><span class="title">addNestedSub</span>(<span class="params">listener</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.listeners.push(listener);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//通知监听者</span></span><br><span class="line">  <span class="function"><span class="title">notifyNestedSub</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.listeners.forEach(<span class="function">(<span class="params">listener</span>) =&gt;</span> listener());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 回调函数的包装</span></span><br><span class="line">  <span class="function"><span class="title">handleChangeWrapper</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.onStateChange) &#123;</span><br><span class="line">      <span class="built_in">this</span>.onStateChange();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//注册回调函数</span></span><br><span class="line">  <span class="comment">//如果没有parentSub，说明是根组件注册到store上</span></span><br><span class="line">  <span class="comment">//如果有，就注册到父组件的监听类上</span></span><br><span class="line">  <span class="function"><span class="title">trySubscribe</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.parentSub</span><br><span class="line">      ? <span class="built_in">this</span>.parentSub.addNestedSub(<span class="built_in">this</span>.handleChangeWrapper)</span><br><span class="line">      : <span class="built_in">this</span>.store.subscribe(<span class="built_in">this</span>.handleChangeWrapper);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/reduxjs/react-redux/blob/v7.2.0/src/utils/Subscription.js#L74">Subscription源码</a></p>
+<h2 id="对应改造"><a href="#对应改造" class="headerlink" title="对应改造"></a>对应改造</h2><h3 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h3><p>在我们使用 redux 的时候，<code>Provider</code>始终是我们的根组件，所以需要给<code>Provider</code>创建一个<code>Subscription</code>实例再通过<code>context</code>传递下去，<a target="_blank" rel="noopener" href="https://codesandbox.io/s/upgrade-mini-react-redux-45h0df?file=/src/mini-react-redux/Provider.tsx">线上代码</a></p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> Provider = <span class="function">(<span class="params">props</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; store, children, context &#125; = props;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 传给子组件的context&#123;store,subscription&#125;</span></span><br><span class="line">  <span class="keyword">const</span> contextValue = useMemo(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> subscription = <span class="keyword">new</span> Subscription(store);</span><br><span class="line">    <span class="comment">// 注册回调函数，通知子组件</span></span><br><span class="line">    subscription.onStateChange = subscription.notifyNestedSubs;</span><br><span class="line">    <span class="keyword">return</span> &#123; store, subscription &#125;;</span><br><span class="line">  &#125;, [store]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> previousState = useMemo(<span class="function">() =&gt;</span> store.getState(), [store]);</span><br><span class="line"></span><br><span class="line">  useEffect(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; subscription &#125; = contextValue;</span><br><span class="line">    <span class="comment">// 添加监听者</span></span><br><span class="line">    subscription.trySubscribe();</span><br><span class="line">    <span class="comment">// 如果state发生改变，通知监听者</span></span><br><span class="line">    <span class="keyword">if</span> (previousState !== store.getState()) &#123;</span><br><span class="line">      subscription.onStateChange();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [contextValue, previousState, store]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> Context = context || ReactReduxContext;</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Context.Provider</span> <span class="attr">value</span>=<span class="string">&#123;contextValue&#125;</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">Context.Provider</span>&gt;</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/reduxjs/react-redux/blob/v7.2.0/src/components/Provider.js#L6">Provider源码</a></p>
+<h3 id="Connect"><a href="#Connect" class="headerlink" title="Connect"></a>Connect</h3><p>在之前的版本中，connect 是直接注册到 store 上，那现在就应该注册在父级的<code>subscription</code>上，在自己更新完成之后，再去通知自己的子级做更新。</p>
+<p>还有就是我们需要重写<code>context</code>中的<code>subscription</code>，因为当前组件拿到的<code>subscription</code>是属于它父级的，而当前组件的子级需要的<code>subscription</code>是当前组件创建的，我们需要重写<code>context</code>中的<code>subscription</code>，所以我们的<code>connect</code>返回的组件需要用<code>Context.Provider</code>包裹一下。<a target="_blank" rel="noopener" href="https://codesandbox.io/s/upgrade-mini-react-redux-45h0df?file=/src/mini-react-redux/connect.tsx">线上代码</a></p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> connect = <span class="function">(<span class="params">mapStateToProps, mapDispatchToProps</span>) =&gt;</span> <span class="function">(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">  WrappedComponent</span></span></span><br><span class="line"><span class="params"><span class="function"></span>) =&gt;</span> <span class="function">(<span class="params">props</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; ...wrapperProps &#125; = props;</span><br><span class="line">  <span class="keyword">const</span> context = useContext(ReactReduxContext);</span><br><span class="line">  <span class="keyword">const</span> &#123; store, <span class="attr">subscription</span>: parentSub &#125; = context; <span class="comment">// 解构出store</span></span><br><span class="line">  <span class="keyword">const</span> subscription = <span class="keyword">new</span> Subscription(store, parentSub); <span class="comment">// 创建当前组件的subscription</span></span><br><span class="line">  <span class="comment">// 保存上一次的值</span></span><br><span class="line">  <span class="keyword">const</span> lastChildProps = useRef();</span><br><span class="line">  <span class="comment">//使用useReducer得到一个强制更新函数</span></span><br><span class="line">  <span class="keyword">const</span> [, forceComponentUpdateDispatch] = useReducer(<span class="function">(<span class="params">count</span>) =&gt;</span> count + <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取传递给组件的props</span></span><br><span class="line">  <span class="keyword">const</span> childPropsSelector = <span class="function">(<span class="params">store, wrapperProps</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> state = store.getState();</span><br><span class="line">    <span class="comment">// 执行mapStateToProps和mapDispatchToProps</span></span><br><span class="line">    <span class="keyword">const</span> stateProps = mapStateToProps?.(state);</span><br><span class="line">    <span class="keyword">const</span> dispatchProps = mapDispatchToProps?.(store.dispatch);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Object</span>.assign(&#123;&#125;, stateProps, dispatchProps, wrapperProps);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//对比state，处理回调</span></span><br><span class="line">  <span class="keyword">const</span> compareStateForUpdate = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> newChildProps = childPropsSelector(store, wrapperProps);</span><br><span class="line">    <span class="keyword">if</span> (isEqual(newChildProps, lastChildProps.current)) <span class="keyword">return</span>;</span><br><span class="line">    lastChildProps.current = newChildProps;</span><br><span class="line">    forceComponentUpdateDispatch();</span><br><span class="line">    subscription.notifyNestedSubs();</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">const</span> actualChildProps = childPropsSelector(store, wrapperProps);</span><br><span class="line"></span><br><span class="line">  useLayoutEffect(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    lastChildProps.current = actualChildProps;</span><br><span class="line">  &#125;, [actualChildProps]);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 使用subscription注册回调</span></span><br><span class="line">  subscription.onStateChange = compareStateForUpdate;</span><br><span class="line">  subscription.trySubscribe();</span><br><span class="line"></span><br><span class="line">  <span class="comment">//重写contextValue，把自己的subscription传递下去</span></span><br><span class="line">  <span class="keyword">const</span> overWriteContextValue = &#123;</span><br><span class="line">    ...context,</span><br><span class="line">    subscription</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">ReactReduxContext.Provider</span> <span class="attr">value</span>=<span class="string">&#123;overWriteContextValue&#125;</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">WrappedComponent</span> &#123;<span class="attr">...actualChildProps</span>&#125; /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">ReactReduxContext.Provider</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/reduxjs/react-redux/blob/v7.2.0/src/connect/connect.js#L46">connect源码</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在本文中，提出了上一篇文章中<code>connect</code>实现的问题，由于 Redux 的引入使得 React 原本的数据流遭遇破坏。通过引入<code>Subscription</code>类实现发布订阅模式，来保证父<strong>父→子</strong>的一个更新顺序。数据发生改变时，从根组件开始通知自己的子组件，子组件通知其子组件，这样来保证更新顺序。</p>
+
     </div>
 
     
@@ -209,6 +254,10 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/React/" rel="tag"># React</a>
+              <a href="/tags/React-Redux/" rel="tag"># React-Redux</a>
+          </div>
 
         
 
@@ -219,7 +268,10 @@
     <a href="/2022/02/23/React-Router%E5%8E%9F%E7%90%86%E5%8F%8A%E4%B8%90%E7%89%88%E5%AE%9E%E7%8E%B0/" rel="prev" title="React-Router原理及丐版实现">
       <i class="fa fa-chevron-left"></i> React-Router原理及丐版实现
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/30/%E6%88%91%E6%89%80%E7%9F%A5%E9%81%93%E7%9A%84npm-Yarn-pnpm%E5%8C%85%E7%AE%A1%E7%90%86/" rel="next" title="我所知道的npm/Yarn/pnpm包管理">
+      我所知道的npm/Yarn/pnpm包管理 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -278,6 +330,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E9%A1%BE%E4%BB%A5%E5%8F%8A%E5%BC%95%E5%85%A5%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">回顾以及引入问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Subscription%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">Subscription类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%BA%94%E6%94%B9%E9%80%A0"><span class="nav-number">3.</span> <span class="nav-text">对应改造</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Provider"><span class="nav-number">3.1.</span> <span class="nav-text">Provider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Connect"><span class="nav-number">3.2.</span> <span class="nav-text">Connect</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -293,7 +346,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">38</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -306,7 +359,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -340,10 +393,30 @@
   <span class="author" itemprop="copyrightHolder">LuckyFBB</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
-    <span class="post-count">| 博客共85k字</span>
+    <span class="post-count">| 博客共93k字</span>
   </div>
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
