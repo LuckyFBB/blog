@@ -1,6 +1,7 @@
 ---
 title: Mobx 原理及丐版实现
 group: React
+order: 6
 ---
 
 ## 前言
