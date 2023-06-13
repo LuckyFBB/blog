@@ -1,7 +1,7 @@
 ---
 title: 你应该知道的Hooks知识
 group: React
-order: 1
+order: 999
 ---
 
 一篇关于 hooks 的内容分享，主要涉及函数组件、类组件的介绍，以及 useEffect 的生命周期替换方案和是否把函数作为 useEffect 的第二参数在实践中的解决方案。

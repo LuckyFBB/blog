@@ -1,6 +1,7 @@
 ---
 title: Nodejs中的进程间通信
 group: Node
+order: 996
 ---
 
 ## 前置知识

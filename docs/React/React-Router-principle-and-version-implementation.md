@@ -1,7 +1,7 @@
 ---
 title: React-Router原理及丐版实现
 group: React
-order: 4
+order: 996
 ---
 
 react-router 版本更新非常快，但是它的底层实现原理确是万变不离其中，在本文中会从前端路由出发到 react-router 原理整体总结与分享。

@@ -1,7 +1,7 @@
 ---
 title: 再谈Connect设计
 group: React
-order: 5
+order: 995
 ---
 
 阅读本文前，请先阅读前文[数据流前篇](https://luckyfbb.github.io/2022/02/23/React%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E6%B5%81%E7%AE%A1%E7%90%86/)

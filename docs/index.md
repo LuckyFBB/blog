@@ -15,6 +15,11 @@ features:
   - title: 工程化
     image: 🤺
     description: 工程化相关内容
+    link: /engineering/engineering-before
+  - title: 数据结构
+    image: 🌳
+    description: 数据结构相关内容
+    link: /data-structure/data-structure-before
   - title: 其他...
     image: 🧿
     description: 无法明确分类内容
