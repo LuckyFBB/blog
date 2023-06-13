@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkblog_of_fbb=self.webpackChunkblog_of_fbb||[]).push([[252],{33753:function(d,o,n){n.r(o),n.d(o,{default:function(){return l}});var u=n(32354),t=n(80821),f=n(86074),l=function(){var s=(0,u.pC)();return(0,f.jsx)(t.Z,{children:s})}}}]);
