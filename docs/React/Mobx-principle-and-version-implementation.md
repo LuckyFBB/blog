@@ -1,7 +1,9 @@
 ---
 title: Mobx 原理及丐版实现
-group: React
-order: 994
+group:
+  title: 数据流
+  order: 1
+order: 2
 ---
 
 ## 前言

@@ -1,7 +1,9 @@
 ---
 title: babel 插件和 eslint 插件对比
-group: 工程化
-order: 997
+group:
+  title: Babel
+  order: 1
+order: 1
 ---
 
 babel 和 eslint 都是我们项目中常用的工具，两者都是基于 AST 去扩展的，前者做代码的转换，后者做错误检查和修复。两者都能够做到分析和转换代码。所以两者有啥不同呢？

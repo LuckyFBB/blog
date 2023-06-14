@@ -1,7 +1,9 @@
 ---
 title: 浅谈一下 NodeJS 中的 Stream
-group: Node
-order: 994
+group:
+  title: Node 基础
+  order: 2
+order: 1
 ---
 
 Stream 是用来处理流式数据的接口。流一般是有顺序的，从一个地方流向另一个地方。

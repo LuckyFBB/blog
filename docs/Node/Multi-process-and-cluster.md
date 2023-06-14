@@ -1,7 +1,9 @@
 ---
 title: 多进程架构和 Cluster
-group: Node
-order: 998
+group:
+  title: 多进程架构
+  order: 3
+order: 3
 ---
 
 在本文中主要会介绍多进程架构以及其问题，cluster 在多进程架构上解决了什么问题，以及其原理。

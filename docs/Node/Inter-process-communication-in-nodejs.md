@@ -1,7 +1,8 @@
 ---
 title: Nodejs中的进程间通信
-group: Node
-order: 996
+group:
+  title: 多进程架构
+order: 1
 ---
 
 ## 前置知识

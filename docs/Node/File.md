@@ -1,7 +1,9 @@
 ---
 title: Node 中的文件模块
-group: Node
-order: 993
+group:
+  title: Node 基础
+  order: 2
+order: 2
 ---
 
 ## 前言
@@ -150,51 +152,51 @@ router.post(
 
 1. 前端切片
 
-   ```js
-   const BIG_FILE_SIZE = 25 * 1024 * 1024;
-   const SLICE_FILE_SIZE = 5 * 1024 * 1024;
+```js
+const BIG_FILE_SIZE = 25 * 1024 * 1024;
+const SLICE_FILE_SIZE = 5 * 1024 * 1024;
 
-   const uploadFile = async () => {
-     if (!fileList?.length) return alert('请选择文件');
-     const file = fileList[0];
-     const shouldUpload = await verifyUpload(file.name);
-     if (!shouldUpload) return message.success('文件已存在，上传成功');
-     if (file.size > BIG_FILE_SIZE) {
-       // big handle
-       getSliceList(file);
-     }
-     // // normal handle
-     // upload("/uploadSingle", file);
-   };
-   const getSliceList = (file: RcFile) => {
-     const sliceList: ISlice[] = [];
-     let curSize = 0;
-     let index = 0;
-     while (curSize < file.size) {
-       sliceList.push({
-         id: shortid.generate(),
-         slice: new File(
-           [file.slice(curSize, (curSize += SLICE_FILE_SIZE))],
-           `${file.name}-${index}`,
-         ),
-         name: file.name,
-         sliceName: `${file.name}-${index}`,
-         progress: 0,
-       });
-       index++;
-     }
-     uploadSlice(sliceList);
-     setSliceList(sliceList);
-   };
-   ```
+const uploadFile = async () => {
+  if (!fileList?.length) return alert('请选择文件');
+  const file = fileList[0];
+  const shouldUpload = await verifyUpload(file.name);
+  if (!shouldUpload) return message.success('文件已存在，上传成功');
+  if (file.size > BIG_FILE_SIZE) {
+    // big handle
+    getSliceList(file);
+  }
+  // // normal handle
+  // upload("/uploadSingle", file);
+};
+const getSliceList = (file: RcFile) => {
+  const sliceList: ISlice[] = [];
+  let curSize = 0;
+  let index = 0;
+  while (curSize < file.size) {
+    sliceList.push({
+      id: shortid.generate(),
+      slice: new File(
+        [file.slice(curSize, (curSize += SLICE_FILE_SIZE))],
+        `${file.name}-${index}`,
+      ),
+      name: file.name,
+      sliceName: `${file.name}-${index}`,
+      progress: 0,
+    });
+    index++;
+  }
+  uploadSlice(sliceList);
+  setSliceList(sliceList);
+};
+```
 
-   file 是一种特殊的 [Blob 对象](https://zhuanlan.zhihu.com/p/161000123)，可以使用 slice 进行大文件分割
+file 是一种特殊的 [Blob 对象](https://zhuanlan.zhihu.com/p/161000123)，可以使用 slice 进行大文件分割
 
-   ![Untitled 11](https://user-images.githubusercontent.com/38368040/232821371-1a679343-4ea6-4b83-9e05-4482b5a05f41.png)
+![Untitled 11](https://user-images.githubusercontent.com/38368040/232821371-1a679343-4ea6-4b83-9e05-4482b5a05f41.png)
 
 2. 上传切片
 
-   ```tsx
+   ```ts
    const uploadSlice = async (sliceList: ISlice[]) => {
      const requestList = sliceList
        .map(({ slice, sliceName, name }: ISlice, index: number) => {

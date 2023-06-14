@@ -1,7 +1,9 @@
 ---
 title: NodeJS 中的 Buffer 究竟是什么？
-group: Node
-order: 995
+group:
+  title: Node 基础
+  order: 2
+order: 0
 ---
 
 > Buffer 用于读取或操作二进制流，用于操作网络协议、数据库、图片和文件 I/O 等一些需要大量二进制数据的场景。
@@ -283,9 +285,7 @@ console.log(buf.toString('utf-8', 1, 10));
 
 1. I/O 操作
 
-I/O 分为文件 I/O 和 网络 I/O。本文只是对 Buffer 的操作，后续会专门介绍 I/O。
-
-**例子**，读取本地文件并写入另一个文件。
+   I/O 分为文件 I/O 和 网络 I/O。本文只是对 Buffer 的操作，后续会专门介绍 I/O。
 
 ```js
 // 读写文件 Buffer
@@ -333,11 +333,8 @@ copy(`${__dirname}/index.html`, `${__dirname}/test.html`, (err) => {
 });
 ```
 
-2. 加解密 TODO: createCipheriv 参数了解;秘钥为什么要用 Buffer
-
-一些加密算法中会用到 Buffer。例如 `crypto.createCipheriv` 中的第二个参数 key 为 String 或 Buffer 类型.
-
-**例子**，
+2. 加解密
+   一些加密算法中会用到 Buffer。例如 `crypto.createCipheriv` 中的第二个参数 key 为 String 或 Buffer 类型.
 
 ```js
 const [key, iv, algorithm, encoding, cipherEncoding] = [
@@ -373,8 +370,8 @@ console.log(encryptStr, decryptStr);
 
 - Buffer
 
-Buffer 用于处理二进制数据，是临时性的存储。等待缓冲区的数据达到一定大小后才存入磁盘。主要用于读写数据。
+  Buffer 用于处理二进制数据，是临时性的存储。等待缓冲区的数据达到一定大小后才存入磁盘。主要用于读写数据。
 
 - Cache
 
-Cache 是缓存。可以永久的将数据缓存，例如 redis。将不易改变的且数据量大的数据存放到缓存中，例如 一些字典数据。等下次请求接口时，直接从缓存返回，速度更快。
+  Cache 是缓存。可以永久的将数据缓存，例如 redis。将不易改变的且数据量大的数据存放到缓存中，例如 一些字典数据。等下次请求接口时，直接从缓存返回，速度更快。

@@ -1,7 +1,9 @@
 ---
 title: 我所知道的npm/Yarn/pnpm包管理
-group: 工程化
-order: 999
+group:
+  title: 包管理
+  order: 2
+order: 0
 ---
 
 在依赖包盛行的今天，安装包的方式也是多种多样的，从 npm->yarn->pnpm，每一次的升级都带来着不一样的便利，这篇文章将从 npm2 开始，剖析到现在火热的 pnpm。

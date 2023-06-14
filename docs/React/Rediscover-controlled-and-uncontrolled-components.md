@@ -1,7 +1,9 @@
 ---
 title: 重新认识受控和非受控组件
-group: React
-order: 998
+group:
+  title: 基础
+  order: 1
+order: 1
 ---
 
 ## 前言

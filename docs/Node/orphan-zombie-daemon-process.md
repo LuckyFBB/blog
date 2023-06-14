@@ -1,7 +1,9 @@
 ---
 title: Node 中的孤儿/僵尸/守护进程
-group: Node
-order: 997
+group:
+  title: 进程
+  order: 2
+order: 1
 ---
 
 ### 孤儿进程
@@ -12,7 +14,7 @@ order: 997
 
 [master 对应代码](./../../src/Process/orphan_process/master.js)
 
-```jsx
+```js
 const fork = require('child_process').fork;
 const server = require('net').createServer();
 server.listen(3000);
@@ -26,7 +28,7 @@ console.log(`worker created, ppid is ${process.pid}, pid is ${worker.pid}`);
 
 [worker 对应代码](./../../src/Process/orphan_process/worker.js)
 
-```jsx
+```js
 const http = require('http');
 const server = http.createServer((req, res) => {
   res.end(`I am worker process, pid: ${process.pid}, ppid: ${process.ppid}`);
@@ -52,7 +54,7 @@ process.on('message', (message, sendHandle) => {
 
 主进程通过 fork 创建了子进程，如果子进程退出之后父进程没有获取子进程的状态信息，那么子进程中保存的进程号/退出状态/运行时间等都不会被释放，进程号会一直被占用
 
-```jsx
+```js
 const fork = require('child_process').fork;
 
 zombie();
@@ -82,7 +84,7 @@ function zombie() {
 
 修改上述代码，子进程退出之后，父进程可以监听到，就不会有僵尸进程的产生。
 
-```jsx
+```js
 const fork = require('child_process').fork;
 
 zombie();

@@ -1,7 +1,9 @@
 ---
 title: babel基础介绍
-group: 工程化
-order: 998
+group:
+  title: Babel
+  order: 1
+order: 0
 ---
 
 babel 的原名叫 6to5，简明扼要就是 es6 转 es5，但是没想到 es 标准推进的过快，短时间就有了 es7/8，所以它改名为 babel
@@ -45,7 +47,7 @@ console.log('result after deal with》〉》〉》', code);
 
 ## babel 的架构
 
-<img width="1302" alt="image" src="https://user-images.githubusercontent.com/38368040/167439000-9e110fd6-f96d-4fd9-bcaf-f1f9e4fee9e8.png">
+<img width="1302" alt="image" src="https://github.com/LuckyFBB/blog/assets/38368040/0142bd87-57c9-46ee-bbe0-3bbc062e2a54">
 
 1. 核心@babel/core
    - 加载处理配置/加载插件
