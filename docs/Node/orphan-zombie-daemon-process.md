@@ -10,9 +10,7 @@ order: 1
 
 父进程已经退出，它的一个或者多个子进程还在运行，上述的子进程会成为孤儿进程
 
-孤儿进程会被 init 进程(pid 为 1)收养，并由 init 进程完成对它们的状态收集工作
-
-[master 对应代码](./../../src/Process/orphan_process/master.js)
+孤儿进程会被 init 进程(pid 为 1)收养，并由 init 进程完成对它们的状态收集工作 [master 对应代码](./../../src/Process/orphan_process/master.js)
 
 ```js
 const fork = require('child_process').fork;
@@ -26,7 +24,7 @@ worker.send('server', server);
 console.log(`worker created, ppid is ${process.pid}, pid is ${worker.pid}`);
 ```
 
-[worker 对应代码](./../../src/Process/orphan_process/worker.js)
+下面是 worker 对应的代码 [worker 对应代码](./../../src/Process/orphan_process/worker.js)
 
 ```js
 const http = require('http');

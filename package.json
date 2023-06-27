@@ -1,7 +1,7 @@
 {
   "name": "blog-of-fbb",
   "version": "0.0.1",
-  "description": "A static site based on dumi",
+  "description": "Welcome to FBB's blog，have something you need",
   "scripts": {
     "start": "npm run dev",
     "dev": "dumi dev",
@@ -25,7 +25,6 @@
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "dumi": "^2.2.0",
-    "dumi-theme-antd-style": "^0.27.3",
     "gh-pages": "^5.0.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",

@@ -3,7 +3,7 @@ import { defineConfig } from 'dumi';
 export default defineConfig({
   themeConfig: {
     name: 'FBB◦Blog',
-    theme: 'dumi-theme-antd-style',
+    footer: `Copyright © 2022-${new Date().getFullYear()} Made with 🤸‍♂️ by FBB`,
     socialLinks: {
       github: 'https://github.com/LuckyFBB',
     },

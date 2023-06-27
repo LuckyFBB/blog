@@ -1,0 +1,39 @@
+.fbb-hero {
+  &__title {
+    text-align: center;
+    width: 100%;
+    margin: 50px 0 32px;
+    display: inline-block;
+    font-family: Alibaba-PuHuiTi, Gill Sans, Gill Sans MT, Calibri, Trebuchet MS,
+      sans-serif;
+    color: #83cdf8;
+    font-size: 180px;
+    line-height: 1;
+    span {
+      color: transparent;
+      text-shadow: 0 10px 20px rgba(22, 119, 255, 0.15);
+      background: linear-gradient(30deg, #90d5ff 30%, #65a5ff);
+      background-clip: text;
+      font-weight: bold;
+    }
+  }
+  &__desc {
+    text-align: center;
+    margin: 32px;
+    color: #4f5866;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+}
+
+@media only screen and (max-width: 1000px) {
+  .fbb-hero__title {
+    font-size: 90px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .fbb-hero__title {
+    font-size: 60px;
+  }
+}
