@@ -6,7 +6,7 @@ group:
 order: 1
 ---
 
-在之前我们讲了 Node 中的进程通信，在 \*nix 系统下使用的是 Unix Domain Socket，在 window 系统下使用的的命名管道。
+在之前我们讲了 [Node 中的进程通信](/node/inter-process-communication-in-nodejs)，在 \*nix 系统下使用的是 Unix Domain Socket，在 window 系统下使用的的命名管道。
 
 其实进程间的通信远不止上述两种，该篇文章我们来了解更多吧！
 

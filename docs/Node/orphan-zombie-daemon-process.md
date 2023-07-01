@@ -66,7 +66,6 @@ function zombie() {
 
 ![11](https://user-images.githubusercontent.com/38368040/170860077-e0a32859-b8c7-4a77-9128-be57481d8d42.png)
 
-// TODO: 下一篇进程状态连接
 进程的状态
 
 - R 运行状态(running): 并不意味着进程一定在运行中，它表明进程要么是在运行中要么在运行队列里。

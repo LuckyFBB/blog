@@ -1,5 +1,5 @@
 ---
-title: Nodejs中的进程间通信
+title: Nodejs 中的进程间通信
 group:
   title: 多进程架构
 order: 1

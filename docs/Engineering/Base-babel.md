@@ -1,5 +1,5 @@
 ---
-title: babel基础介绍
+title: babel 基础介绍
 group:
   title: Babel
   order: 1

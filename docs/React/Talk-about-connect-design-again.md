@@ -1,5 +1,5 @@
 ---
-title: 再谈Connect设计
+title: 再谈 Connect 设计
 group:
   title: 数据流
   order: 1

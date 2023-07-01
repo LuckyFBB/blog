@@ -1,5 +1,5 @@
 ---
-title: 我所知道的npm/Yarn/pnpm包管理
+title: 我所知道的 npm/Yarn/pnpm 包管理
 group:
   title: 包管理
   order: 2
