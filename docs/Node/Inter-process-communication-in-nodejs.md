@@ -1,8 +1,8 @@
 ---
 title: Nodejs 中的进程间通信
 group:
-  title: 多进程架构
-order: 1
+  title: 进程
+order: 3
 ---
 
 ## 前置知识
@@ -138,7 +138,7 @@ UDS 的优势：
 
 ##### Server 端
 
-```c++
+```c
 int main(int argc, char *argv[])
 {
     int server_fd ,ret, client_fd;
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 
 ##### Client 端
 
-```c++
+```c
 int main(int argc, char *argv[])
 {
     int client_fd ,ret;
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 
 ##### Pipe Server
 
-```c++
+```c
 void ServerTest()
 {
     HANDLE  serverNamePipe;
@@ -281,7 +281,7 @@ void ServerTest()
 
 ##### Pipe Client
 
-```c++
+```c
 void ClientTest()
 {
     char    pipeName[MAX_PATH] = {0};
@@ -331,7 +331,7 @@ void ClientTest()
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/185771767-2fc1335e-c8a3-4953-bbac-09f6629b2803.png">
 
-对于创建子进程、创建管道、重定向管道均是在 c++ 层实现的
+对于创建子进程、创建管道、重定向管道均是在 c 层实现的
 
 #### 创建子进程
 

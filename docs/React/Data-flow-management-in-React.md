@@ -78,7 +78,7 @@ Context 工作流的简单图解：
 
 ## Redux
 
-Redux 是**JS 应用**的状态容器，提供可预测的状态管理
+Redux 是 **JS 应用**的状态容器，提供可预测的状态管理
 
 Redux 的三大原则
 
@@ -116,83 +116,7 @@ const cloneObj = { ...obj, info: { name: 'shuangxu' } };
 
 **Redux 期望所有的状态都采用不可变的方式。**
 
-### react-redux
-
-react-redux 是 Redux 提供的 react 绑定，辅助在 react 项目中使用 redux
-
-它的 API 简单，包括一个组件`Provider`和一个高阶函数`connect`
-
-#### Provider
-
-❓ 为什么`Provider`只传递一个`store`，被它包裹的组件都能够访问到`store`的数据呢？
-
-Provider 做了些啥？
-
-- 创建一个`contextValue`包含`redux`传入的`store`和根据`store`创建出的`subscription`，发布订阅均为`subscription`做的
-- 通过`context`上下文把`contextValue`传递子组件
-
-#### Connect
-
-❓connect 做了什么事情讷？
-
-使用容器组件通过`context`提供的`store`，并将`mapStateToProps`和`mapDispatchToProps`返回的`state`和`dispatch`传递给 UI 组件
-
-组件依赖 redux 的`state`，映射到容器组件的`props`中，`state`改变时触发容器组件的`props`的改变，触发容器组件组件更新视图
-
-```js
-const enhancer = connect(mapStateToProps, mapDispatchToProps);
-enhancer(Component);
-```
-
-#### react-redux 丐版实现
-
-[mini-react-redux](https://codesandbox.io/s/mini-react-redux-x8j5t0?file=/src/App.js:141-149)
-
-**Provider**
-
-```js
-export const Provider = (props) => {
-  const { store, children, context } = props;
-  const contextValue = { store };
-  const Context = context || ReactReduxContext;
-  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
-};
-```
-
-**connect**
-
-```ts
-import { useContext, useReducer } from 'react';
-import { ReactReduxContext } from './ReactReduxContext';
-
-export const connect =
-  (mapStateToProps, mapDispatchToProps) => (WrappedComponent) => (props) => {
-    const { ...wrapperProps } = props;
-    const context = useContext(ReactReduxContext);
-    const { store } = context; // 解构出store
-    const state = store.getState(); // 拿到state
-    //使用useReducer得到一个强制更新函数
-    const [, forceComponentUpdateDispatch] = useReducer(
-      (count) => count + 1,
-      0,
-    );
-    // 订阅state的变化，当state变化的时候执行回调
-    store.subscribe(() => {
-      forceComponentUpdateDispatch();
-    });
-    // 执行mapStateToProps和mapDispatchToProps
-    const stateProps = mapStateToProps?.(state);
-    const dispatchProps = mapDispatchToProps?.(store.dispatch);
-    // 组装最终的props
-    const actualChildProps = Object.assign(
-      {},
-      stateProps,
-      dispatchProps,
-      wrapperProps,
-    );
-    return <WrappedComponent {...actualChildProps} />;
-  };
-```
+[点击查看]("/react/redux")更多的 Redux 相关内容
 
 ## 总结
 
@@ -206,4 +130,3 @@ export const connect =
 
 - [对 React 状态管理的理解及方案对比](https://github.com/sunyongjian/blog/issues/36)
 - [聊一聊我对 React Context 的理解以及应用](https://juejin.cn/post/6844903566381940744)
-- [手写 react-redux](http://dennisgo.cn/Articles/React/React-Redux.html)

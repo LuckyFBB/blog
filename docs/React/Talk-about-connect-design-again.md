@@ -3,10 +3,10 @@ title: 再谈 Connect 设计
 group:
   title: 数据流
   order: 1
-order: 1
+order: 2
 ---
 
-阅读本文前，请先阅读前文[数据流前篇](https://luckyfbb.github.io/blog/react/data-flow-management-in--react)
+阅读本文前，请先阅读前文[数据流前篇](/react/data-flow-management-in--react)和[关于 Redux 的更多](/react/redux)
 
 在前文中，已经初步实现了 React-Redux，但是组件的更新存在一些问题，因此在本文中会逐步解决该问题。
 
