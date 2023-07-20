@@ -137,6 +137,8 @@ function onPopState() {
 
 [v3](https://codesandbox.io/s/router-demo-v3-wqhjd)、[v4](https://codesandbox.io/s/router-demo-v4-7xj3f)、[v6](https://codesandbox.io/s/router-demo-v6-dpv1m)
 
+![](https://github.com/LuckyFBB/blog/assets/38368040/eedd5ac6-d94d-4e15-b7ce-5444838dae07)
+
 ## history
 
 在上文中说到，`BrowserRouter`使用 history 库提供的`createBrowserHistory`创建的`history`对象改变路由状态和监听路由变化。
@@ -164,7 +166,7 @@ export const EventEmitter = () => {
 };
 ```
 
-### **Browser**History
+### BrowserHistory
 
 ```js
 const createBrowserHistory = () => {
@@ -241,7 +243,7 @@ const createHashHistory = () => {
 
 ## react-router 丐版
 
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/17cecc3f2a924ae1b1294b7836c50f31~tplv-k3u1fbpfcp-watermark.image?)
+![](https://github.com/LuckyFBB/blog/assets/38368040/3380494c-323c-45f1-8143-9796f1e4d48c)
 
 ### Router
 
