@@ -7,14 +7,14 @@ order: 0
 ---
 
 <style>
-    .from{
+    .quote {
         background-color: #f9f1db;
         padding: 10px;
         border-radius: 8px;
         font-weight: 500;
     }
 </style>
-<div class="from">📨 此文转载来源于景明</div>
+<div class="quote">📨 此文转载来源于景明</div>
 
 内存（RAM）是计算机中一种需要认真管理的重要资源。就目前来说，虽然一台普通家用计算机的内存容量已经是 20 世纪 60 年代早期全球最大的计算机 IBM 7094 的内存容量的 10000 倍以上，但是程序大小的增长速度比内存容量的增长速度要快得多。正如帕金森定律所指出的：“不管存储器有多大，程序都可以把它填满”。
 
