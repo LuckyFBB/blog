@@ -59,8 +59,11 @@ export const connect =
 `Subscription`需要做什么？[线上代码](https://codesandbox.io/s/upgrade-mini-react-redux-45h0df?file=/src/mini-react-redux/Subscription.js)
 
 1. 实现发布订阅，处理所有 state 的回调
+
 2. 需要判断当前连接 redux 的组件是否为第一个连接 redux 的组件，如果当前组件就是连接 redux 的根组件，它`state`回调直接注册到 redux store；同时创建一个`Subscription`实例(`subscription`)并且通过`context`传递给子级
+
 3. 如果当前组件不是根组件，说明已经有组件注册到了 redux store 了，那在子组件中可以拿到通过`context`传递的`subscription`(由于是父组件的监听类又称为`parentSub`)，那么当前子组件的回调会注册到`parentSub`上。并且会新建一个`Subscription`实例，在`context`上继续传递，那么当前组件的子组件回调会注册到当前组件的`Subscription`实例上
+
 4. 当`state`变化了，根组件注册到 redux store 的回调会更新根组件，根组件会手动更新子组件的回调，子组件的回调执行更新子组件，子组件会执行`subscription`上注册的回调，触发孙子组件更新...这样子就实现了一层一层的组件更新，保证了**父 → 子**的更新顺序
 
 ```js
@@ -203,4 +206,4 @@ export const connect =
 
 ## 总结
 
-在本文中，提出了上一篇文章中`connect`实现的问题，由于 Redux 的引入使得 React 原本的数据流遭遇破坏。通过引入`Subscription`类实现发布订阅模式，来保证父**父 → 子**的一个更新顺序。数据发生改变时，从根组件开始通知自己的子组件，子组件通知其子组件，这样来保证更新顺序。
+在本文中，提出了上一篇文章中`connect`实现的问题，由于 Redux 的引入使得 React 原本的数据流遭遇破坏。通过引入`Subscription`类实现发布订阅模式，来保证了**父 → 子**的一个更新顺序。数据发生改变时，从根组件开始通知自己的子组件，子组件通知其子组件，这样来保证更新顺序。

@@ -6,6 +6,17 @@ group:
 order: 0
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+</style>
+
 ## 进程和线程
 
 ### 进程(Process)的概念
@@ -192,55 +203,56 @@ Process 是 Node 中的全局模块，可以通过它来获取 node 进程相关
   返回一个对象，存储当前环境相关的所有信息
   一般使用是在上面挂载一些变量标识当前的的环境。例如: `process.env.NODE_ENV`用于区分 development 和 production
 
-```shell
-NODE_ENV=production node index
-```
+  ```shell
+  NODE_ENV=production node index
+  ```
 
 - 异步 process.nextTick
   process.nextTick 是异步执行的，会在当前 event loop 执行完成之后执行
 
-```js
-function tick() {
-  process.nextTick(() => console.log('tick'));
-}
+  ```js
+  function tick() {
+    process.nextTick(() => console.log('tick'));
+  }
 
-console.log('start');
+  console.log('start');
 
-setTimeout(() => {
-  console.log('setTimeout');
-});
+  setTimeout(() => {
+    console.log('setTimeout');
+  });
 
-tick();
+  tick();
 
-console.log('end');
-```
+  console.log('end');
+  ```
 
 - 获取命令行参数 process.argv
   process.argv 返回一个数组
   对于数组来说，前两个参数分别是 node 路径和文件路径
 
-```js
-node index a=1 b=1
+  ```js
+  node index a=1 b=1
 
-//[
-//  '/Users/shuangxu/.nvm/versions/node/v14.17.0/bin/node',
-//  '/Users/shuangxu/Documents/code/Node-RoadMap/src/Process/process/index',
-//  'a=1',
-//  'b=1'
-//]
-```
+  //[
+  //  '/Users/shuangxu/.nvm/versions/node/v14.17.0/bin/node',
+  //  '/Users/shuangxu/Documents/code/Node-RoadMap/src/Process/process/index',
+  //  'a=1',
+  //  'b=1'
+  //]
+  ```
 
 - 当前工作路径
+
   - process.cwd 返回当前的工作路径
   - process.chdir(directory) 更改当前的工作路径
 
-```js
-console.log(process.cwd());
-try {
-  process.chdir('./src'); // .../Node-RoadMap
-  console.log(process.cwd()); //.../Node-RoadMap/src
-} catch (error) {}
-```
+  ```js
+  console.log(process.cwd());
+  try {
+    process.chdir('./src'); // .../Node-RoadMap
+    console.log(process.cwd()); //.../Node-RoadMap/src
+  } catch (error) {}
+  ```
 
 ##### 标准流
 
@@ -585,6 +597,6 @@ process.on('message', (msg) => {
 
 ![8](https://user-images.githubusercontent.com/38368040/170860070-1b113e51-60aa-4935-8b13-2ba61c639d1d.png)
 
-> 参考链接
+<div class="link">参考链接</div>
 
 - [Node.js 中 spawn 与 exec 的异同比较](https://segmentfault.com/a/1190000002913884)

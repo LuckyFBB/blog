@@ -6,6 +6,30 @@ group:
 order: 0
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+    .foreword{
+        padding: 12px 12px 12px 16px;
+        background-color: #ECF9FF;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #439dd3;
+    }
+    .quote {
+        background-color: #FFE7CC;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
+
 一篇关于 hooks 的内容分享，主要涉及函数组件、类组件的介绍，以及 useEffect 的生命周期替换方案和是否把函数作为 useEffect 的第二参数在实践中的解决方案。
 
 <!-- more -->
@@ -125,27 +149,27 @@ useEffect 能够在函数组件中执行副作用操作(数据获取/涉及订�
 
 2. 在 useEffect 中[]需要处理什么
 
-[React 官网 FAQ](https://zh-hans.reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies)这样说
+   [React 官网 FAQ](https://zh-hans.reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies)这样说
 
-只有当函数(以及它所调用的函数)不引用 props、state 以及由它们衍生而来的值时，你才能放心地把它们从依赖列表中省略，使用 eslint-plugin-react-hooks 帮助我们的代码做一个校验
+   只有当函数(以及它所调用的函数)不引用 props、state 以及由它们衍生而来的值时，你才能放心地把它们从依赖列表中省略，使用 eslint-plugin-react-hooks 帮助我们的代码做一个校验
 
-[点击查看详细示例](https://codesandbox.io/s/count-ilrrt?file=/src/App.js)
+   [点击查看详细示例](https://codesandbox.io/s/count-ilrrt?file=/src/App.js)
 
-```js
-function Counter() {
-  const [count, setCount] = useState(0);
+   ```js
+   function Counter() {
+     const [count, setCount] = useState(0);
 
-  useEffect(() => {
-    const id = setInterval(() => {
-      setCount(count + 1);
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
+     useEffect(() => {
+       const id = setInterval(() => {
+         setCount(count + 1);
+       }, 1000);
+       return () => clearInterval(id);
+     }, []);
 
-  return <h1>{count}</h1>;
-}
-//只会做一次更新，然后定时器不再转动
-```
+     return <h1>{count}</h1>;
+   }
+   //只会做一次更新，然后定时器不再转动
+   ```
 
 3. 是否应该把函数当做 effect 的依赖
 
@@ -308,12 +332,12 @@ useCallback(fn,deps)相当于 useMemo(() => fn, deps)
 
 1. 引用相等
 
-当在 React 函数组件中定义一个对象时，它跟上次定义的相同对象，引用是不一样的（即使它具有所有相同值和相同属性）
+   当在 React 函数组件中定义一个对象时，它跟上次定义的相同对象，引用是不一样的（即使它具有所有相同值和相同属性）
 
-- 依赖列表
-- React.memo
+   - 依赖列表
+   - React.memo
 
-大多数时候，你不需要考虑去优化不必要的重新渲染，因为优化总会带来成本。
+   大多数时候，你不需要考虑去优化不必要的重新渲染，因为优化总会带来成本。
 
 2. 昂贵的计算
 
@@ -323,14 +347,10 @@ useCallback(fn,deps)相当于 useMemo(() => fn, deps)
 
 本文介绍了 hooks 产生动机、函数组件和类组件的区别以及 useEffect/useCallback/useMemo 等内容。重点介绍了 useEffect 的生命周期替换方案以及是否把函数作为 useEffect 的第二参数。
 
-> 参考链接
+<div class="link"> 参考链接 </div>
 
-[When to useMemo and useCallback](https://kentcdodds.com/blog/usememo-and-usecallback)
-
-[How to fetch data with React Hooks](https://www.robinwieruch.de/react-hooks-fetch-data)
-
-[A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
-
-[How Are Function Components Different from Classes?](https://overreacted.io/how-are-function-components-different-from-classes/)
-
-[useCallback、useMemo 分析 & 差别](https://github.com/monsterooo/blog/issues/37)
+- [When to useMemo and useCallback](https://kentcdodds.com/blog/usememo-and-usecallback)
+- [How to fetch data with React Hooks](https://www.robinwieruch.de/react-hooks-fetch-data)
+- [A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
+- [How Are Function Components Different from Classes?](https://overreacted.io/how-are-function-components-different-from-classes/)
+- [useCallback、useMemo 分析 & 差别](https://github.com/monsterooo/blog/issues/37)

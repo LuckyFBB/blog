@@ -6,6 +6,17 @@ group:
 order: 2
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+</style>
+
 ## 消息队列
 
 消息队列是在两个不相关进程间传递数据的一种简单、高效的方式，其独立于发送进程 、接收进程存在。
@@ -240,6 +251,6 @@ int main()
 1. 共享内存是进程间共享数据具有最高的效率。一个进程向共享内存区写入了数据，共享这个内存区域的所有进程就可以立刻看到其中的内容。并不需要通过系统调用或者其它需要切入内核的过程来完成。同时它也避免了对数据的各种不必要的复制
 2. 使用共享内存值得注意的是多个进程之间对共享内存区访问读取的互斥。某个进程正在向共享内存区写入数据时，别的进程不应当去读/写当前数据
 
-> 参考链接
+<div class="参考链接"></div>
 
 [腾讯二面：大白你了解共享内存吗？-51CTO.COM](https://www.51cto.com/article/693037.html)

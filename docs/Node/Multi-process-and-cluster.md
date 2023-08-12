@@ -5,6 +5,17 @@ group:
 order: 2
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+</style>
+
 在本文中主要会介绍多进程架构以及其问题，cluster 在多进程架构上解决了什么问题，以及其原理。
 
 ## 多进程架构
@@ -21,7 +32,7 @@ order: 2
 - 在主进程中监听子进程的变化，如果是自杀信号(suicide)重新启动一个工作进程
 - 主进程在监听到退出消息的时候，先退出子进程再退出主进程
 
-[对应代码](./../../src/Process/multi_process/master.js)
+[对应代码](https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/more_process/master.js)
 
 ```js
 const fork = require('child_process').fork;
@@ -82,7 +93,7 @@ function close(code) {
 - 通过 message 事件接受主进程 send 方法发送的消息
 - 监听 uncaughtException 事件，捕获未处理的异常，发送自杀信息由主进程重建进程，子进程在连接关闭之后再退出
 
-[对应代码](./../../src/Process/multi_process/worker.js)
+[对应代码](https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/more_process/worker.js)
 
 ```js
 const http = require('http');
@@ -145,7 +156,7 @@ Cluster 是常见的 Nodejs 利用多核的方法，是基于上面讲的`child_
 
 `ab -c 10 -n 5000 -r http://localhost:8080`，发起 5000 个请求
 
-[对应代码](./../../src/Process/cluster/worker.js)
+[对应代码](https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/cluster/worker.js)
 
 ```js
 const http = require('http');
@@ -166,7 +177,7 @@ http
 
 借助上述的示例，把它作为一个 worker，使用 cluster 模块来扩展当前示例，在主进程中根据电脑 cpu 的数量来创建对应的子进程
 
-[对应代码](./../../src/Process/cluster/master.js)
+[对应代码](https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/cluster/master.js)
 
 ```js
 const http = require('http');
@@ -489,7 +500,7 @@ function onconnection(err, clientHandle) {
 }
 ```
 
-> 参考连接
+<div class="link">参考连接</div>
 
 - [详解 Node.Js 中实现端口重用原理](https://segmentfault.com/a/1190000014701988)
 - [通过源码解析 Node.js 中 cluster 模块的主要功能实现](https://cnodejs.org/topic/56e84480833b7c8a0492e20c)

@@ -6,6 +6,30 @@ group:
 order: 0
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+    .foreword{
+        padding: 12px 12px 12px 16px;
+        background-color: #ECF9FF;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #439dd3;
+    }
+    .quote {
+        background-color: #FFE7CC;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
+
 ## 什么是编码
 
 编码，是信息从一种形式转变为另一种形式的过程，简要来说就是语言的翻译。
@@ -46,7 +70,7 @@ ASCII 码是一种字符编码标准，用于将数字、字母和其他字符�
 
 Unicode 最常用的就是使用两个字节来表示一个字符(如果是更为偏僻的字符，可能所需字节更多)。现代操作系统都直接支持 Unicode。
 
-> Unicode 和 ASCII 的区别
+<div class="quote">Unicode 和 ASCII 的区别</div>
 
 - ASCII 编码通常是一个字节，Unicode 编码通常是两个字节
 
@@ -192,6 +216,6 @@ const int8Array1 = new Int8Array(buffer);
 console.log(int8Array1);
 ```
 
-> 虽然 TypedArray 无法指定字节序，但是在存储的时候采用操作系统默认的字节序。所以当我们设置 int16Array[0] = 256 时，内存中存储的为 00 01
+<div class="quote">虽然 TypedArray 无法指定字节序，但是在存储的时候采用操作系统默认的字节序。所以当我们设置 int16Array[0] = 256 时，内存中存储的为 00 01</div>
 
 ![Untitled 5](https://user-images.githubusercontent.com/38368040/223735133-b3bc5ab7-ba7d-4177-b65d-4e113fe46ff4.png)

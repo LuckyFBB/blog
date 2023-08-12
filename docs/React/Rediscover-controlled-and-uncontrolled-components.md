@@ -6,6 +6,23 @@ group:
 order: 1
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+    .quote {
+        background-color: #FFE7CC;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
+
 ## 前言
 
 在 HTML 中，表单元素(`<input>`/`<textarea>`/`<select>`)，通常自己会维护 state，并根据用户的输入进行更新
@@ -158,7 +175,7 @@ function Demo() {
 }
 ```
 
-> 📌 受控以及非受控组件的边界划分取决于`当前组件对于子组件值的变更是否拥有控制权`。如果拥有控制权利子组件对于当前组件来说是受控的；反之则是非受控。
+<div class="quote">📌 受控以及非受控组件的边界划分取决于`当前组件对于子组件值的变更是否拥有控制权`。如果拥有控制权利子组件对于当前组件来说是受控的；反之则是非受控。</div>
 
 ## 反模式-以非受控组件的方式去调用受控组件
 
@@ -282,45 +299,45 @@ function EmailInput(props) {
 
 1. 使用 key 属性来做，会使组件整个组件的 state 都重置。可以在`getDerivedStateFromProps`和`componentWillReceiveProps` 来观察 id 的变化，麻烦但是可行
 
-```js
-class EmailInput extends Component {
-  state = {
-    email: this.props.email,
-    prevId: this.props.id,
-  };
+   ```js
+   class EmailInput extends Component {
+     state = {
+       email: this.props.email,
+       prevId: this.props.id,
+     };
 
-  componentWillReceiveProps(nextProps) {
-    const { prevId } = this.state;
-    if (nextProps.id !== prevId) {
-      this.setState({
-        email: nextProps.email,
-        prevId: nextProps.id,
-      });
-    }
-  }
-  // ...
-}
-```
+     componentWillReceiveProps(nextProps) {
+       const { prevId } = this.state;
+       if (nextProps.id !== prevId) {
+         this.setState({
+           email: nextProps.email,
+           prevId: nextProps.id,
+         });
+       }
+     }
+     // ...
+   }
+   ```
 
-[点击查看示例](https://codesandbox.io/s/use-componentwillreceiveprops-wovjf?file=/src/App.js)
+   [点击查看示例](https://codesandbox.io/s/use-componentwillreceiveprops-wovjf?file=/src/App.js)
 
 2. 使用实例方法重置非受控组件
 
    刚刚两种方式，均是再有唯一标识值的情况下。如果在没有合适的`key`值时，也想要重新创建组件。第一种方案就是生成随机值或者递增的值当作`key`值，另一种就是使用示例方法强制重置内部状态
 
-```js
-class EmailInput extends Component {
-  state = {
-    email: this.props.email,
-  };
-  resetEmailForNewUser(newEmail) {
-    this.setState({ email: newEmail });
-  }
-  // ...
-}
-```
+   ```js
+   class EmailInput extends Component {
+     state = {
+       email: this.props.email,
+     };
+     resetEmailForNewUser(newEmail) {
+       this.setState({ email: newEmail });
+     }
+     // ...
+   }
+   ```
 
-    父组件使用[ref](https://zh-hans.reactjs.org/docs/glossary.html#refs)调用这个方法，[点击查看示例](https://codesandbox.io/s/use-ref-cmfw0?file=/src/App.js)
+   父组件使用[ref](https://zh-hans.reactjs.org/docs/glossary.html#refs)调用这个方法，[点击查看示例](https://codesandbox.io/s/use-ref-cmfw0?file=/src/App.js)
 
 ## 那我们如何选？
 
@@ -342,7 +359,7 @@ class EmailInput extends Component {
 
 最后总结了一下，应当如何选择受控组件还是非受控组件。
 
-> 参考链接
+<div class="link"> 参考链接 </div>
 
 - [React 官网——受控组件](https://zh-hans.reactjs.org/docs/forms.html#controlled-components)
 - [React 官网——非受控组件](https://zh-hans.reactjs.org/docs/uncontrolled-components.html)

@@ -6,6 +6,17 @@ group:
 order: 0
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+</style>
+
 babel 的原名叫 6to5，简明扼要就是 es6 转 es5，但是没想到 es 标准推进的过快，短时间就有了 es7/8，所以它改名为 babel
 
 <!-- more -->
@@ -516,7 +527,7 @@ plugin-transform-runtime 插件借助 babel-runtime 实现了下面两个重要�
 - 使用 @babel/polyfill 解决 API 不能够被转译的，但是产生了全量引用的问题
 - 为了解决 @babel/polyfill 解决转译语法层时出现的代码冗余 以及全局变量污染问题，@babel/plugin-transform-runtime 出现了
 
-> 参考链接
+<div class="link">参考链接</div>
 
 - [不容错过的 Babel7 知识](https://juejin.cn/post/6844904008679686152#heading-7)
 - [手把手带你走进 Babel 的编译世界](https://mp.weixin.qq.com/s/E153XvbK16Y2r5FPwPX-3A)

@@ -3,375 +3,226 @@ title: NodeJS 中的 Buffer 究竟是什么？
 group:
   title: 异步 I/O
   order: 2
-order: 0
+order: 1
 ---
 
-> Buffer 用于读取或操作二进制流，用于操作网络协议、数据库、图片和文件 I/O 等一些需要大量二进制数据的场景。
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+    .foreword{
+        padding: 12px 12px 12px 16px;
+        background-color: #ECF9FF;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #439dd3;
+    }
+    .quote {
+        background-color: #FFE7CC;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
 
-## 二进制
+## 前言
 
-二进制就是使用 0 和 1 来表示数据。由于计算机只能读取和存储 0 和 1，所以在读取和展示数据时需进行二进制的转换。
+在 Stream 篇结中，我们留下了一个问题，下述代码输出的 chunk 是一个什么东西？
 
-**例如：**用二进制表示数字 10：
+![Untitled](/blog/imgs/buffer/Untitled.png)
 
-```js
-01010;
-```
+通过打印，我们发现 chunk 是 Buffer 对象，其中的元素是 16 进制的两位数，即 0 ～ 255 的数值
 
-## Stream
+![Untitled](/blog/imgs/buffer/Untitled%201.png)
 
-Stream，即流，是对输入输出文件的抽象。读取文件时即输入流，写入文件时即输出流。将文件以流的形式进行在程序中进行传输。
+说明在 Stream 中流动的数据就是 Buffer，那下面就让我们来探究一下 Buffer 的真实面目！
 
-## Buffer
+<div class="quote"> 🤔 Node 中为什么要引入 Buffer?</div>
 
-Buffer，即缓冲区。在内存中分配指定大小的内存空间，用来临时存储二进制数据。
+最开始的时候 JS 只在浏览器端运行，对于 Unicode 编码的字符串容易处理，但是对于二进制和非 Unicode 编码的字符串处理困难。并且二进制是计算机最底层的数据格式，视频/音频/程序/网络包都是以二进制来存储的。所以 Node 需要引入一个对象来操作二进制，因此 Buffer 诞生了，用于 TCP 流/文件系统等操作处理二进制字节。
 
-**一个实际的例子**，从一个文件夹拷贝到另一个文件夹，数据量大时，一次性那个拷贝的时间大于分批少量数据拷贝的时间。
+由于 Buffer 在 Node 中过于常用，所以在 Node 启动的时候已经引入了 Buffer，无需使用 require()
 
-![F2019CE7-9210-4B6E-A26D-FCF3504F54EE](https://user-images.githubusercontent.com/33477087/172648754-9fe07eb2-4b6c-42ca-8f4e-8d5aff6d9def.png)
+## ArrayBuffer
 
-**一个极端的例子**，假设读取一个 100G 的文件，写入另一个文件中。如果一次性读取所有的数据，并一次性写入。会有两个问题：
+### 是什么
 
-    1. 一次行读取，读取到的内容是放在内存中的，会造成内存的崩溃
-    2. 一次性写入，由于文件太大，写入速度会很慢
+ArrayBuffer 是内存之中的一段二进制数据，本身不能够操作内存，需要通过 [TypedArray 对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)或者 [DataView](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/DataView) 来操作。将缓冲区中的数据表示为特定的格式，并通过这些格式来读写缓冲区的内容，其部署了数组接口，可以使用数组的方式来操作数据
 
-能想到的一个解决办法是：分段读取和写入。即边读编写。可以利用 Buffer 来存储读取的数据，当数据量达到 Buffer 的长度时，就开始写入。防止一次性读取造成内存被占满阻塞。
+### TypedArray 视图
 
-```js
-// 读写文件 普通
-const fs = require('fs');
-const path = require('path');
-console.log(__dirname);
-fs.readFile(path.resolve(__dirname, 'index.html'), (err, data) => {
-  fs.writeFile(path.resolve(__dirname, './test.html'), data, (err, data) => {
-    console.log(data);
-  });
-});
+最常用的是 TypeArray 视图，用于读写简单类型的 ArrayBuffer，比如 Uint8Array(无符号 8 位整数)数组视图, Int16Array(16 位整数)数组视图
 
-// 读写文件 Buffer
-const fs = require('fs');
-const path = require('path');
-function copy(source, target, cb) {
-  const BUFFER_SIZE = 3;
-  const buffer = Buffer.alloc(BUFFER_SIZE);
-  let readOffset = 0;
-  let writeOffset = 0;
+### 和 Buffer 的关系
 
-  fs.open(source, 'r', (err, rfd) => {
-    fs.open(target, 'w', (err, wfd) => {
-      function next() {
-        fs.read(rfd, buffer, 0, BUFFER_SIZE, readOffset, (err, bytesRead) => {
-          console.log(222, bytesRead);
-          if (err) return cb(err);
-          if (bytesRead) {
-            fs.write(
-              wfd,
-              buffer,
-              0,
-              bytesRead,
-              writeOffset,
-              (err, bytesWrite) => {
-                readOffset += bytesRead;
-                writeOffset += bytesWrite;
-                next();
-              },
-            );
-            return;
-          }
-          fs.close(rfd, () => {});
-          fs.close(wfd, () => {});
-          cb();
-        });
-      }
-      next();
-    });
-  });
-}
-copy(`${__dirname}/index.html`, `${__dirname}/test.html`, (err) => {
-  if (err) return console.log('err：', err);
-  console.log('copy success');
-});
-```
+NodeJS 中的 Buffer 类其实是 Uint8Array 的实现。
 
-### Buffer 内存机制
+## Buffer 结构
 
-Node.js 中内存是由虚拟机进行管理的。由于**Node.js 是一个基于 Chrome V8 引擎的运行环境**，所以 V8 就是 Node.js 的运行环境。但是 Buffer 处理的是大量的二进制数据，如果用一点内存就像系统去申请，就会造成频繁的向系统申请内存。所以 Buffer 对象的内存不再由 V8 分配，而**是由 Node.js 中的 C++ 进行申请，Javascript 进行内存分配**。这部分内存被称为**堆外内存**。
+Buffer 是一个类似 Array 的对象，但是它主要用于操作字节
 
-### Buffer 的内存分配原理
+### 模块结构
 
-Buffer 的内存分配采用了 slab 机制预先申请，事后分配。slab 是一种动态的内存管理机制，是一块申请好的固定大小的内存区域。
+Buffer 是 JS 和 C++ 结合的模块，性能部分都由 C++ 实现，非性能部分都是 JS 实现的
 
-申请到固定的内存后，slab 有三种状态：
+![Untitled](/blog/imgs/buffer/Untitled%202.png)
 
-    - full：完全分配状态
+Buffer 所占用的内存不是由 V8 分配的，属于堆外内存。
 
-    申请的内存完全被分配。
+### 对象结构
 
-    - partial: 部分分配状态
+Buffer 对象类似数组，其元素是 16 进制的两位数，即 0 ～ 255 的数值
 
-    申请的内存部分被分配。
+![Untitled](/blog/imgs/buffer/Untitled%203.png)
 
-    - empty: 没有被分配的状态
+从这个例子能够看出，不同字符在 Buffer 中占据的字节是不一样的，在 UTF-8 编码下，中文占据 3 个字节，英文和半角标号占用 1 个字节
 
-    申请的内存完全没有被分配。
+<div class="quote"> 🤔 输入的元素是小数/负数/超出255会发生什么事情？</div>
 
-#### 8KB 限制
+![Untitled](/blog/imgs/buffer/Untitled%204.png)
 
-Node.js 以 8KB 来区分是大对象还是小对象。小于 8KB 被认为是小对象，大于等于 8KB 被认为是大对象。
+对于上述这种情况，Buffer 的处理为：
 
-源码中设置了初始化的 Buffer 的大小：
+- 给元素的赋值小于 0， 就将该值逐次加 256，直到得到一个 0 到 255 之间的整数
+- 如果得到的数值大于 255，就逐次减 256，直到得到 0 ～ 255 区间内的数值
+- 如果是小数，只保留整数部分
 
-```js
-Buffer.poolSize = 8 * 1024;
-```
+<div class="quote"> 🤔 Buffer 里面为什么展示的是16进制？</div>
 
-创建 Buffer 时，如果未指定大小，则会默认设置为 8KB
+其实在内存存储的依旧是二进制数，只是 Buffer 在显示这内存数据的时候采用了 16 进制
 
-![image](https://user-images.githubusercontent.com/33477087/173372740-253ebd18-0bd1-4f47-b9a4-251e50dbaea2.png)
+大小为 2 字节的 buffer，一共有 16 bit ，比如是`00000001 00100011`，如果直接这样显示不太方便就转成为了 16 进制`<Buffer 01, 23>`
 
-#### < 8kB
+## Buffer 的创建
+
+### Buffer.alloc 和 Buffer.allocUnsafe
+
+创建固定大小的 buffer
+
+\***\*Buffer.alloc(size [, fill [, encoding]])\*\***
+
+- size 新 Buffer 的所需长度
+- fill 用于预填充新 Buffer 的值。默认值: 0
+- encoding 如果 fill 是一个字符串，则这是它的字符编码。默认值: utf8
+
+![Untitled](/blog/imgs/buffer/Untitled%205.png)
+
+\***\*Buffer.allocUnsafe(size)\*\***
+
+分配一个大小为 size 字节的 Buffer，allocUnsafe 执行速度比 alloc 快，我们发现其结果并不像 Buffer.alloc 那样都初始化为 00
+
+![Untitled](/blog/imgs/buffer/Untitled%206.png)
+
+当调用 allocUnsafe 时分配的内存段尚未初始化，这样分配内存速度很块，但分配到的内存片段可能包含旧数据。如果在使用的时候不覆盖这些旧数据就可能造成内存泄露，虽然速度快，尽量避免使用
+
+Buffer 模块会预分配一个内部的大小为  Buffer.poolSize 的 Buffer 实例，作为快速分配的内存池，用于使用 allocUnsafe 创建新的 Buffer 实例
+
+### Buffer.from
+
+根据内容直接创建 Buffer
+
+- Buffer.from(string [, encoding])
+- Buffer.from(array)
+- Buffer.from(buffer)
+
+![Untitled](/blog/imgs/buffer/Untitled%207.png)
+
+## Buffer.allocUnsafe 的内存机制
+
+为了高效使用申请来的内存，Node.js 采用了 slab 机制进行预先申请、事后分配，是一种动态的管理机制
+
+使用  Buffer.alloc(size)  传入一个指定的  size 就会申请一块固定大小的内存区域，slab 具有如下三种状态
+
+- full: 完全分配状态
+- partial：部分分配状态
+- empty：没有被分配状态
+
+Node.js 使用 8 KB 为界限来区分是小对象还是大对象
+
+![Untitled](/blog/imgs/buffer/Untitled%208.png)
+
+<div class="quote">📌 Buffer 在创建的时候大小就已经被确定了且无法调整！</div>
+
+### 分配小对象
+
+如果分配的对象小于 8KB，Node 会按着小对象的方式来进行分配
+
+Buffer 的分配过程中主要使用一个局部变量  pool 作为中间处理对象，处于分配状态的  slab 单元都指向它。以下是分配一个全新的 slab 单元的操作，它将会新申请的 SlowBuffer 对象指向它
+
+![Untitled](/blog/imgs/buffer/Untitled%209.png)
+
+一个 slab 单元
+
+![Untitled](/blog/imgs/buffer/Untitled%2010.png)
 
 **分配一个 2KB 大小的 Buffer**
 
-```js
-var buf2KB = Buffer.allocUnsafe(2 * 1024);
-console.log('2KB：', Buffer.poolOffset());
-var buf2KB2 = Buffer.allocUnsafe(2 * 1024);
-console.log('第二个 2KB', Buffer.poolOffset());
+创建一个 2KB 的 buffer 后，一个 slab 单元内存如下：
 
-var buf2KB3 = Buffer.allocUnsafe(2 * 1024);
-console.log('第二个 2KB', Buffer.poolOffset());
-var buf3KB4 = Buffer.allocUnsafe(3 * 1024);
-console.log('第二个 2KB', Buffer.poolOffset());
-```
+![Untitled](/blog/imgs/buffer/Untitled%2011.png)
 
-![image](https://user-images.githubusercontent.com/33477087/173394570-dda3c0d9-cf86-4c15-84b0-da48c7888d4c.png)
+这个分配过程是由 allocate 方法完成
 
-#### >= 8kB
+![Untitled](/blog/imgs/buffer/Untitled%2012.png)
 
-**分配大于 8kB 的 BUffer**
+当我们创建了一个 2KB 的 buffer 之后，当前 slab 状态为 partial
 
-```js
-var buf9KB = Buffer.allocUnsafe(9 * 1024);
-console.log('9KB：', Buffer.poolOffset());
-```
+再次创建 buffer 的时候，会去判断当前 slab 剩余空间是否足够。如果足够，使用剩余空间，并更新 slab 的分配状态
 
-![image](https://user-images.githubusercontent.com/33477087/173395741-7bde09ab-9ab5-41f5-8507-b05979972741.png)
+如果 slab 空间不够，就会构建新的 slab，原 slab 中剩余的空间造成浪费
 
-#### 总结(alloc 分配内存除外)
+### 分配大对象
 
-1. 在首次加载时会分配一个 8KB 的内存空间
-2. 以 8KB 为界，小于 8KB 为小对象，大于 8KB 为大对象
-3. 小 Buffer 的情况，判断 slab 的空间是否足够：
-   - 如果足够，从剩余的空间进行分配，并更新位移 `poolOffset` 的值
-   - 如果不够，则利用 `createPool()` 重新创建一个 slab 的空间大小
+如果有超过 8KB 的 buffer，直接会走到 creatUnsafeBuffer 函数，分配一个 slab 单元，这个 slab 单元将会被这个大 Buffer 对象独占
 
-![image](https://user-images.githubusercontent.com/33477087/173386023-b5f65d9f-fdd9-40af-a50d-d638ee2b6ee1.png)
+allocate 分配机制如图
 
-4. 大 buffer 的情况，直接通过 `createUnsafeBuffer(size)` 进行创建
-5. 内存是利用 Node.js 中的 C++ 进行分配的，利用 JS 进行内存管理。最终的垃圾回收还是通过 V8 的垃圾回收标记进行回收的
+![Untitled](/blog/imgs/buffer/Untitled%2013.png)
 
-### Buffer 的基本使用
+### Buffer 的内存分配机制
 
-#### 实例化方式
+![Untitled](/blog/imgs/buffer/Untitled%2014.png)
 
-- `Buffer.from()`
-  TODO: ArrayBuffer
+## Buffer 和字符编码
 
-```js
-// Buffer.from(array)：传入数组，数组的每一项是一个表示8位的数字，值必须在 0-255之间，否则会取模
-const bf1 = Buffer.from([1, 2, 3]);
-const bf11 = Buffer.from([256]);
-// Buffer.from(arrayBuffer)： arrayBuffer 的一个副本
-const bf2 = Buffer.from(bf1);
-// Buffer.from(string [, encoding])：返回包含给定字符串的 buffer
-const bf3 = Buffer.from('test', 'utf-8');
-// Buffer.from(buffer)：buffer 的一个副本
-const bf4 = Buffer.from(bf3);
-console.log(bf1, bf11, bf2, bf3, bf4);
-```
+通过使用字符编码，可实现 Buffer 实例与 JavaScript 字符串之间的相互转换
 
-![image](https://user-images.githubusercontent.com/33477087/173399589-d4d9a80a-3d9c-4dd3-9c44-2ea654000fe1.png)
+![Untitled](/blog/imgs/buffer/Untitled%2015.png)
 
-- `Buffer.alloc()` TODO: buffer 里面为什么存的是 16 进制
+Node 中目前支持 utf8、ucs2、utf16le、latin1、ascii、base64、hex、base64Url 八种编码方式，[具体实现](https://github.com/nodejs/node/blob/main/lib/buffer.js#L589)
 
-```js
-// Buffer.alloc(size [, fill [, encoding]])：返回指定大小，并且已填充的 buffer
-var buf1 = Buffer.alloc(10);
-var buf2 = Buffer.alloc(10, 1);
-var buf3 = Buffer.alloc(10, 2);
-var buf4 = Buffer.alloc(10, 22);
+![Untitled](/blog/imgs/buffer/Untitled%2016.png)
 
-console.log(buf1);
-console.log(buf2);
-console.log(buf3);
-console.log(buf4);
-```
+针对于每一种不同的编码方案都会用实现一系列 api，返回会有不同的结果，Node.js 会根据传入的 encoding 来返回不同的对象
 
-![image](https://user-images.githubusercontent.com/33477087/173400248-ba686be4-e438-4d79-b0ba-001c1bcd9075.png)
+## Buffer 和字符串的转换
 
-- `Buffer.allocUnsafe()`
+### 字符串转 Buffer
 
-```js
-// Buffer.allocUnsafe(size)：返回指定大小的 buffer
-const bufUnsafe1 = Buffer.allocUnsafe(10);
-console.log(bufUnsafe1);
-```
+主要通过上述讲的 Buffer.from 方法，默认的 encoding 方式为 utf-8
 
-![image](https://user-images.githubusercontent.com/33477087/173400607-84cbd46f-1897-42c0-965e-a15507cdd8f7.png)
+### Buffer 转字符串
 
-#### Buffer 字符编码
+![Untitled](/blog/imgs/buffer/Untitled%2017.png)
 
-- 'ascii' - 仅适用于 7 位 ASCII 数据。此编码速度很快，如果设置则会剥离高位。
-- 'utf8' - 多字节编码的 Unicode 字符。许多网页和其他文档格式都使用 UTF-8。
-- 'utf16le' - 2 或 4 个字节，小端序编码的 Unicode 字符。支持代理对（U+10000 至 U+10FFFF）。
-- 'ucs2' - 'utf16le' 的别名。
-- 'base64' - Base64 编码。当从字符串创建 Buffer 时，此编码也会正确地接受 RFC 4648 第 5 节中指定的 “URL 和文件名安全字母”。
-- 'latin1' - 一种将 Buffer 编码成单字节编码字符串的方法（由 RFC 1345 中的 IANA 定义，第 63 页，作为 Latin-1 的补充块和 C0/C1 控制码）。
-- 'binary' - 'latin1' 的别名。
-- 'hex' - 将每个字节编码成两个十六进制的字符。
+<div class="quote"> 🤔 为什么会出现乱码呢？如何解决这个问题呢？</div>
 
-### 字符串类型与 Buffer 类型相互转换
+按着读取来说，我们每次读取的长度为 4，chunk 输出如下
 
-- 字符串转 Buffer
+![Untitled](/blog/imgs/buffer/Untitled%2018.png)
 
-利用 `Buffer.from(string, encoding)`
+对于`data += chunk`等价于`data = data.toString + chunk.toString`
 
-```js
-// 字符串转 Buffer
-const buf = Buffer.from('Buffer 学习', 'utf-8');
+由于一个中文占据三个字节，第一个 chunk 中的第四个字节会显示乱码，第二个 chunk 的第一第二个字节也无法形成文字等等，所以会展示乱码问题
 
-console.log(buf);
-console.log(buf.length);
-```
+<div class="link">参考链接</div>
 
-![image](https://user-images.githubusercontent.com/33477087/173401794-a600308b-c183-479b-83a7-5f78a47b34dd.png)
-
-- Buffer 转字符串
-
-利用 `toString([encoding], [start], [end])`进行转换
-
-    - start、end 不写，默认转换全部
-
-```js
-const buf = Buffer.from('Buffer 学习', 'utf-8');
-
-console.log(buf.toString());
-```
-
-![image](https://user-images.githubusercontent.com/33477087/173402252-1ba36ce6-d32b-4c95-9c5d-68cf8fe16d15.png)
-
-    - 传入 start、end 实现部分转换
-
-```js
-const buf = Buffer.from('Buffer 学习', 'utf-8');
-
-console.log(buf.toString());
-console.log(buf.toString('utf-8', 1, 3));
-console.log(buf.toString('utf-8', 1, 9));
-```
-
-![image](https://user-images.githubusercontent.com/33477087/173402753-8ee5358b-fe2e-4add-bdb3-2b227f506b3a.png)
-
-**为什么会出现乱码？**
-
-在 UTF-8 编码中，一个汉字占三个字节。截取字符串 ·Buffer 学习· 中的 1-9 位，共 8 个字节，前 6 个字符分别是 ·uffer ·，导致最后一个汉字只有两个字节了。所以会乱码。修改如下：
-
-```js
-console.log(buf.toString('utf-8', 1, 10));
-```
-
-### Buffer 的应用场景
-
-1. I/O 操作
-
-   I/O 分为文件 I/O 和 网络 I/O。本文只是对 Buffer 的操作，后续会专门介绍 I/O。
-
-```js
-// 读写文件 Buffer
-const fs = require('fs');
-const path = require('path');
-function copy(source, target, cb) {
-  const BUFFER_SIZE = 3;
-  const buffer = Buffer.alloc(BUFFER_SIZE);
-  let readOffset = 0;
-  let writeOffset = 0;
-
-  fs.open(source, 'r', (err, rfd) => {
-    fs.open(target, 'w', (err, wfd) => {
-      function next() {
-        fs.read(rfd, buffer, 0, BUFFER_SIZE, readOffset, (err, bytesRead) => {
-          console.log(222, bytesRead);
-          if (err) return cb(err);
-          if (bytesRead) {
-            fs.write(
-              wfd,
-              buffer,
-              0,
-              bytesRead,
-              writeOffset,
-              (err, bytesWrite) => {
-                readOffset += bytesRead;
-                writeOffset += bytesWrite;
-                next();
-              },
-            );
-            return;
-          }
-          fs.close(rfd, () => {});
-          fs.close(wfd, () => {});
-          cb();
-        });
-      }
-      next();
-    });
-  });
-}
-copy(`${__dirname}/index.html`, `${__dirname}/test.html`, (err) => {
-  if (err) return console.log('err：', err);
-  console.log('copy success');
-});
-```
-
-2. 加解密
-   一些加密算法中会用到 Buffer。例如 `crypto.createCipheriv` 中的第二个参数 key 为 String 或 Buffer 类型.
-
-```js
-const [key, iv, algorithm, encoding, cipherEncoding] = [
-  'a123456789',
-  '',
-  'aes-128-ecb',
-  'utf8',
-  'base64',
-];
-function getKey(key) {
-  const buf = Buffer.alloc(16);
-  buf.fill(key, 0, 10);
-  return buf;
-}
-function encrypt(key, iv, data) {
-  const cipher = crypto.createCipheriv(algorithm, key, iv);
-  cipher.update(data, encoding, cipherEncoding);
-  return cipher.final(cipherEncoding);
-}
-function decrypt(key, iv, crypted) {
-  let decipher = crypto.createDecipheriv(algorithm, key, iv);
-  decipher.update(crypted, cipherEncoding, encoding);
-  return decipher.final(encoding);
-}
-
-const key2 = getKey(key);
-let encryptStr = encrypt(key2, iv, 'Buffer 学习');
-let decryptStr = decrypt(key2, iv, encryptStr);
-console.log(encryptStr, decryptStr);
-```
-
-## Buffer 与 Cache 的区别
-
-- Buffer
-
-  Buffer 用于处理二进制数据，是临时性的存储。等待缓冲区的数据达到一定大小后才存入磁盘。主要用于读写数据。
-
-- Cache
-
-  Cache 是缓存。可以永久的将数据缓存，例如 redis。将不易改变的且数据量大的数据存放到缓存中，例如 一些字典数据。等下次请求接口时，直接从缓存返回，速度更快。
+- [Buffer 缓冲器](https://tsejx.github.io/node-guidebook/system/io/buffer/)
+- [NodeJS stream 一：Buffer](https://zhuanlan.zhihu.com/p/24429470)
+- [探究不在 V8 堆内存中存储的 Buffer 对象](https://juejin.cn/post/6844903988597358600)
+- [【深入探究 Node】（5）“Buffer 与乱码的故事” 有十问](https://mp.weixin.qq.com/s/lcSfn2-bECNnXEIYm5gA5A)

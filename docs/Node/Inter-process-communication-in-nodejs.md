@@ -5,6 +5,23 @@ group:
 order: 3
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+    .quote {
+        background-color: #FFE7CC;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
+
 ## 前置知识
 
 ### 文件描述符
@@ -116,7 +133,7 @@ Node 中的 IPC 通道具体实现是由 [libuv](https://luohaha.github.io/Chine
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/179391106-7ec14866-a7cd-42b8-a9fb-b6ab01692eb9.png">
 
-⚠️  只有在启动的子进程是 Node 进程时，子进程才会根据环境变量去连接对应的 IPC 通道，对于其他类型的子进程则无法实现进程间通信，除非其他进程也按着该约定去连接这个 IPC 通道。
+<div class="quote">⚠️  只有在启动的子进程是 Node 进程时，子进程才会根据环境变量去连接对应的 IPC 通道，对于其他类型的子进程则无法实现进程间通信，除非其他进程也按着该约定去连接这个 IPC 通道。</div>
 
 ### unix domain socket
 
@@ -442,7 +459,8 @@ fork 函数开启一个子进程的流程
 
 ## 句柄传递
 
-setupChannel
+### setupChannel
+
 主要是完成了处理接收的消息、发送消息、处理文件描述符传递等
 
 ```js
@@ -473,7 +491,7 @@ function setipChannel() {
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/185774300-230c37a0-c816-4cdd-89da-1fbdfcbc6bea.png">
 
-进程间消息传递
+### 进程间消息传递
 
 - 父进程通过 child.send 发送消息 和 server/socket 句柄对象
 - 普通消息直接 JSON.stringify 序列化；对于句柄对象来说，需要先包装成为内部对象
@@ -513,7 +531,7 @@ function setipChannel() {
 - 检查是否带有 TCP 对象，通过 handleConversion.[message.type].got 得到和父进程一样的句柄对象
 - 最后发触发 message 事件传递处理好的消息和句柄对象，子进程通过 process.on 接收
 
-> 参考链接
+<div class="link">参考链接</div>
 
 - [分析 child_process.fork 以及进程间消息传递](https://zhuanlan.zhihu.com/p/342049236)
 - [Node.js 源码剖析 - 进程](https://theanarkh.github.io/understand-nodejs/chapter13-%E8%BF%9B%E7%A8%8B/)

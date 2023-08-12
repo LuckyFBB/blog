@@ -6,6 +6,17 @@ group:
 order: 1
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+</style>
+
 babel 和 eslint 都是我们项目中常用的工具，两者都是基于 AST 去扩展的，前者做代码的转换，后者做错误检查和修复。两者都能够做到分析和转换代码。所以两者有啥不同呢？
 
 ## babel 插件
@@ -351,7 +362,7 @@ Babel 和 Eslint 原理是差不多的，先将源代码 parse，在提供对应
 
 ![对比](https://user-images.githubusercontent.com/38368040/169676160-2030cce6-7732-41a2-8bc9-15346f32a456.png)
 
-> 参考链接
+<div class="link">参考链接</div>
 
 - [零基础理解 ESLint 核心原理](https://mp.weixin.qq.com/s/wzFh_dvB13hq9OV3pC955w)
 - [深入对比 eslint 插件 和 babel 插件的异同点](https://mp.weixin.qq.com/s/73TYS14n_J4nRZrj9pCt0g)

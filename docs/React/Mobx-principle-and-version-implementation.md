@@ -6,6 +6,23 @@ group:
 order: 3
 ---
 
+<style>
+    .link {
+        margin-top: 16px;
+        padding: 4px 12px 4px 10px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-left: 5px solid #F8CBA6;
+        background-color: #FFFBEB;
+    }
+    .quote {
+        background-color: #FFE7CC;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+</style>
+
 ## 前言
 
 在之前的文章中，我们讲述了 React 的数据流管理，从 props → context → Redux，以及 Redux 相关的三方库 React-Redux。
@@ -182,7 +199,7 @@ class TodoList {
 
 包裹 React 组件的高阶组件，在组件的 render 函数中任何使用的`observable`发生变化时，组件都会调用 render 重新渲染，更新 UI
 
-⚠️ 不要放在顶层 Page，如果一个 state 改变，整个 Page 都会 render，所以 observer 尽量取包裹小组件，组件越小重新渲染的变化就越小
+<div class="quote">⚠️ 不要放在顶层 Page，如果一个 state 改变，整个 Page 都会 render，所以 observer 尽量取包裹小组件，组件越小重新渲染的变化就越小</div>
 
 ```js
 @observer
@@ -466,9 +483,7 @@ export function observer(target: any) {
 2. 修改数据的方式
 
    - 他们修改状态的方式是不同的，Redux 每一次都返回了新的 state。Mobx 每次修改的都是同一个状态对象，基于响应式原理，`get`时收集依赖，`set`时通知所有的依赖
-
    - 当 state 发生改变时，Redux 会通知所有使用 connect 包裹的组件；Mobx 由于收集了每个属性的依赖，能够精准通知
-
    - 当我们使用 Redux 来修改数据时采用的是 reducer 函数，函数式编程思想；Mobx 使用的则是面向对象代理的方式
 
 3. Store 的区别
@@ -479,7 +494,7 @@ export function observer(target: any) {
 
 本文从 Mobx 的简单示例开始，讲述了一下 Mobx 的执行流程，引入了对应的核心概念，然后从零开始实现了一个简版的 Mobx，最后将 Mobx 和 Redux 做了一个简单的对比
 
-> 参考链接
+<div class="link">参考链接</div>
 
 - [从零实现 Mobx：深入理解 Mobx 原理](https://github.com/yinguangyao/blog/issues/54#)
 - [MobX 实现原理揭秘](https://mp.weixin.qq.com/s/KnlRBGr0iS2BBrsVB4oUsw)
