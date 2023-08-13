@@ -11,7 +11,7 @@ order: 2
 
 <!-- more -->
 
-在[前文](https://luckyfbb.github.io/2019/03/21/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/)中介绍了栈和队列的相关知识，可以进行查看阅读。
+在[前文](/data-structure/stack-and-queue)中介绍了栈和队列的相关知识，可以进行查看阅读。
 
 ## 解题技巧
 

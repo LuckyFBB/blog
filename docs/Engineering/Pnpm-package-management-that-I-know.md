@@ -2,7 +2,7 @@
 title: 我所知道的 npm/Yarn/pnpm 包管理
 group:
   title: 包管理
-  order: 2
+  order: 3
 order: 0
 ---
 

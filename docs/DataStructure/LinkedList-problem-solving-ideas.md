@@ -11,7 +11,7 @@ order: 1
 
 <!-- more -->
 
-在[前文](https://luckyfbb.github.io/2019/03/22/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%8B%E9%93%BE%E8%A1%A8/)中介绍了链表的相关知识，可以进行查看阅读。
+在[前文](/data-structure/linked-list)中介绍了链表的相关知识，可以进行查看阅读。
 
 ## 解题思路
 

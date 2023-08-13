@@ -6,7 +6,7 @@ group:
 order: 0
 ---
 
-在[前文](https://luckyfbb.github.io/2020/04/19/%E4%BA%8C%E5%8F%89%E6%A0%91/#more)中介绍了二叉树的相关知识，可以进行查看阅读。
+在[前文](/data-structure/node-tree)中介绍了二叉树的相关知识，可以进行查看阅读。
 
 ## 解题技巧
 

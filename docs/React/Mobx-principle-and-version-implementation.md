@@ -464,7 +464,7 @@ export function observer(target: any) {
 
 至此一个简单的 Mobx 就实现了，[线上代码地址](https://github.com/LuckyFBB/Front-End-Examples/tree/defineProperty_mobx/mini-mobx)
 
-文章中使用的 Object.defineProperty 实现，Proxy 实现差不多，[线上代码地址](https://github.com/LuckyFBB/Front-End-Examples/tree/proxy_mobx/mini-mobx)
+文章中使用的 Object.defineProperty 实现，Proxy 实现差不多，[线上代码地址](https://github.com/LuckyFBB/Front-End-Examples/tree/proxy_mobx/mini-proxy-mobx)
 
 ## Mobx vs Redux
 

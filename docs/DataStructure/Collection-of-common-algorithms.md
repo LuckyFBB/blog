@@ -780,7 +780,7 @@ var numSubarrayProductLessThanK = function (nums, k) {
 区间的很多问题中，通常需要判断是否有重叠，要么合并区间。
 对于给定的两个区间 a，b 来说，可能存在三种情况--覆盖/交叉(可合并成一个大区间)/不相交。
 
-<div >![](/image/algorithm/interval.png)</div>
+![](/blog/imgs/algorithm/interval.png)
 
 技巧:
 
@@ -798,7 +798,7 @@ var numSubarrayProductLessThanK = function (nums, k) {
 - 按区间终点升序排列。
 - 前一项的 end<后一项的 start，则不存在相交。
 
-<div >![](/image/algorithm/interval_b.png)</div>
+![](/blog/imgs/algorithm/interval_b.png)
 
 ### 1288-删除被覆盖区间
 
@@ -897,7 +897,7 @@ var merge = function (intervals) {
 
 分析：对于一组数据，要找交集列表，交集的 start 是两个数组中较大的左边界(红线)，交集的 end 是两个数组中较小的右边界(绿线)。如果 start<=end，即有交集[start,end]。右边界较小的区间 point 向下一个区间移动。
 
-<div >![](/image/algorithm/interval_a.png)</div>
+![](/blog/imgs/algorithm/interval_a.png)
 
 ```js
 var intervalIntersection = function (A, B) {
@@ -1283,7 +1283,7 @@ var findDisappearedNumbers = function (nums) {
 
 需要借助别的变量，一个变量指向头结点(current)，另一个指向处理完的节点(previous)。将 current 的指向 previous，然后移向下一个，同时 previous 更新到刚处理完的节点。
 
-<div >![](/image/algorithm/reverseLink.png)</div>
+![](/blog/imgs/algorithm/reverseLink.png)
 
 ```js
 const next = current.next;
@@ -1603,8 +1603,6 @@ var minDepth = function (root) {
 };
 ```
 
-前面的博客中梳理了更多关于二叉树的题目，[点击查看](https://luckyfbb.github.io/2020/09/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/#more)
-
 ## 树上的 DFS
 
 该模式是从根开始，如果该节点不是叶子节点，需要干三件事情：
@@ -1733,8 +1731,6 @@ var sumNumbers = function (root) {
 };
 ```
 
-前面的博客中梳理了更多关于二叉树的题目，[点击查看](https://luckyfbb.github.io/2020/09/20/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/#more)
-
 ## 子集类型
 
 子集问题模式一般用多重 DFS。
@@ -1785,7 +1781,7 @@ bakctrack(nums, 0, []);
 
 分析：在递归之前加入解集；枚举出当前可选的数字，第一个数可选 1/2/3；假如第一个数选了 1，第二个数可选 2/3，以此类推；每次传入子递归的 index 是：当前选中数字的索引+1；然后每次递归的选项变少，一直递归到没有可选数字，进入不了循环，整个 DFS 结束；最后递归自然结束；
 
-<div >![](/image/algorithm/subset.png)</div>
+![](/blog/imgs/algorithm/subset.png)
 
 ```js
 var subsets = function (nums) {
@@ -1854,7 +1850,7 @@ var subsetsWithDup = function (nums) {
 
 分析：采用回溯模板，选择-递归-撤销选择。数组中的每一个数据都应该存在于解集中，所以当 track 的长度等于 nums 的长度时，把当前解集放入答案。遍历数组，做选择，如果 track 中已经有当前数据了，则跳过。
 
-<div >![](/image/algorithm/permute.png)</div>
+![](/blog/imgs/algorithm/permute.png)
 
 ```js
 var permute = function (nums) {
@@ -2073,7 +2069,7 @@ var combinationSum2 = function (candidates, target) {
 [Leetcode](https://leetcode-cn.com/problems/letter-case-permutation/)
 分析：变形的全排列题目。改变字母大小写，获得新的字符串。套用回溯算法。
 
-<div>![](/image/algorithm/letterCase.png)</div>
+![](/blog/imgs/algorithm/letterCase.png)
 
 ```js
 var letterCasePermutation = function (S) {
