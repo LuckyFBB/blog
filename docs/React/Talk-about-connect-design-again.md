@@ -3,7 +3,7 @@ title: 再谈 Connect 设计
 group:
   title: 数据流
   order: 1
-order: 2
+order: 3
 ---
 
 阅读本文前，请先阅读前文[数据流前篇](/react/data-flow-management-in--react)和[关于 Redux 的更多](/react/redux)

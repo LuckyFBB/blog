@@ -3,7 +3,7 @@ title: 关于 Redux 的更多
 group:
   title: 数据流
   order: 1
-order: 1
+order: 2
 ---
 
 <style>
