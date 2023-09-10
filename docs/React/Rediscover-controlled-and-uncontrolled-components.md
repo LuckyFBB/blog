@@ -108,7 +108,7 @@ const handleChange = (event) => {
 
 React 组件控制着用户输入过程中表单发生的操作并且 state 还是唯一数据源，被 React 以这种方式控制取值的表单输入元素叫做受控组件
 
-> 📌 对于受控组件来说，输入的值始终由`React`的`state`驱动!!!
+<div class="quote">📌 对于受控组件来说，输入的值始终由`React`的`state`驱动!!!</div>
 
 ## 受控和非受控组件边界
 
