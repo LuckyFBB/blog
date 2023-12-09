@@ -364,12 +364,15 @@ const createStore = (reducer, initialState = {}) => {
 
 - createStore
   创建 store 对象，包含 getState/dispatch/subscribe 等方法，能够获取 state/更改数据/监听数据的改变
+
   ![Untitled](/blog/imgs/redux/Untitled%201.png)
+
 - reducer
   一个计划函数，接收旧的 state 和 action 返回一个新的 state
-  ![Untitled](/blog/imgs/redux/Untitled%202.png)
-- combineReducers
 
+  ![Untitled](/blog/imgs/redux/Untitled%202.png)
+
+- combineReducers
   多 reducer 合并成一个 reducer
 
   ![Untitled](/blog/imgs/redux/Untitled%203.png)
