@@ -44,7 +44,7 @@ ASCII 码是一种字符编码标准，用于将数字、字母和其他字符�
 
 它最初是由美国信息交换标准所制定的，它包含了 128 个字符，其中包括了数字、大小写字母、标点符号、控制字符等等。
 
-在计算机中一个字节可以表示 256 众不同的状态，就对应 256 字符，从 0000000 到 11111111。ASCII 码一共规定了 128 字符，所以只需要占用一个字节的后面 7 位，最前面一位均为 0，所以 ASCII 码对应的二进制位 00000000 到 01111111。
+在计算机中一个字节可以表示 256 种不同的状态，就对应 256 字符，从 0000000 到 11111111。ASCII 码一共规定了 128 字符，所以只需要占用一个字节的后面 7 位，最前面一位均为 0，所以 ASCII 码对应的二进制位 00000000 到 01111111。
 
 ![Untitled](https://user-images.githubusercontent.com/38368040/222965840-df5e6a11-2191-40e0-b62a-55fb09635206.png)
 
@@ -142,7 +142,7 @@ Unicode 符号范围                   |     具体Unicode码                ｜
 
 ![Untitled 3](https://user-images.githubusercontent.com/38368040/222965864-e980f3ce-0916-437f-a1c8-d3b8f07ca805.png)
 
-### 简单聊聊 ArrayBuffer 和 \***\*TypedArray、DataView\*\***
+### 简单聊聊 ArrayBuffer 和 TypedArray、DataView
 
 ![Untitled 4](https://user-images.githubusercontent.com/38368040/223735182-548576bf-a071-4e65-94ef-09ccb50e12e8.png)
 
