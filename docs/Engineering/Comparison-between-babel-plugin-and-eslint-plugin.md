@@ -237,8 +237,10 @@ module.exports = {
 #### 项目中引入插件
 
 由于是本地开发，所以采用`npm link`的方式，使用我们创建的 plugins
+
 ![link](https://user-images.githubusercontent.com/38368040/169676050-bb1f0d7e-7d85-463d-bb6b-53232a517ce9.png)
 在我们的项目中引入该插件 npm link eslint-plugin-demo，创建对应的软链接
+
 ![demo](https://user-images.githubusercontent.com/38368040/169676054-8220744a-b145-4279-ada5-1f6ffebe9459.png)
 
 配置如下的 .eslintrc.js 文件，编写对应的代码，执行一下 eslint
@@ -263,6 +265,7 @@ module.exports = {
 我们需要处理块级语句，也就是`BlockStatement`，对于该节点来说，希望它和判断条件在一行并且中间保持一个空格。
 
 ⚠️ 我们之所以在 Eslint 中可以做格式校验，是因为我们可以通过 context 提供的`getSourceCode`API 获得 AST 以及相关的 tokens
+
 ![sourceCode](https://user-images.githubusercontent.com/38368040/169676114-74a8eb9f-8424-4ac8-ae2e-0c4bdc5b6e8f.png)
 ![token](https://user-images.githubusercontent.com/38368040/169676121-32809119-21da-4318-a837-e8cffa0138be.png)
 
