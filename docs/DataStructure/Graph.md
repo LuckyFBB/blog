@@ -20,15 +20,15 @@ order: 7
 
 在图中，有**无向图**与**有向图**之分，如果边有方向的话，就是有向图，反之则为无向图。
 
-<div style="margin: auto;width:500px;">![无向图](/image/graph/first.png)</div>
+![无向图](/blog/imgs/graph/first.png)
 
-<div style="margin: auto;width:500px;">![无向图](/image/graph/second.png)</div>
+![无向图](/blog/imgs/graph/second.png)
 
 在无向图中，有度的概念，表示为一个顶点有多少条边。在有向图中，会把度分为**入度**和**出度**。入度表示有多少边指向这个顶点；出度表示有多少条边是以这个顶点为起点指向其他顶点。
 
 还有一种图，叫做**带权图**，在带权图中每条边都有一个权重。
 
-<div style="margin: auto;width:500px;">![无向图](/image/graph/three.png)</div>
+![无向图](/blog/imgs/graph/three.png)
 
 #### 存储方法
 
@@ -37,7 +37,7 @@ order: 7
 图的最直观一种存储方式就是邻接矩阵。
 邻接矩阵的底层是一个二维数组。对于无向图来说，如果顶点 i 和顶点 j 之间有边，就把 A[i][j]和 A[j][i]标记为 1；对于有向图来说，如果顶点 i 到顶点 j 之间，有一条箭头从顶点 i 指向顶点 j 的边，就把 A[i][j]标记为 1；对于带权图来说，数组中对应的存储相应的权重。
 
-<div style="margin: auto;width:500px;">![无向图](/image/graph/array.png)</div>
+![无向图](/blog/imgs/graph/array.png)
 
 虽然这种存储方式简单、直观，但是比较浪费存储空间。尤其是对于无向图来说，A[i][j]为 1 的话，那么 A[j][i]也为 1。实际上，只需要存储一个就行了，等用于浪费了一般的存储空间。
 
@@ -45,7 +45,7 @@ order: 7
 
 在表示上，邻接表看起来有点像散列表。每个顶点，都对应了一条链表，链表中存储的是这个顶点与相连接的其他顶点。
 
-<div style="margin: auto;width:500px;">![邻接表](/image/graph/list.png)</div>
+![邻接表](/blog/imgs/graph/list.png)
 
 ### 构建图
 
@@ -94,7 +94,7 @@ class Graph {
 
 这一段代码就已经将图类创建好了，如图：
 
-<div style="margin: auto;width:500px;">![邻接表](/image/graph/search.png)</div>
+![邻接表](/blog/imgs/graph/search.png)
 
 为了直观的将邻接表展示出来，我们为 Graph 添加 toString 方法，能够展示出与每个顶点连接的其他的顶点。
 
@@ -156,7 +156,7 @@ __initializeColor() {
 
 针对于上图，以'A'做为第一个访问顶点，它的访问顺序就是下图所展示的：
 
-<div style="margin: auto;width:500px;">![示意图](/image/graph/bfs.png)</div>
+![示意图](/blog/imgs/graph/bfs.png)
 
 代码实现：
 
@@ -190,7 +190,7 @@ bfs(v, cb) {
 
 针对于上图，以'A'做为第一个访问顶点，它的访问顺序就是下图所展示的：
 
-<div style="margin: auto;width:500px;">![示意图](/image/graph/dfs.png)</div>
+![示意图](/blog/imgs/graph/dfs.png)
 
 代码实现：
 

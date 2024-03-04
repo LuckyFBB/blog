@@ -656,7 +656,7 @@ var hasCycle = function (head) {
 [leetcode](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
 
 分析 1：快慢指针法。和上一题的方法一样，从链表头开始，快指针每次走两步，慢指针每次走一步。
-![](/image/linked_list_sycle.png)
+![](/blog/imgs/algorithm/linked_list_sycle.png)
 D：头节点到入环点的距离
 S1：从入环点到首次相遇点的距离
 S2：从首次相遇点到入环点的距离

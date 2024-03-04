@@ -28,13 +28,13 @@ order: 6
 - 高度(height)：节点到叶子节点的最长路径
 - 深度(depth)：根节点到这个节点所经历的边的个数
 - 层(level)：节点的深度+1
-<div style="margin: auto">![普通二叉树](/image/tree/tree_height.png)</div>
+  ![普通二叉树](/blog/imgs/tree/tree_height.png)
 
 ## 二叉树
 
 在上面我们提到，二叉树就是每个节点最多含有两个子树。
 
-<div style="margin: auto">![普通二叉树](/image/tree/binary_tree.png)</div>
+![普通二叉树](/blog/imgs/tree/binary_tree.png)
 
 ### 关于递归
 
@@ -89,14 +89,14 @@ function traverse(root) {
 这是一种基于指针或者引用的二叉链式存储法。这是一种常用的方式。
 每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。
 
-<div style="margin: auto">![普通二叉树](/image/tree/tree_linked.png)</div>
+![普通二叉树](/blog/imgs/tree/tree_linked.png)
 
 ##### 顺序存储法
 
 这是一种基于数组的顺序存储法。
 我们把根节点存储在下标 i = 1 的位置，那左子节点存储在下标 2 \* i = 2 的位置，右子节点存储在 2 \* i + 1 = 3 的位置，以此类推。
 
-<div style="margin: auto">![普通二叉树](/image/tree/tree_array.png)</div>
+![普通二叉树](/blog/imgs/tree/tree_array.png)
 
 所以某棵二叉树是一棵完全二叉树的时候，用数组存储是最节省内存的一种方式。
 
@@ -184,7 +184,7 @@ function levelOrder() {
 - 其左子树(left subtree)下的每个后代节点（descendant node）的值都小于节点 n 的值；
 - 其右子树(right subtree)下的每个后代节点的值都大于节点 n 的值。
 
-<div style="margin: auto">![普通二叉树](/image/tree/binary_search_tree.png)</div>
+![普通二叉树](/blog/imgs/tree/binary_search_tree.png)
 
 #### 二叉查找树的构建
 

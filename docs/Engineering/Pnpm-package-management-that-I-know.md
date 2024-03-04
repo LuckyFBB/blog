@@ -202,7 +202,7 @@ order: 0
 
     能够发现，这次是`base64-js@ 1.5.1`被提取到了根目录下的 node_modules 下，buffer 的 base64-js 能够和它兼容，所以 buffer 的 node_modules 下不再存在依赖，然而 bops 依赖的 base64-js 不兼容，所以会挂在自身的 node_modules 下
 
-<div class="quote"> 💡 子依赖项的依赖不兼容的情况下，底层会通过[localeCompare](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare)的方法对依赖进行一个排序，字典序靠前的 npm 包的**底层依赖**会优先被提取出来，放到根目录下的 node_modules 中，之后如果发现不兼容的依赖，则继续采用 npm 2 的处理方式，都会放在自身的 node_modules 下</div>
+<div class="quote"> 💡 子依赖项的依赖不兼容的情况下，底层会通过 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">localeCompare</a> 的方法对依赖进行一个排序，字典序靠前的 npm 包的**底层依赖**会优先被提取出来，放到根目录下的 node_modules 中，之后如果发现不兼容的依赖，则继续采用 npm 2 的处理方式，都会放在自身的 node_modules 下</div>
 
 ❓ 通过上面这几个例子，能够发现 npm3 在解决了一些问题的同时，也带来新的问题。
 
