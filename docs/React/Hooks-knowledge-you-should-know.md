@@ -94,7 +94,8 @@ const handleMessageChange = (e) => {
 
 ## useEffect
 
-useEffect 能够在函数组件中执行副作用操作(数据获取/涉及订阅)，其实可以把 useEffect 看作是 componentDidMount/componentDidUpdate/componentWillUnMount 的组合
+useEffect 能够在函数组件中执行副作用操作(数据获取/涉及订阅)
+其实可以把 useEffect 看作是 componentDidMount/componentDidUpdate/componentWillUnMount 的组合
 
 第一个参数是一个 callback，返回 destory。destory 作为下一个 callback 执行前调用，用于清除上一次 callback 产生的副作用
 
