@@ -117,6 +117,7 @@ function zombie() {
 #### 如何查看守护进程
 
 使用命令 ps axj a: 显示所有 x: 显示没有终端控制的进程 j: 显示相关信息
+
 ![image](https://user-images.githubusercontent.com/38368040/174937045-3444580c-ffe1-4ff0-9307-57abb369296e.png)
 
 #### 进程组/会话/控制终端
@@ -182,6 +183,7 @@ fs.open(path.resolve(__dirname, 'log.txt'), 'w', function (err, fd) {
 ```
 
 使用 node master 启动项目之后，使用 kill 命令杀掉对应的子进程，能够成功重启子进程，守护进程生效~
+
 <img width="721" alt="image" src="https://user-images.githubusercontent.com/38368040/175310465-ae81f9f2-bef8-4c32-a6e6-62915f13f16d.png">
 
 ##### 如何退出终端运行？

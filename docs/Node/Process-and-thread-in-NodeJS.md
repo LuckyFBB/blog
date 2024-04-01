@@ -43,6 +43,7 @@ http.createServer().listen(8081, () => {
 进程中包括要执行的代码，代码操作的数据，以及进程控制块 PCB(Processing Control Block)，程序是代码在数据集上的执行过程，执行过程的状态和申请的资源需要记录在同一个数据结构中(PCB)，所以进程是由代码、数据、PCB 组成的
 
 PCB 中记录着 pid、执行到的代码地址、进程的状态(阻塞、运行、就绪等)以及用于通信的信号量、管道、消息队列等数据结构
+
 ![18](https://user-images.githubusercontent.com/38368040/171115053-1bc88940-906f-43a3-ab20-bf95d29ee053.png)
 
 ### 线程(Thread)的概念
@@ -513,6 +514,7 @@ execFile('./file.sh', function (err, stdout, stderr) {
 ```
 
 其中遇到的一个问题，权限不够，使用`chmod 777 file.sh`修改权限即可
+
 ![image](https://user-images.githubusercontent.com/38368040/174480366-0bf41cd8-32d4-4ef7-b04c-d9bd08d3679d.png)
 
 ##### fork
