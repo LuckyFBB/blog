@@ -1,7 +1,7 @@
 ---
 title: 我所知道的 npm/Yarn/pnpm 包管理
 group:
-  title: 包管理
+  title: 工程化
   order: 4
 order: 0
 ---
