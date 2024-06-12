@@ -1,7 +1,7 @@
 ---
 title: 基于 pnpm 的 monorepo 的工作流
 group:
-  title: 工程化
+  title: 包管理
   order: 4
 order: 1
 ---
