@@ -2,7 +2,7 @@
 title: 代码检查
 group:
   title: 项目规范
-  order: 5
+  order: 6
 order: 0
 ---
 

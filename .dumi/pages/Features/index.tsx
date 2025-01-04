@@ -34,7 +34,7 @@ export default function Features() {
   return (
     <div className="fbb-features">
       {features.map((feature) => (
-        <div className="fbb-features__item">
+        <div className="fbb-features__item" key={feature?.link}>
           <div className="item__emoji">{feature?.emoji}</div>
           <div className="item__title">{feature?.title}</div>
           <div className="item__description">{feature?.description}</div>

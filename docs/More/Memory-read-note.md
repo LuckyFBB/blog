@@ -1,9 +1,9 @@
 ---
 title: 操作系统之内存管理读书笔记
 group:
-  title: 转载
-  order: 10
-order: 0
+  title: 操作系统
+  order: 1
+order: 5
 ---
 
 <style>
