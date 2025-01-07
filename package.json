@@ -33,9 +33,5 @@
   },
   "dependencies": {
     "git-cz": "^4.9.0"
-  },
-  "packageManager": "pnpm@6.32.12",
-  "engines": {
-    "node": ">=14"
   }
 }
