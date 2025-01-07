@@ -8,6 +8,7 @@ order: -1
 
 - [你应该知道的 Hooks 知识](/react/hooks-knowledge-you-should-know)
 - [重新认识受控和非受控组件](/react/rediscover-controlled-and-uncontrolled-components)
+- [React Hook 之 useSyncExternalStore](/react/use-sync-external-store)
 
 ### 数据流
 
