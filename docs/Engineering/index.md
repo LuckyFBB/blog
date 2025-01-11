@@ -31,6 +31,7 @@ order: 0
 ### 国际化
 
 - [国际化利器 Intl Messageformat](/engineering/intl-messageformat)
+- [如何做国际化文本提取](/engineering/extract-chinese)
 
 ### 代码规范
 
