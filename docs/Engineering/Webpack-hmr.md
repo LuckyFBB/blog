@@ -337,70 +337,73 @@ if (this.options.hot) {
 
 上述知道了 module.hot.check 的来源，现在看看该[`check`](https://github.com/webpack/webpack/blob/main/lib/hmr/HotModuleReplacement.runtime.js#L258)函数具体做了什么事情
 
-- 调用`$hmrDownloadManifest$`获取当前的`hash.hot-update.json`
+#### 调用`$hmrDownloadManifest$`获取当前的`hash.hot-update.json`
 
-  ```js
-  // $hmrDownloadManifest$ 都是动态注入的代码
-  __webpack_require__.hmrM = () => {
-    if (typeof fetch === 'undefined')
-      throw new Error('No browser support: need fetch API');
-    return fetch(__webpack_require__.p + __webpack_require__.hmrF()).then(
-      (response) => {
-        if (response.status === 404) return;
+```js
+// $hmrDownloadManifest$ 都是动态注入的代码
+__webpack_require__.hmrM = () => {
+  if (typeof fetch === 'undefined')
+    throw new Error('No browser support: need fetch API');
+  return fetch(__webpack_require__.p + __webpack_require__.hmrF()).then(
+    (response) => {
+      if (response.status === 404) return;
 
-        if (!response.ok)
-          throw new Error(
-            'Failed to fetch update manifest ' + response.statusText,
-          );
+      if (!response.ok)
+        throw new Error(
+          'Failed to fetch update manifest ' + response.statusText,
+        );
 
-        return response.json();
-      },
-    );
-  };
-  __webpack_require__.hmrF = () =>
-    'main.' + __webpack_require__.h() + '.hot-update.json';
-  ```
+      return response.json();
+    },
+  );
+};
+__webpack_require__.hmrF = () =>
+  'main.' + __webpack_require__.h() + '.hot-update.json';
+```
 
-- 再调用`$hmrDownloadUpdateHandlers$["jsonp"]`请求`js`文件
+#### 再调用`$hmrDownloadUpdateHandlers$["jsonp"]`请求`js`文件
 
-  ```js
-  // 执行 loadUpdateChunk
-  __webpack_require__.hu = (chunkId) => {
-    return '' + chunkId + '.' + __webpack_require__.h() + '.hot-update.js';
-  };
+```js
+// 执行 loadUpdateChunk
+__webpack_require__.hu = (chunkId) => {
+  return '' + chunkId + '.' + __webpack_require__.h() + '.hot-update.js';
+};
 
-  // __webpack_require__.l 中创建 script 标签下载 hash.hot-update.js
-  ```
+// __webpack_require__.l 中创建 script 标签下载 hash.hot-update.js
+```
 
 ### apply
 
 终于到了最后一步热更新的操作，所有的代码逻辑都在[`internalApply`](https://github.com/webpack/webpack/blob/main/lib/hmr/HotModuleReplacement.runtime.js#L319)中
 
-- 删除过期的模块
-  ```js
-  var queue = outdatedModules.slice();
-  while (queue.length > 0) {
-    moduleId = queue.pop();
-    // 从缓存中删除过期的模块
-    module = installedModules[moduleId];
-    // 删除过期的依赖
-    delete outdatedDependencies[moduleId];
+#### 删除过期的模块
+
+```js
+var queue = outdatedModules.slice();
+while (queue.length > 0) {
+  moduleId = queue.pop();
+  // 从缓存中删除过期的模块
+  module = installedModules[moduleId];
+  // 删除过期的依赖
+  delete outdatedDependencies[moduleId];
+}
+```
+
+#### 将新的模块添加到更新列表，**webpack_require**执行相关模块的代码
+
+```js
+appliedUpdate[moduleId] = newModuleFactory;
+
+for (var updateModuleId in appliedUpdate) {
+  if (__webpack_require__.o(appliedUpdate, updateModuleId)) {
+    __webpack_require__.m[updateModuleId] = appliedUpdate[updateModuleId];
   }
-  ```
-- 将新的模块添加到更新列表，**webpack_require**执行相关模块的代码
+}
+```
 
-  ```js
-  appliedUpdate[moduleId] = newModuleFactory;
+#### 执行`hot._acceptedDependencies`的`callback`
 
-  for (var updateModuleId in appliedUpdate) {
-    if (__webpack_require__.o(appliedUpdate, updateModuleId)) {
-      __webpack_require__.m[updateModuleId] = appliedUpdate[updateModuleId];
-    }
-  }
-  ```
-
-- 执行`hot._acceptedDependencies`的`callback`
-  ![image.png](/blog/imgs/webpackHmr/image%209.png)
+![image.png](/blog/imgs/webpackHmr/image%209.png)
 
 ## 总结
 

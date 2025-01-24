@@ -393,54 +393,58 @@ fork 函数开启一个子进程的流程
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/185772970-9f946fff-a000-4eae-90ba-9107a116e020.png">
 
-- 初始化参数中的 options.stdio，并且调用 spawn 函数
+### 初始化参数中的 options.stdio，并且调用 spawn 函数
 
-  ```js
-  function spawn(file, args, options) {
-    const child = new ChildProcess();
+```js
+function spawn(file, args, options) {
+  const child = new ChildProcess();
 
-    child.spawn(options);
+  child.spawn(options);
+}
+```
+
+### 创建 ChildProcess 实例，创建子进程也是调用 C++ 层 this.\_handle.spawn 方法
+
+```js
+function ChildProcess() {
+  // C++层定义
+  this._handle = new Process();
+}
+```
+
+### 通过 child.spawn 调用到 ChildProcess.prototype.spawn 方法中。
+
+其中 getValidStdio 方法会根据 options.stdio 创建和 C++ 交互的 Pipe 对象，并获得对应的文件描述符，将文件描述符写入到环境变量 NODE_CHANNEL_FD 中，调用 C++ 层创建子进程，在调用 setupChannel 方法
+
+```js
+ChildProcess.prototype.spawn = function (options) {
+  // 预处理进程间通信的数据结构
+  stdio = getValidStdio(stdio, false);
+  const ipc = stdio.ipc;
+  const ipcFd = stdio.ipcFd;
+  //将文件描述符写入环境变量中
+  if (ipc !== undefined) {
+    ArrayPrototypePush(options.envPairs, `NODE_CHANNEL_FD=${ipcFd}`);
   }
-  ```
+  // 创建进程
+  const err = this._handle.spawn(options);
+  // 添加send方法和监听IPC中数据
+  if (ipc !== undefined) setupChannel(this, ipc, serialization);
+};
+```
 
-- 创建 ChildProcess 实例，创建子进程也是调用 C++ 层 this.\_handle.spawn 方法
+### 子进程启动
 
-  ```js
-  function ChildProcess() {
-    // C++层定义
-    this._handle = new Process();
-  }
-  ```
+会根据环境变量中是否存在 NODE_CHANNEL_FD 判断是否调用 \_forkChild 方法，创建一个 Pipe 对象, 同时调用 open 方法打开对应的文件描述符，在调用 setupChannel
 
-- 通过 child.spawn 调用到 ChildProcess.prototype.spawn 方法中。其中 getValidStdio 方法会根据 options.stdio 创建和 C++ 交互的 Pipe 对象，并获得对应的文件描述符，将文件描述符写入到环境变量 NODE_CHANNEL_FD 中，调用 C++ 层创建子进程，在调用 setupChannel 方法
-
-  ```js
-  ChildProcess.prototype.spawn = function (options) {
-    // 预处理进程间通信的数据结构
-    stdio = getValidStdio(stdio, false);
-    const ipc = stdio.ipc;
-    const ipcFd = stdio.ipcFd;
-    //将文件描述符写入环境变量中
-    if (ipc !== undefined) {
-      ArrayPrototypePush(options.envPairs, `NODE_CHANNEL_FD=${ipcFd}`);
-    }
-    // 创建进程
-    const err = this._handle.spawn(options);
-    // 添加send方法和监听IPC中数据
-    if (ipc !== undefined) setupChannel(this, ipc, serialization);
-  };
-  ```
-
-- 子进程启动时，会根据环境变量中是否存在 NODE_CHANNEL_FD 判断是否调用 \_forkChild 方法，创建一个 Pipe 对象, 同时调用 open 方法打开对应的文件描述符，在调用 setupChannel
-
-  ```js
-  function _forkChild(fd, serializationMode) {
-    const p = new Pipe(PipeConstants.IPC);
-    p.open(fd);
-    p.unref();
-    const control = setupChannel(process, p, serializationMode);
-  }
-  ```
+```js
+function _forkChild(fd, serializationMode) {
+  const p = new Pipe(PipeConstants.IPC);
+  p.open(fd);
+  p.unref();
+  const control = setupChannel(process, p, serializationMode);
+}
+```
 
 ## 句柄传递
 
@@ -481,35 +485,35 @@ function setipChannel() {
 - 父进程通过 child.send 发送消息 和 server/socket 句柄对象
 - 普通消息直接 JSON.stringify 序列化；对于句柄对象来说，需要先包装成为内部对象
 
-  ```js
-  message = {
-    cmd: 'NODE_HANDLE',
-    type: null,
-    msg: message,
-  };
-  ```
+```js
+message = {
+  cmd: 'NODE_HANDLE',
+  type: null,
+  msg: message,
+};
+```
 
-  通过 handleConversion.[message.type].send 的方法取出句柄对象对应的 C++ 层面的 TCP 对象，在采用 JSON.stringify 序列化
+通过 handleConversion.[message.type].send 的方法取出句柄对象对应的 C++ 层面的 TCP 对象，在采用 JSON.stringify 序列化
 
-  ```js
-  const handleConversion = {
-    'net.Server': {
-      simultaneousAccepts: true,
+```js
+const handleConversion = {
+  'net.Server': {
+    simultaneousAccepts: true,
 
-      send(message, server, options) {
-        return server._handle;
-      },
-
-      got(message, handle, emit) {
-        const server = new net.Server();
-        server.listen(handle, () => {
-          emit(server);
-        });
-      },
+    send(message, server, options) {
+      return server._handle;
     },
-    //....
-  };
-  ```
+
+    got(message, handle, emit) {
+      const server = new net.Server();
+      server.listen(handle, () => {
+        emit(server);
+      });
+    },
+  },
+  //....
+};
+```
 
 - 最后将序列化后的内部对象和 TCP 对象写入到 IPC 通道中
 - 子进程在接收到消息之后，使用 JSON.parse 反序列化消息，如果为内部对象触发 internalMessage 事件

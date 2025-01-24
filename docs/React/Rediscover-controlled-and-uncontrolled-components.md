@@ -284,47 +284,49 @@ function EmailInput(props) {
 
 ### 可选方案
 
-1. 使用 key 属性来做，会使组件整个组件的 state 都重置。可以在`getDerivedStateFromProps`和`componentWillReceiveProps` 来观察 id 的变化，麻烦但是可行
+#### 使用 key 属性
 
-   ```js
-   class EmailInput extends Component {
-     state = {
-       email: this.props.email,
-       prevId: this.props.id,
-     };
+会使组件整个组件的 state 都重置。可以在`getDerivedStateFromProps`和`componentWillReceiveProps` 来观察 id 的变化，麻烦但是可行
 
-     componentWillReceiveProps(nextProps) {
-       const { prevId } = this.state;
-       if (nextProps.id !== prevId) {
-         this.setState({
-           email: nextProps.email,
-           prevId: nextProps.id,
-         });
-       }
-     }
-     // ...
-   }
-   ```
+```js
+class EmailInput extends Component {
+  state = {
+    email: this.props.email,
+    prevId: this.props.id,
+  };
 
-   [点击查看示例](https://codesandbox.io/s/use-componentwillreceiveprops-wovjf?file=/src/App.js)
+  componentWillReceiveProps(nextProps) {
+    const { prevId } = this.state;
+    if (nextProps.id !== prevId) {
+      this.setState({
+        email: nextProps.email,
+        prevId: nextProps.id,
+      });
+    }
+  }
+  // ...
+}
+```
 
-2. 使用实例方法重置非受控组件
+[点击查看示例](https://codesandbox.io/s/use-componentwillreceiveprops-wovjf?file=/src/App.js)
 
-   刚刚两种方式，均是再有唯一标识值的情况下。如果在没有合适的`key`值时，也想要重新创建组件。第一种方案就是生成随机值或者递增的值当作`key`值，另一种就是使用示例方法强制重置内部状态
+#### 使用实例方法重置非受控组件
 
-   ```js
-   class EmailInput extends Component {
-     state = {
-       email: this.props.email,
-     };
-     resetEmailForNewUser(newEmail) {
-       this.setState({ email: newEmail });
-     }
-     // ...
-   }
-   ```
+刚刚两种方式，均是再有唯一标识值的情况下。如果在没有合适的`key`值时，也想要重新创建组件。第一种方案就是生成随机值或者递增的值当作`key`值，另一种就是使用示例方法强制重置内部状态
 
-   父组件使用[ref](https://zh-hans.reactjs.org/docs/glossary.html#refs)调用这个方法，[点击查看示例](https://codesandbox.io/s/use-ref-cmfw0?file=/src/App.js)
+```js
+class EmailInput extends Component {
+  state = {
+    email: this.props.email,
+  };
+  resetEmailForNewUser(newEmail) {
+    this.setState({ email: newEmail });
+  }
+  // ...
+}
+```
+
+父组件使用[ref](https://zh-hans.reactjs.org/docs/glossary.html#refs)调用这个方法，[点击查看示例](https://codesandbox.io/s/use-ref-cmfw0?file=/src/App.js)
 
 ## 那我们如何选？
 

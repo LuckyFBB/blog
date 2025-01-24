@@ -118,7 +118,7 @@ interface IProps<T> {
 }
 ```
 
-```ts
+```tsx | pure
 export const FilterRules = <T>(props: IProps<T>) => {
   const {
     component,
@@ -173,7 +173,7 @@ export const FilterRules = <T>(props: IProps<T>) => {
 
 ##### 非受控组件使用
 
-```ts
+```tsx | pure
 <Form form={form}>
   <Form.Item name={'condition'}>
     <FilterRules<IRowValue>
@@ -206,7 +206,7 @@ export const FilterRules = <T>(props: IProps<T>) => {
 
 ##### 受控组件使用
 
-```ts
+```tsx | pure
 const [ruleData, setRuleData] = useState({
   key: shortid(),
   level: 0,
@@ -231,7 +231,7 @@ const [ruleData, setRuleData] = useState({
 
 #### 查看使用
 
-```ts
+```tsx | pure
 <FilterRules
   component={(props) => <RowColumnConfig columns={[]} {...props} />}
   disabled

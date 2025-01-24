@@ -6,10 +6,6 @@ group:
 order: 0
 ---
 
-<style>
-    .color{color: #4384b5}
-</style>
-
 ## 并发和并行的区别
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/201523710-c349412a-fac3-445f-9dd0-7eec08f49842.png">

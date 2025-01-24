@@ -73,175 +73,176 @@ const handleMessageChange = (e) => {
 useEffect 能够在函数组件中执行副作用操作(数据获取/涉及订阅)
 其实可以把 useEffect 看作是 componentDidMount/componentDidUpdate/componentWillUnMount 的组合
 
-第一个参数是一个 callback，返回 destory。destory 作为下一个 callback 执行前调用，用于清除上一次 callback 产生的副作用
-
+第一个参数是一个 callback，返回 destory。destory 作为下一个 callback 执行前调用，用于清除上一次 callback 产生的副作用  
 第二个参数是依赖项，一个数组，可以有多个依赖项。依赖项改变，执行上一个 callback 返回的 destory，和执行新的 effect 第一个参数 callback
 
 对于 useEffect 的执行，React 处理逻辑是`采用异步调用`的，对于每一个 effect 的 callback 会像 setTimeout 回调函数一样，放到任务队列里面，等到主线程执行完毕才会执行。所以 effect 的回调函数不会阻塞浏览器绘制视图
 
-1. 相关的生命周期替换方案
+### 相关的生命周期替换方案
 
-   - componentDidMount 替代方案
+#### componentDidMount 替代方案
 
-   ```js
-   React.useEffect(() => {
-     //请求数据，事件监听，操纵DOM
-   }, []); //dep=[]，只有在初始化执行
-   /* 
-       因为useEffect会捕获props和state，
-       所以即使是在回调函数中我们拿到的还是最初的props和state
-     */
-   ```
+```js
+React.useEffect(() => {
+  //请求数据，事件监听，操纵DOM
+}, []); //dep=[]，只有在初始化执行
+/*
+  因为useEffect会捕获props和state，
+  所以即使是在回调函数中我们拿到的还是最初的props和state
+*/
+```
 
-   - componentDidUnmount 替代方案
+#### componentDidUnmount 替代方案
 
-   ```js
-   React.useEffect(() => {
-     /* 请求数据 ， 事件监听 ， 操纵dom ， 增加定时器，延时器 */
-     return function componentWillUnmount() {
-       /* 解除事件监听器 ，清除定时器，延时器 */
-     };
-   }, []); /* 切记 dep = [] */
-   //useEffect第一个函数的返回值可以作为componentWillUnmount使用
-   ```
+```js
+React.useEffect(() => {
+  /* 请求数据 ， 事件监听 ， 操纵dom ， 增加定时器，延时器 */
+  return function componentWillUnmount() {
+    /* 解除事件监听器 ，清除定时器，延时器 */
+  };
+}, []); /* 切记 dep = [] */
+//useEffect第一个函数的返回值可以作为componentWillUnmount使用
+```
 
-   - componentWillReceiveProps 替代方案
-     其实两者的执行时机是完全不同的，`一个在render阶段，一个在commit阶段`
-     useEffect 会初始化执行一次，但是 componentWillReceiveProps 只会在 props 变化时执行更新
+#### componentWillReceiveProps 替代方案
 
-   ```js
-   React.useEffect(() => {
-     console.log('props变化：componentWillReceiveProps');
-   }, [props]);
-   ```
+其实两者的执行时机是完全不同的，`一个在render阶段，一个在commit阶段`
+useEffect 会初始化执行一次，但是 componentWillReceiveProps 只会在 props 变化时执行更新
 
-   - componentDidUpdate 替代方案
-     useEffect 和 componentDidUpdate 在执行时期虽然有点差别，`useEffect是异步执行，componentDidUpdate是同步执行`，但都是在 commit 阶段
+```js
+React.useEffect(() => {
+  console.log('props变化：componentWillReceiveProps');
+}, [props]);
+```
 
-   ```js
-   React.useEffect(() => {
-     console.log('组件更新完成：componentDidUpdate ');
-   }); //没有dep依赖项，没有第二个参数，那么每一次执行函数组件，都会执行该effect。
-   ```
+#### componentDidUpdate 替代方案
 
-2. 在 useEffect 中[]需要处理什么
+useEffect 和 componentDidUpdate 在执行时期虽然有点差别，`useEffect是异步执行，componentDidUpdate是同步执行`，但都是在 commit 阶段
 
-   [React 官网 FAQ](https://zh-hans.reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies)这样说
+```js
+React.useEffect(() => {
+  console.log('组件更新完成：componentDidUpdate ');
+}); //没有dep依赖项，没有第二个参数，那么每一次执行函数组件，都会执行该effect。
+```
 
-   只有当函数(以及它所调用的函数)不引用 props、state 以及由它们衍生而来的值时，你才能放心地把它们从依赖列表中省略，使用 eslint-plugin-react-hooks 帮助我们的代码做一个校验
+### 在 useEffect 中[]需要处理什么
 
-   [点击查看详细示例](https://codesandbox.io/s/count-ilrrt?file=/src/App.js)
+[React 官网 FAQ](https://zh-hans.reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies)这样说
 
-   ```js
-   function Counter() {
-     const [count, setCount] = useState(0);
+只有当函数(以及它所调用的函数)不引用 props、state 以及由它们衍生而来的值时，你才能放心地把它们从依赖列表中省略，使用 eslint-plugin-react-hooks 帮助我们的代码做一个校验
 
-     useEffect(() => {
-       const id = setInterval(() => {
-         setCount(count + 1);
-       }, 1000);
-       return () => clearInterval(id);
-     }, []);
+[点击查看详细示例](https://codesandbox.io/s/count-ilrrt?file=/src/App.js)
 
-     return <h1>{count}</h1>;
-   }
-   //只会做一次更新，然后定时器不再转动
-   ```
+```js
+function Counter() {
+  const [count, setCount] = useState(0);
 
-3. 是否应该把函数当做 effect 的依赖
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCount(count + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
 
-   ```js
-   const loadResourceCatalog = async () => {
-     if (!templateType) return;
-     const reqApi =
-       templateType === TEMPLATE_TYPE.STANDARD
-         ? 'listCatalog'
-         : 'getCodeManageCatalog';
-     const res: any = await API[reqApi]();
-     if (!res.success) return;
-     setCatalog(res.data);
-   };
+  return <h1>{count}</h1>;
+}
+//只会做一次更新，然后定时器不再转动
+```
 
-   useEffect(() => {
-     loadResourceCatalog();
-   }, []);
-   //在函数loadResourceCatalog中使用了templateType这样的一个state
-   //在开发的过程中可能会忘记函数loadResourceCatalog依赖templateType值
-   ```
+### 是否应该把函数当做 effect 的依赖
 
-   第一个简单的解法，对于**某些只在 useEffect 中使用的函数**，直接定义在 effect 中，以至于能够直接依赖某些 state
+```js
+const loadResourceCatalog = async () => {
+  if (!templateType) return;
+  const reqApi =
+    templateType === TEMPLATE_TYPE.STANDARD
+      ? 'listCatalog'
+      : 'getCodeManageCatalog';
+  const res: any = await API[reqApi]();
+  if (!res.success) return;
+  setCatalog(res.data);
+};
 
-   ```js
-   useEffect(() => {
-     const loadResourceCatalog = async () => {
-       if (!templateType) return;
-       const reqApi =
-         templateType === TEMPLATE_TYPE.STANDARD
-           ? 'listCatalog'
-           : 'getCodeManageCatalog';
-       const res: any = await API[reqApi]();
-       if (!res.success) return;
-       setCatalog(res.data);
-     };
-     loadResourceCatalog();
-   }, [templateType]);
-   ```
+useEffect(() => {
+  loadResourceCatalog();
+}, []);
+//在函数loadResourceCatalog中使用了templateType这样的一个state
+//在开发的过程中可能会忘记函数loadResourceCatalog依赖templateType值
+```
 
-   假如我们需要在很多地方用到我们定义的函数，不能够把定义放到当前的 effect 中，并且将函数放到了第二个的依赖参数中，那这个代码将就进入死循环。因为函数在每一次渲染中都返回一个`新的引用`
+第一个简单的解法，对于**某些只在 useEffect 中使用的函数**，直接定义在 effect 中，以至于能够直接依赖某些 state
 
-   ```js
-   const Template = () => {
-     const getStandardTemplateList = async () => {
-       const res: any = await API.getStandardTemplateList();
-       if (!res.success) return;
-       const { data } = res;
-       setCascaderOptions(data);
-       getDefaultOption(data[0]);
-     };
-     useEffect(() => {
-       getStandardTemplateList();
-     }, [getStandardTemplateList]);
-   };
-   ```
+```js
+useEffect(() => {
+  const loadResourceCatalog = async () => {
+    if (!templateType) return;
+    const reqApi =
+      templateType === TEMPLATE_TYPE.STANDARD
+        ? 'listCatalog'
+        : 'getCodeManageCatalog';
+    const res: any = await API[reqApi]();
+    if (!res.success) return;
+    setCatalog(res.data);
+  };
+  loadResourceCatalog();
+}, [templateType]);
+```
 
-   针对这种情况，如果当前函数没有引用任何组件内的任何值，可以将该函数提取到组件外面去定义，这样就不会组件每次 render 时不会再次改变函数引用。
+假如我们需要在很多地方用到我们定义的函数，不能够把定义放到当前的 effect 中，并且将函数放到了第二个的依赖参数中，那这个代码将就进入死循环。因为函数在每一次渲染中都返回一个`新的引用`
 
-   ```js
-   const getStandardTemplateList = async () => {
-     const res: any = await API.getStandardTemplateList();
-     if (!res.success) return;
-     const { data } = res;
-     setCascaderOptions(data);
-     getDefaultOption(data[0]);
-   };
+```js
+const Template = () => {
+  const getStandardTemplateList = async () => {
+    const res: any = await API.getStandardTemplateList();
+    if (!res.success) return;
+    const { data } = res;
+    setCascaderOptions(data);
+    getDefaultOption(data[0]);
+  };
+  useEffect(() => {
+    getStandardTemplateList();
+  }, [getStandardTemplateList]);
+};
+```
 
-   const Template = () => {
-     useEffect(() => {
-       getStandardTemplateList();
-     }, []);
-   };
-   ```
+针对这种情况，如果当前函数没有引用任何组件内的任何值，可以将该函数提取到组件外面去定义，这样就不会组件每次 render 时不会再次改变函数引用。
 
-   如果说当前函数中引用了组件内的一些状态值，可以采用 useCallBack 对当前函数进行包裹
+```js
+const getStandardTemplateList = async () => {
+  const res: any = await API.getStandardTemplateList();
+  if (!res.success) return;
+  const { data } = res;
+  setCascaderOptions(data);
+  getDefaultOption(data[0]);
+};
 
-   ```js
-   const loadResourceCatalog = useCallback(async () => {
-     if (!templateType) return;
-     const reqApi =
-       templateType === TEMPLATE_TYPE.STANDARD
-         ? 'listCatalog'
-         : 'getCodeManageCatalog';
-     const res: any = await API[reqApi]();
-     if (!res.success) return;
-     setCatalog(res.data);
-   }, [templateType]);
+const Template = () => {
+  useEffect(() => {
+    getStandardTemplateList();
+  }, []);
+};
+```
 
-   useEffect(() => {
-     loadResourceCatalog();
-   }, [loadResourceCatalog]);
-   //通过useCallback的包裹，如果templateType保持不变，那么loadResourceCatalog也会保持不变，所以useEffect也不会重新运行
-   //如果templateType改变，那么loadResourceCatalog也会改变，所以useEffect也会重新运行
-   ```
+如果说当前函数中引用了组件内的一些状态值，可以采用 useCallBack 对当前函数进行包裹
+
+```js
+const loadResourceCatalog = useCallback(async () => {
+  if (!templateType) return;
+  const reqApi =
+    templateType === TEMPLATE_TYPE.STANDARD
+      ? 'listCatalog'
+      : 'getCodeManageCatalog';
+  const res: any = await API[reqApi]();
+  if (!res.success) return;
+  setCatalog(res.data);
+}, [templateType]);
+
+useEffect(() => {
+  loadResourceCatalog();
+}, [loadResourceCatalog]);
+//通过useCallback的包裹，如果templateType保持不变，那么loadResourceCatalog也会保持不变，所以useEffect也不会重新运行
+//如果templateType改变，那么loadResourceCatalog也会改变，所以useEffect也会重新运行
+```
 
 ## useCallback
 
@@ -284,7 +285,7 @@ export default CallBackTest;
 
 React.memo 是通过记忆组件渲染结果的方式来提高性能，memo 是 react16.6 引入的新属性，通过`浅比较`(源码通过 Object.is 方法比较)当前依赖的 props 和下一个 props 是否相同来决定是否重新渲染；如果使用过类组件方式，就能知道 memo 其实就相当于 class 组件中的 React.PureComponent，区别就在于 memo 用于函数组件。useCallback 和 React.memo 一定要结合使用才能有效果。
 
-**使用场景**
+### 使用场景
 
 - 作为 props，传递给子组件，为避免子元素不必要的渲染，需要配合 React.Memo 使用，否则无意义
 - 作为 useEffect 的依赖项，需要进行比较的时候才需要加上 useCallback
@@ -301,23 +302,20 @@ useCallback(fn,deps)相当于 useMemo(() => fn, deps)
 
 对于实现上，基本上是和 useCallback 相似，只是略微有些不同
 
-**使用场景**
+### 使用场景
 
 - 避免在每次渲染时都进行高开销的计算
 
 两个 hooks 内置于 React 都有特别的原因：
 
 1. 引用相等
-
    当在 React 函数组件中定义一个对象时，它跟上次定义的相同对象，引用是不一样的（即使它具有所有相同值和相同属性）
 
    - 依赖列表
    - React.memo
-
-   大多数时候，你不需要考虑去优化不必要的重新渲染，因为优化总会带来成本。
+     大多数时候，你不需要考虑去优化不必要的重新渲染，因为优化总会带来成本。
 
 2. 昂贵的计算
-
    计算成本很高的同步计算值的函数
 
 ## 总结

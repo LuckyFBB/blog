@@ -64,13 +64,11 @@ order: 2
 
 ![Untitled 5](https://user-images.githubusercontent.com/38368040/232821065-1cf9af48-b027-4241-a292-635b1f80368f.png)
 
-## 一些实践
-
-### 过滤项目中适当的文件
+## 过滤项目中适当的文件
 
 ![Untitled 6](https://user-images.githubusercontent.com/38368040/232821159-8d0bd0a8-58c5-403c-a31a-6494a82256c0.png)
 
-### 文件拷贝
+## 文件拷贝
 
 问题：需要将文件 1 中的内容拷贝到文件 2 中
 
@@ -91,9 +89,9 @@ order: 2
 
 ![Untitled 9](https://user-images.githubusercontent.com/38368040/232821353-8bd4a708-7ed4-460f-93e4-0920762b4128.png)
 
-### 文件上传
+## 文件上传
 
-#### 小文件上传
+### 小文件上传
 
 ```js
 // 上传后资源的URL地址
@@ -136,7 +134,7 @@ router.post(
 );
 ```
 
-#### 大文件上传
+### 大文件上传
 
 ![Untitled 10](https://user-images.githubusercontent.com/38368040/232821366-d03fa5b7-93d7-45c3-884f-8e5698a96c4c.png)
 
@@ -148,9 +146,9 @@ router.post(
 4. 将文件夹中的切片做合并，并对切片做删除
 5. 再次上传统一文件时，能够快速上传
 
-**具体实现**
+#### 具体实现
 
-1. 前端切片
+**前端切片**
 
 ```js
 const BIG_FILE_SIZE = 25 * 1024 * 1024;
@@ -194,217 +192,217 @@ file 是一种特殊的 [Blob 对象](https://zhuanlan.zhihu.com/p/161000123)，
 
 ![Untitled 11](https://user-images.githubusercontent.com/38368040/232821371-1a679343-4ea6-4b83-9e05-4482b5a05f41.png)
 
-2. 上传切片
+**上传切片**
 
-   ```ts
-   const uploadSlice = async (sliceList: ISlice[]) => {
-     const requestList = sliceList
-       .map(({ slice, sliceName, name }: ISlice, index: number) => {
-         const formData = new FormData();
-         formData.append('slice', slice);
-         formData.append('sliceName', sliceName);
-         formData.append('name', name);
-         return { formData, index, sliceName };
-       })
-       .map(({ formData }: { formData: FormData }, index: number) =>
-         request.post('/uploadBig', formData, {
-           onUploadProgress: (progressEvent: AxiosProgressEvent) =>
-             sliceUploadProgress(progressEvent, index),
-         }),
-       );
-     await Promise.all(requestList);
-   };
-   ```
+```ts
+const uploadSlice = async (sliceList: ISlice[]) => {
+  const requestList = sliceList
+    .map(({ slice, sliceName, name }: ISlice, index: number) => {
+      const formData = new FormData();
+      formData.append('slice', slice);
+      formData.append('sliceName', sliceName);
+      formData.append('name', name);
+      return { formData, index, sliceName };
+    })
+    .map(({ formData }: { formData: FormData }, index: number) =>
+      request.post('/uploadBig', formData, {
+        onUploadProgress: (progressEvent: AxiosProgressEvent) =>
+          sliceUploadProgress(progressEvent, index),
+      }),
+    );
+  await Promise.all(requestList);
+};
+```
 
-   根据切片构建每个切片的 formData，将二进制数据放在 slice 参数中，分别发送请求。
+根据切片构建每个切片的 formData，将二进制数据放在 slice 参数中，分别发送请求。
 
-   onUploadProgress 来处理每个切片的上传进度
+onUploadProgress 来处理每个切片的上传进度
 
-   ```js
-   // Client
-   const storage = multer.diskStorage({
-     destination: async function (req, file, cb) {
-       const name = file?.originalname.split('.')?.[0];
-       const SLICE_DIR = path.join(UPLOAD_DIR, `${name}-slice`);
-       if (!fs.existsSync(SLICE_DIR)) {
-         await fs.mkdirSync(SLICE_DIR);
-       }
-       // 设置文件的存储目录
-       cb(null, SLICE_DIR);
-     },
-     filename: async function (req, file, cb) {
-       // 设置文件名
-       cb(null, `${file?.originalname}`);
-     },
-   });
+```js
+// Client
+const storage = multer.diskStorage({
+  destination: async function (req, file, cb) {
+    const name = file?.originalname.split('.')?.[0];
+    const SLICE_DIR = path.join(UPLOAD_DIR, `${name}-slice`);
+    if (!fs.existsSync(SLICE_DIR)) {
+      await fs.mkdirSync(SLICE_DIR);
+    }
+    // 设置文件的存储目录
+    cb(null, SLICE_DIR);
+  },
+  filename: async function (req, file, cb) {
+    // 设置文件名
+    cb(null, `${file?.originalname}`);
+  },
+});
 
-   // Server
-   router.post(
-     '/uploadBig',
-     async (ctx, next) => {
-       try {
-         await next();
-         const slice = ctx.files.slice[0]; // 切片文件
-         ctx.body = {
-           code: 1,
-           msg: '文件上传成功',
-           url: `${RESOURCE_URL}/${slice.originalname}`,
-         };
-       } catch (error) {
-         ctx.body = {
-           code: 0,
-           msg: '文件上传失败',
-         };
-       }
-     },
-     multerUpload.fields([{ name: 'slice' }]),
-   );
-   ```
+// Server
+router.post(
+  '/uploadBig',
+  async (ctx, next) => {
+    try {
+      await next();
+      const slice = ctx.files.slice[0]; // 切片文件
+      ctx.body = {
+        code: 1,
+        msg: '文件上传成功',
+        url: `${RESOURCE_URL}/${slice.originalname}`,
+      };
+    } catch (error) {
+      ctx.body = {
+        code: 0,
+        msg: '文件上传失败',
+      };
+    }
+  },
+  multerUpload.fields([{ name: 'slice' }]),
+);
+```
 
-3. 切片合并
+**切片合并**
 
-   当我们所有的切片上传成功之后，我们依旧希望是按着原始文件作为保存的，所以需要对切片进行合并操作
+当我们所有的切片上传成功之后，我们依旧希望是按着原始文件作为保存的，所以需要对切片进行合并操作
 
-   ```js
-   // Client
-   const uploadSlice = async (sliceList: ISlice[]) => {
-     // ...和上述 uploadSlice 一致
-     mergeSlice();
-   };
+```js
+// Client
+const uploadSlice = async (sliceList: ISlice[]) => {
+  // ...和上述 uploadSlice 一致
+  mergeSlice();
+};
 
-   const mergeSlice = () => {
-     request.post('/mergeSlice', {
-       size: SLICE_FILE_SIZE,
-       name: fileList[0].name,
-     });
-   };
+const mergeSlice = () => {
+  request.post('/mergeSlice', {
+    size: SLICE_FILE_SIZE,
+    name: fileList[0].name,
+  });
+};
 
-   // Server
-   router.post('/mergeSlice', async (ctx, next) => {
-     try {
-       await next();
-       const { size, name } = ctx.request.body ?? {};
-       const sliceName = name.split('.')?.[0];
-       const filePath = path.join(UPLOAD_DIR, name);
-       const slice_dir = path.join(UPLOAD_DIR, `${sliceName}-slice`);
-       await mergeSlice(filePath, slice_dir, size);
-       ctx.body = {
-         code: 1,
-         msg: '文件合并成功',
-       };
-     } catch (error) {
-       ctx.body = {
-         code: 0,
-         msg: '文件合并失败',
-       };
-     }
-   });
+// Server
+router.post('/mergeSlice', async (ctx, next) => {
+  try {
+    await next();
+    const { size, name } = ctx.request.body ?? {};
+    const sliceName = name.split('.')?.[0];
+    const filePath = path.join(UPLOAD_DIR, name);
+    const slice_dir = path.join(UPLOAD_DIR, `${sliceName}-slice`);
+    await mergeSlice(filePath, slice_dir, size);
+    ctx.body = {
+      code: 1,
+      msg: '文件合并成功',
+    };
+  } catch (error) {
+    ctx.body = {
+      code: 0,
+      msg: '文件合并失败',
+    };
+  }
+});
 
-   // 通过 stream 来读写数据，将 slice 中数据读取到文件中
-   const pipeStream = (path, writeStream) => {
-     return new Promise((resolve) => {
-       const readStream = fs.createReadStream(path);
-       readStream.on('end', () => {
-         fs.unlinkSync(path); // 读取完成之后，删除切片文件
-         resolve();
-       });
-       readStream.pipe(writeStream);
-     });
-   };
+// 通过 stream 来读写数据，将 slice 中数据读取到文件中
+const pipeStream = (path, writeStream) => {
+  return new Promise((resolve) => {
+    const readStream = fs.createReadStream(path);
+    readStream.on('end', () => {
+      fs.unlinkSync(path); // 读取完成之后，删除切片文件
+      resolve();
+    });
+    readStream.pipe(writeStream);
+  });
+};
 
-   const mergeSlice = async (filePath, sliceDir, size) => {
-     if (!fs.existsSync(sliceDir)) {
-       throw new Error('当前文件不存在');
-     }
-     const slices = await fs.readdirSync(sliceDir);
-     slices.sort((a, b) => a.split('-')[1] - b.split('-')[1]);
-     try {
-       const slicesPipe = slices.map((sliceName, index) => {
-         return pipeStream(
-           path.resolve(sliceDir, sliceName),
-           fs.createWriteStream(filePath, { start: index * size }),
-         );
-       });
-       await Promise.all(slicesPipe);
-       await fs.rmdirSync(sliceDir); // 读取完成之后，删除切片文件夹
-     } catch (error) {
-       console.log(error);
-     }
-   };
-   ```
+const mergeSlice = async (filePath, sliceDir, size) => {
+  if (!fs.existsSync(sliceDir)) {
+    throw new Error('当前文件不存在');
+  }
+  const slices = await fs.readdirSync(sliceDir);
+  slices.sort((a, b) => a.split('-')[1] - b.split('-')[1]);
+  try {
+    const slicesPipe = slices.map((sliceName, index) => {
+      return pipeStream(
+        path.resolve(sliceDir, sliceName),
+        fs.createWriteStream(filePath, { start: index * size }),
+      );
+    });
+    await Promise.all(slicesPipe);
+    await fs.rmdirSync(sliceDir); // 读取完成之后，删除切片文件夹
+  } catch (error) {
+    console.log(error);
+  }
+};
+```
 
-4. 上传文件校验
+**上传文件校验**
 
-   当我们上传一个文件的时候，先去判断在服务器上是否存在该文件，如果存在则直接不做上传操作，否则按上述逻辑进行上传
+当我们上传一个文件的时候，先去判断在服务器上是否存在该文件，如果存在则直接不做上传操作，否则按上述逻辑进行上传
 
-   ```js
-   // Client
-   const verifyUpload = async (name: string) => {
-     const res = await request.post('/verify', { name });
-     return res?.data?.data;
-   };
+```js
+// Client
+const verifyUpload = async (name: string) => {
+  const res = await request.post('/verify', { name });
+  return res?.data?.data;
+};
 
-   const uploadFile = async () => {
-     if (!fileList?.length) return alert('请选择文件');
-     const file = fileList[0];
-     const shouldUpload = await verifyUpload(file.name);
-     if (!shouldUpload) return message.success('文件已存在，上传成功');
-     if (file.size > BIG_FILE_SIZE) {
-       // big handle
-       getSliceList(file);
-     }
-     // // normal handle
-     // upload("/uploadSingle", file);
-   };
+const uploadFile = async () => {
+  if (!fileList?.length) return alert('请选择文件');
+  const file = fileList[0];
+  const shouldUpload = await verifyUpload(file.name);
+  if (!shouldUpload) return message.success('文件已存在，上传成功');
+  if (file.size > BIG_FILE_SIZE) {
+    // big handle
+    getSliceList(file);
+  }
+  // // normal handle
+  // upload("/uploadSingle", file);
+};
 
-   // Server
-   router.post('/verify', async (ctx, next) => {
-     try {
-       await next();
-       const { name } = ctx.request.body ?? {};
-       const filePath = path.resolve(UPLOAD_DIR, name);
-       if (fs.existsSync(filePath)) {
-         ctx.body = {
-           code: 1,
-           data: false,
-         };
-       } else {
-         ctx.body = {
-           code: 1,
-           data: true,
-         };
-       }
-     } catch (error) {
-       ctx.body = {
-         code: 0,
-         msg: '检测失败',
-       };
-     }
-   });
-   ```
+// Server
+router.post('/verify', async (ctx, next) => {
+  try {
+    await next();
+    const { name } = ctx.request.body ?? {};
+    const filePath = path.resolve(UPLOAD_DIR, name);
+    if (fs.existsSync(filePath)) {
+      ctx.body = {
+        code: 1,
+        data: false,
+      };
+    } else {
+      ctx.body = {
+        code: 1,
+        data: true,
+      };
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 0,
+      msg: '检测失败',
+    };
+  }
+});
+```
 
-   上述直接使用文件名来做判断，过于绝对，对文件做了相关修改并不更改名字，就会出现问题。更应该采用的方案是根据文件相关的元数据计算出它的 hash 值来做判断。
+上述直接使用文件名来做判断，过于绝对，对文件做了相关修改并不更改名字，就会出现问题。更应该采用的方案是根据文件相关的元数据计算出它的 hash 值来做判断。
 
-   ```js
-   const calculateMD5 = (file: any) =>
-     new Promise((resolve, reject) => {
-       const chunkSize = SLICE_FILE_SIZE;
-       const fileReader = new FileReader();
-       const spark = new SparkMD5.ArrayBuffer();
-       let cursor = 0;
-       fileReader.onerror = () => {
-         reject(new Error('Error reading file'));
-       };
-       fileReader.onload = (e: any) => {
-         spark.append(e.target.result);
-         cursor += e.target.result.byteLength;
-         if (cursor < file.size) loadNext();
-         else resolve(spark.end());
-       };
-       const loadNext = () => {
-         const fileSlice = file.slice(cursor, cursor + chunkSize);
-         fileReader.readAsArrayBuffer(fileSlice);
-       };
-       loadNext();
-     });
-   ```
+```js
+const calculateMD5 = (file: any) =>
+  new Promise((resolve, reject) => {
+    const chunkSize = SLICE_FILE_SIZE;
+    const fileReader = new FileReader();
+    const spark = new SparkMD5.ArrayBuffer();
+    let cursor = 0;
+    fileReader.onerror = () => {
+      reject(new Error('Error reading file'));
+    };
+    fileReader.onload = (e: any) => {
+      spark.append(e.target.result);
+      cursor += e.target.result.byteLength;
+      if (cursor < file.size) loadNext();
+      else resolve(spark.end());
+    };
+    const loadNext = () => {
+      const fileSlice = file.slice(cursor, cursor + chunkSize);
+      fileReader.readAsArrayBuffer(fileSlice);
+    };
+    loadNext();
+  });
+```

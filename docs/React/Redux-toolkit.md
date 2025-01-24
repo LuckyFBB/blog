@@ -37,82 +37,86 @@ const store = configureStore({
 
 ### createAction + createReducer
 
-- createAction -- 创建 Redux 中的 action 创建函数
+#### createAction
 
-  ```js
-  function createAction(type, prepareAction?)
-  ```
+创建 Redux 中的 action 创建函数
 
-  redux 中 action 的创建以及使用
+```js
+function createAction(type, prepareAction?)
+```
 
-  ```js
-  const updateName = (name: string) => ({ type: 'user/UPDATE_NAME', name });
-  const updateAge = (age: number) => ({ type: 'user/UPDATE_AGE', age });
-  ```
+redux 中 action 的创建以及使用
 
-  Toolkit 中 action 的创建以及使用
+```js
+const updateName = (name: string) => ({ type: 'user/UPDATE_NAME', name });
+const updateAge = (age: number) => ({ type: 'user/UPDATE_AGE', age });
+```
 
-  ```js
-  // 第一种
-  const updateName = createAction < { name: string } > 'user/UPDATE_NAME';
-  const updateAge = createAction < { age: number } > 'user/UPDATE_AGE';
+Toolkit 中 action 的创建以及使用
 
-  updateName(); // { type: 'user/UPDATE_NAME', payload: undefined }
-  updateName({ name: 'FBB' }); // { type: 'user/UPDATE_NAME', payload: { name: 'FBB' } }
-  updateAge({ age: 18 });
+```js
+// 第一种
+const updateName = createAction < { name: string } > 'user/UPDATE_NAME';
+const updateAge = createAction < { age: number } > 'user/UPDATE_AGE';
 
-  // 第二种
-  const updateName = createAction('user/UPDATE_NAME', (name: string) => ({
-    payload: {
-      name,
-    },
-  }));
-  const updateAge = createAction('user/UPDATE_AGE', (age: number) => ({
-    payload: {
-      age,
-    },
-  }));
+updateName(); // { type: 'user/UPDATE_NAME', payload: undefined }
+updateName({ name: 'FBB' }); // { type: 'user/UPDATE_NAME', payload: { name: 'FBB' } }
+updateAge({ age: 18 });
 
-  updateName('FBB');
-  updateAge(18);
-  ```
+// 第二种
+const updateName = createAction('user/UPDATE_NAME', (name: string) => ({
+  payload: {
+    name,
+  },
+}));
+const updateAge = createAction('user/UPDATE_AGE', (age: number) => ({
+  payload: {
+    age,
+  },
+}));
 
-- createReducer -- 创建 Redux reducer 的函数
+updateName('FBB');
+updateAge(18);
+```
+
+#### createReducer
+
+创建 Redux reducer 的函数
 
   :::info{title=" "}
   💡 createReducer 使用 Immer 库，可以在 reducer 中直接对状态进行修改，而不需要手动编写不可变性的逻辑
   :::
 
-  Redux 中 reducer 的创建
+Redux 中 reducer 的创建
 
-  ```js
-  export const userReducer = (
-    state = initialUserState,
-    action: { type: string, [propName: string]: any },
-  ) => {
-    switch (action.type) {
-      case 'user/UPDATE_NAME':
-        return { ...state, name: action.name };
-      case 'user/UPDATE_AGE':
-        return { ...state, age: action.age };
-      default:
-        return state;
-    }
-  };
-  ```
+```js
+export const userReducer = (
+  state = initialUserState,
+  action: { type: string, [propName: string]: any },
+) => {
+  switch (action.type) {
+    case 'user/UPDATE_NAME':
+      return { ...state, name: action.name };
+    case 'user/UPDATE_AGE':
+      return { ...state, age: action.age };
+    default:
+      return state;
+  }
+};
+```
 
-  Toolkit 中 reducer 的创建
+Toolkit 中 reducer 的创建
 
-  ```js
-  export const userReducer = createReducer(initialUserState, (builder) => {
-    builder.addCase(updateAge, (state, action) => {
-      state.age = action.payload.age;
-    });
-    builder.addCase(updateName, (state, action) => {
-      state.name = action.payload.name;
-    });
+```js
+export const userReducer = createReducer(initialUserState, (builder) => {
+  builder.addCase(updateAge, (state, action) => {
+    state.age = action.payload.age;
   });
-  ```
+  builder.addCase(updateName, (state, action) => {
+    state.name = action.payload.name;
+  });
+});
+```
 
 toolkit 提供的 createAction 和 createReducer 能够帮我们简化 Redux 中一些模版语法，但是整体的使用还是差不多的，我们依旧需要 action 文件和 reducer 文件，做了改善但是不多。
 
