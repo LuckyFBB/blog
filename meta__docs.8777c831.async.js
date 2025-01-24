@@ -1,4 +1,4 @@
-"use strict";(self.webpackChunkblog_of_fbb=self.webpackChunkblog_of_fbb||[]).push([[1904],{6912:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(96968),o={}},8082:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(69958),o={}},29533:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(77284),o={}},22032:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(90864),o={}},18922:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(29290),o={}},49830:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(84451),o={}},6318:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(46569),o={}},45951:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(55411),o={}},57315:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(89512),o={}},24944:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(28402),o={}},45599:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(37),o={}},29697:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(30089),o={}},24997:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(85532),o={}},12519:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(34796),o={}},18505:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(90102),o={}},97594:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(15064),o={}},54379:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(50429),o={}},97949:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(82726),o={}},9531:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(69942),o={}},88927:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(79588),o={}},23651:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(58907),o={}},86324:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(49222),o={}},44723:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(98671),o={}},91184:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(57086),o={}},39262:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(92182),o={}},82672:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(470),o={}},4044:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(30679),o={}},85119:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(95816),o={}},61085:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(18095),o={}},96240:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(47656),o={}},633:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(89647),o={}},53699:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(22503),o={}},80533:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(27951),o={}},23024:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(75481),o={}},44790:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(78802),o={}},58927:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(74969),o={}},89035:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(97432),o={}},71270:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(24565),o={}},89676:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(55516),o={}},87088:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(50855),o={}},26211:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(92511),o={}},16482:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(76394),o={}},83220:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(37810),o={}},30156:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(48202),o={}},98223:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(1117),o={}},47800:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(49125),o={}},88992:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(17562),o={}},54843:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(26764),o={}},73068:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(65834),o={}},25778:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(79980),o={}},28013:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(20799),o={}},64859:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(10376),o={}},42714:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(49273),o={}},45763:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(18110),o={}},93084:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(96277),o={}},26115:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(19952),o={}},98226:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(53703),o={}},35949:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(71348),o={}},31667:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(98370),o={}},64111:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(20984),o={}},31285:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(61856),o={}},54140:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(20248),o={}},11171:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(68537),o={}},68356:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(96968);const a=[{value:`var array = new Array(); //\u58F0\u660E\u5E76\u521D\u59CB\u5316\u4E00\u4E2A\u6570\u7EC4
+"use strict";(self.webpackChunkblog_of_fbb=self.webpackChunkblog_of_fbb||[]).push([[1904],{6912:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(96968),o={}},8082:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(69958),o={}},29533:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(77284),o={}},22032:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(90864),o={}},18922:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(29290),o={}},49830:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(84451),o={}},6318:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(46569),o={}},45951:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(55411),o={}},57315:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(89512),o={}},24944:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(28402),o={}},45599:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(37),o={}},29697:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(30089),o={}},24997:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(85532),o={}},12519:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(34796),o={}},18505:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(90102),o={}},24606:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(76626),o={}},53465:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(726),o={}},97594:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(15064),o={}},54379:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(50429),o={}},97949:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(82726),o={}},9531:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(69942),o={}},88927:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(79588),o={}},86324:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(49222),o={}},44723:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(98671),o={}},91184:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(57086),o={}},39262:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(92182),o={}},82672:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(470),o={}},4044:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(30679),o={}},85119:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(95816),o={}},61085:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(18095),o={}},96240:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(47656),o={}},633:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(89647),o={}},53699:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(22503),o={}},80533:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(27951),o={}},23024:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(75481),o={}},44790:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(78802),o={}},58927:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(74969),o={}},89035:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(97432),o={}},71270:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(24565),o={}},89676:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(55516),o={}},87088:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(50855),o={}},26211:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(92511),o={}},16482:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(76394),o={}},83220:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(37810),o={}},30156:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(48202),o={}},98223:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(1117),o={}},47800:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(49125),o={}},88992:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(17562),o={}},54843:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(26764),o={}},73068:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(65834),o={}},25778:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(79980),o={}},28013:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(20799),o={}},64859:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(10376),o={}},42714:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(49273),o={}},45763:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(18110),o={}},93084:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(96277),o={}},26115:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(19952),o={}},98226:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(53703),o={}},35949:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(71348),o={}},31667:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(98370),o={}},64111:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(20984),o={}},31285:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(61856),o={}},54140:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(20248),o={}},11171:function(t,n,e){e.r(n),e.d(n,{demos:function(){return o}});var r=e(67294),a=e(68537),o={}},68356:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(96968);const a=[{value:`var array = new Array(); //\u58F0\u660E\u5E76\u521D\u59CB\u5316\u4E00\u4E2A\u6570\u7EC4
 var array = new Array(7); //\u521B\u5EFA\u6307\u5B9A\u957F\u5EA6\u7684\u6570\u7EC4
 var array = new Array(1, 2, 3, 4); //\u76F4\u63A5\u5C06\u6570\u7EC4\u5143\u7D20\u4F5C\u4E3A\u53C2\u6570\u4F20\u9012\u7ED9\u5B83\u7684\u6784\u9020\u5668
 
@@ -5155,7 +5155,182 @@ var arr1 = (0, _concat.default)((_context = [])).call(_context, arr);
 var p = new _promise.default(function (resolve, reject) {
   resolve('FBB');
 });
-`,paraId:75,tocIndex:11},{value:"plugin-transform-runtime \u63D2\u4EF6\u501F\u52A9 babel-runtime \u5B9E\u73B0\u4E86\u4E0B\u9762\u4E24\u4E2A\u91CD\u8981\u7684\u529F\u80FD",paraId:76,tocIndex:11},{value:"\u5BF9\u8F85\u52A9\u51FD\u6570\u7684\u590D\u7528\uFF0C\u89E3\u51B3\u8F6C\u8BD1\u8BED\u6CD5\u5C42\u65F6\u51FA\u73B0\u7684\u4EE3\u7801\u5197\u4F59",paraId:77,tocIndex:11},{value:"\u89E3\u51B3\u8F6C\u8BD1 api \u5C42\u51FA\u73B0\u7684\u5168\u5C40\u53D8\u91CF\u6C61\u67D3",paraId:77,tocIndex:11},{value:"\u5728\u672C\u6587\u4E2D\u7B80\u5355\u4ECB\u7ECD\u4E86:",paraId:78,tocIndex:12},{value:"Babel \u7684\u8F6C\u8BD1\u8FC7\u7A0B/\u57FA\u7840\u67B6\u6784\uFF0C\u76F8\u5173\u5305\u7684\u6838\u5FC3\u5305\u7684\u610F\u4E49",paraId:79,tocIndex:12},{value:"\u91CD\u70B9\u653E\u5230\u4E86 .babelrc \u7684\u914D\u7F6E\u4E0A\uFF0C\u4ECE plugins \u7684\u4F7F\u7528\uFF0C\u5230\u4E3A\u4EC0\u4E48\u4EA7\u751F\u4E86 presets",paraId:79,tocIndex:12},{value:"@babel/preset-env \u51FA\u73B0\u7684\u539F\u56E0\u548C\u89E3\u51B3\u95EE\u9898\uFF0C\u4EE5\u53CA\u901A\u8FC7 browserList \u548C babel-compat-data \u5B9E\u73B0\u7684\u6309\u9700\u52A0\u8F7D",paraId:79,tocIndex:12},{value:"\u4F7F\u7528 @babel/polyfill \u89E3\u51B3 API \u4E0D\u80FD\u591F\u88AB\u8F6C\u8BD1\u7684\uFF0C\u4F46\u662F\u4EA7\u751F\u4E86\u5168\u91CF\u5F15\u7528\u7684\u95EE\u9898",paraId:79,tocIndex:12},{value:"\u4E3A\u4E86\u89E3\u51B3 @babel/polyfill \u89E3\u51B3\u8F6C\u8BD1\u8BED\u6CD5\u5C42\u65F6\u51FA\u73B0\u7684\u4EE3\u7801\u5197\u4F59 \u4EE5\u53CA\u5168\u5C40\u53D8\u91CF\u6C61\u67D3\u95EE\u9898\uFF0C@babel/plugin-transform-runtime \u51FA\u73B0\u4E86",paraId:79,tocIndex:12},{value:"\u53C2\u8003\u94FE\u63A5",paraId:51},{value:"\u4E0D\u5BB9\u9519\u8FC7\u7684 Babel7 \u77E5\u8BC6",paraId:80,tocIndex:12},{value:"\u624B\u628A\u624B\u5E26\u4F60\u8D70\u8FDB Babel \u7684\u7F16\u8BD1\u4E16\u754C",paraId:80,tocIndex:12},{value:"\u524D\u7AEF\u4E5F\u8981\u61C2\u7F16\u8BD1\uFF1ABabel \u6700\u5168\u4E0A\u624B\u6307\u5357",paraId:80,tocIndex:12}]},71917:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(15064);const a=[{value:"\u968F\u7740\u5728\u7F16\u8BD1\u4E2D\u8D8A\u6765\u8D8A\u5377\uFF0CSWC \u7531\u4E8E\u901F\u5EA6\u6781\u5FEB\u4E5F\u51FA\u73B0\u5728\u5927\u4F17\u7684\u89C6\u91CE\u4E2D\uFF0C\u672C\u6587\u4F1A\u7B80\u5355\u4ECB\u7ECD\u4E00\u4E0B SWC\u3002",paraId:0},{value:"\u524D\u6587",paraId:1},{value:"\u4E2D\u6709\u5BF9 Babel \u505A\u76F8\u5173\u4ECB\u7ECD\uFF0C\u5927\u5BB6\u53EF\u4EE5\u4E00\u8D77\u9605\u8BFB\u3002",paraId:0},{value:`
+`,paraId:75,tocIndex:11},{value:"plugin-transform-runtime \u63D2\u4EF6\u501F\u52A9 babel-runtime \u5B9E\u73B0\u4E86\u4E0B\u9762\u4E24\u4E2A\u91CD\u8981\u7684\u529F\u80FD",paraId:76,tocIndex:11},{value:"\u5BF9\u8F85\u52A9\u51FD\u6570\u7684\u590D\u7528\uFF0C\u89E3\u51B3\u8F6C\u8BD1\u8BED\u6CD5\u5C42\u65F6\u51FA\u73B0\u7684\u4EE3\u7801\u5197\u4F59",paraId:77,tocIndex:11},{value:"\u89E3\u51B3\u8F6C\u8BD1 api \u5C42\u51FA\u73B0\u7684\u5168\u5C40\u53D8\u91CF\u6C61\u67D3",paraId:77,tocIndex:11},{value:"\u5728\u672C\u6587\u4E2D\u7B80\u5355\u4ECB\u7ECD\u4E86:",paraId:78,tocIndex:12},{value:"Babel \u7684\u8F6C\u8BD1\u8FC7\u7A0B/\u57FA\u7840\u67B6\u6784\uFF0C\u76F8\u5173\u5305\u7684\u6838\u5FC3\u5305\u7684\u610F\u4E49",paraId:79,tocIndex:12},{value:"\u91CD\u70B9\u653E\u5230\u4E86 .babelrc \u7684\u914D\u7F6E\u4E0A\uFF0C\u4ECE plugins \u7684\u4F7F\u7528\uFF0C\u5230\u4E3A\u4EC0\u4E48\u4EA7\u751F\u4E86 presets",paraId:79,tocIndex:12},{value:"@babel/preset-env \u51FA\u73B0\u7684\u539F\u56E0\u548C\u89E3\u51B3\u95EE\u9898\uFF0C\u4EE5\u53CA\u901A\u8FC7 browserList \u548C babel-compat-data \u5B9E\u73B0\u7684\u6309\u9700\u52A0\u8F7D",paraId:79,tocIndex:12},{value:"\u4F7F\u7528 @babel/polyfill \u89E3\u51B3 API \u4E0D\u80FD\u591F\u88AB\u8F6C\u8BD1\u7684\uFF0C\u4F46\u662F\u4EA7\u751F\u4E86\u5168\u91CF\u5F15\u7528\u7684\u95EE\u9898",paraId:79,tocIndex:12},{value:"\u4E3A\u4E86\u89E3\u51B3 @babel/polyfill \u89E3\u51B3\u8F6C\u8BD1\u8BED\u6CD5\u5C42\u65F6\u51FA\u73B0\u7684\u4EE3\u7801\u5197\u4F59 \u4EE5\u53CA\u5168\u5C40\u53D8\u91CF\u6C61\u67D3\u95EE\u9898\uFF0C@babel/plugin-transform-runtime \u51FA\u73B0\u4E86",paraId:79,tocIndex:12},{value:"\u53C2\u8003\u94FE\u63A5",paraId:51},{value:"\u4E0D\u5BB9\u9519\u8FC7\u7684 Babel7 \u77E5\u8BC6",paraId:80,tocIndex:12},{value:"\u624B\u628A\u624B\u5E26\u4F60\u8D70\u8FDB Babel \u7684\u7F16\u8BD1\u4E16\u754C",paraId:80,tocIndex:12},{value:"\u524D\u7AEF\u4E5F\u8981\u61C2\u7F16\u8BD1\uFF1ABabel \u6700\u5168\u4E0A\u624B\u6307\u5357",paraId:80,tocIndex:12}]},13849:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(76626);const a=[{value:"\u5728\u4F9D\u8D56\u5305\u76DB\u884C\u7684\u4ECA\u5929\uFF0C\u5B89\u88C5\u5305\u7684\u65B9\u5F0F\u4E5F\u662F\u591A\u79CD\u591A\u6837\u7684\uFF0C\u4ECE npm->yarn->pnpm\uFF0C\u6BCF\u4E00\u6B21\u7684\u5347\u7EA7\u90FD\u5E26\u6765\u7740\u4E0D\u4E00\u6837\u7684\u4FBF\u5229\uFF0C\u8FD9\u7BC7\u6587\u7AE0\u5C06\u4ECE npm2 \u5F00\u59CB\u3002",paraId:0},{value:"\u5728 npm2 \u4E2D\uFF0Cnpm \u7684\u5904\u7406\u4F9D\u8D56\u7684\u65B9\u5F0F\u5F88\u7C97\u66B4\uFF0C\u76F4\u63A5\u91C7\u7528\u9012\u5F52\u7684\u65B9\u5F0F\uFF0C\u4E25\u683C\u7684\u6309\u7167 package.json \u7ED3\u6784\u4EE5\u53CA\u5B50\u4F9D\u8D56\u5305\u4E2D\u7684 package.json \u7ED3\u6784\u5C06\u4F9D\u8D56\u5B89\u88C5\u5230\u5404\u81EA\u7684 node_modules \u4E2D",paraId:1,tocIndex:1},{value:"\u4E3E\u4E2A \u{1F330} \u6765\u8BF4\uFF0Cnpm-test \u9879\u76EE\u4F9D\u8D56\u5982\u4E0B\u4E09\u4E2A\u6A21\u5757\uFF1A",paraId:2,tocIndex:1},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "buffer": "^5.4.3",
+    "ignore": "^5.1.4"
+  }
+}
+`,paraId:3,tocIndex:1},{value:"buffer",paraId:4,tocIndex:1},{value:"\u6A21\u5757\u4F9D\u8D56\u4E86",paraId:4,tocIndex:1},{value:"base64-js",paraId:4,tocIndex:1},{value:"\u548C",paraId:4,tocIndex:1},{value:"ieee754",paraId:4,tocIndex:1},{value:"\u6A21\u5757",paraId:4,tocIndex:1},{value:`{
+  "name": "buffer",
+  "dependencies": {
+    "base64-js": "^1.3.1",
+    "ieee754": "^1.1.13"
+  }
+}
+`,paraId:5,tocIndex:1},{value:"\u6267\u884C npm install \u4E4B\u540E\uFF0C\u6211\u4EEC\u4F1A\u5F97\u5230\u5982\u4E0B\u56FE\u7684\u76EE\u5F55\u7ED3\u6784:",paraId:6,tocIndex:1},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:7,tocIndex:1},{value:"\u8FD9\u79CD\u65B9\u5F0F\u7684\u4F18\u52A3\u5F0F\u90FD\u975E\u5E38\u7684\u660E\u663E\u3002",paraId:8,tocIndex:1},{value:"\u4F18\u70B9",paraId:8,tocIndex:1},{value:"\u5C31\u662F node_modules \u7684\u7ED3\u6784\u548C package.json \u7684\u7ED3\u6784\u662F\u4E00\u4E00\u5BF9\u5E94\u7684\uFF0C\u7ED3\u6784\u5C42\u7EA7\u5F88\u660E\u663E\uFF0C\u5E76\u4E14\u80FD\u591F\u4FDD\u8BC1\u6BCF\u6B21 install \u7684\u76EE\u5F55\u90FD\u662F\u76F8\u540C\u7684\u3002",paraId:8,tocIndex:1},{value:"\u8BD5\u60F3\u4E00\u4E0B\uFF0C\u4F9D\u8D56\u7684\u6A21\u5757\u975E\u5E38\u591A\uFF0C\u9879\u76EE\u7684 node_modules \u4F1A\u975E\u5E38\u7684\u5E9E\u5927\uFF0C\u5D4C\u5957\u4F1A\u5F88\u6DF1",paraId:9,tocIndex:1},{value:"\u4ECE\u4E0A\u56FE\u4E2D\uFF0C\u6211\u4EEC\u53EF\u4EE5\u770B\u51FA\u6765\u5D4C\u5957\u7ED3\u6784\u7684\u52A3\u52BF",paraId:10,tocIndex:1},{value:"\u5728\u4E0D\u540C\u5C42\u7EA7\u7684\u4F9D\u8D56\u4E2D\uFF0C\u53EF\u80FD\u5F15\u7528\u4E86\u540C\u4E00\u4E2A\u6A21\u5757\uFF0C\u5BFC\u81F4\u5927\u91CF\u7684\u6A21\u5757\u5197\u4F59",paraId:11,tocIndex:1},{value:"\u5728 windows \u7CFB\u7EDF\u4E2D\uFF0C\u6587\u4EF6\u8DEF\u5F84\u6700\u5927\u957F\u5EA6\u4E3A 260 \u5B57\u7B26\uFF0C\u5D4C\u5957\u5C42\u7EA7\u8FC7\u6DF1\u53EF\u80FD\u5BFC\u81F4\u4E0D\u53EF\u9884\u77E5\u7684\u95EE\u9898",paraId:11,tocIndex:1},{value:" \u{1F4A1} \u5728 npm2 \u4E2D\uFF0C\u6309\u7167\u9012\u5F52\u7684\u65B9\u5F0F\uFF0C\u4E25\u683C\u5C06 package.json \u4E2D\u7684\u4F9D\u8D56\u5B89\u88C5\u5230\u5BF9\u5E94\u6A21\u5757\u4E0B\u3002\u5E76\u4E0D\u4F1A\u5904\u7406\u67D0\u51E0\u4E2A\u6A21\u5757\u4E2D\u7684\u76F8\u540C\u7248\u672C\u4F9D\u8D56\uFF0C\u76F4\u63A5\u65E0\u8111\u751F\u6210\u5BF9\u5E94\u6811\u7ED3\u6784",paraId:12},{value:"\u5728\u6B64\u4E4B\u540E\u7684 npm3 \u505A\u4E86\u8F83\u5927\u7684\u66F4\u65B0\uFF0C\u5C06 npm2 \u7684\u5D4C\u5957\u7ED3\u6784\u6539\u6210\u4E86\u6241\u5E73\u7ED3\u6784",paraId:13,tocIndex:2},{value:"\u5B89\u88C5\u6A21\u5757\u65F6\uFF0C\u4E0D\u7BA1\u5176\u662F\u76F4\u63A5\u4F9D\u8D56\u6A21\u5757\u8FD8\u662F\u5B50\u4F9D\u8D56\u7684\u4F9D\u8D56\u6A21\u5757\uFF0C\u90FD\u4F18\u5148\u5B89\u88C5\u5728 node_modules \u6839\u76EE\u5F55\u4E0B",paraId:14,tocIndex:3},{value:"\u6267\u884C npm install \u4E4B\u540E\uFF0C\u4F1A\u5F97\u5230\u5982\u4E0B\u7684\u76EE\u5F55\u7ED3\u6784",paraId:15,tocIndex:3},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:16,tocIndex:3},{value:" \u{1F4A1} \u5982\u679C package.json \u4E2D\u7684\u4F9D\u8D56\u7684\u5B50\u4F9D\u8D56\u65E0\u76F8\u540C\u4F9D\u8D56\uFF0C\u90A3\u4E48\u6240\u6709\u7684\u4F9D\u8D56\u90FD\u4F1A\u88AB\u6241\u5E73\u5316\u5230\u6839\u76EE\u5F55\u7684 node_modules \u4E0B",paraId:12},{value:"\u4FEE\u6539 npm-test \u7684 package.json \u6587\u4EF6\uFF0C\u6DFB\u52A0",paraId:17,tocIndex:4},{value:"websocket-util",paraId:17,tocIndex:4},{value:"\uFF0Cwebsocket-util \u4E5F\u4F9D\u8D56\u4E86 ",paraId:17,tocIndex:4},{value:"base64-js^1.3.0",paraId:17,tocIndex:4},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "buffer": "^5.4.3",
+    "ignore": "^5.1.4",
+    "websocket-util": "1.0.0"
+  }
+}
+`,paraId:18,tocIndex:4},{value:"\u6267\u884C npm install\uFF0C\u4F1A\u5F97\u5230\u5982\u4E0B\u7684\u76EE\u5F55\u7ED3\u6784\uFF1A",paraId:19,tocIndex:4},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:20,tocIndex:4},{value:" \u{1F4A1} \u5982\u679C package.json \u4E2D\u7684\u4F9D\u8D56\u7684\u5B50\u4F9D\u8D56\u6709\u76F8\u540C\u6216\u8005\u517C\u5BB9\u7248\u672C\u4F9D\u8D56\uFF0C\u90A3\u4E48\u6240\u6709\u7684\u4F9D\u8D56\u90FD\u4F1A\u88AB\u6241\u5E73\u5316\u5230\u6839\u76EE\u5F55\u7684 node_modules \u4E0B",paraId:12},{value:"\u6211\u4EEC\u5728\u9879\u76EE npm-test \u4E2D\uFF0C\u53C8\u4F9D\u8D56\u4E86",paraId:21,tocIndex:5},{value:"base64-js@ 1.0.1",paraId:21,tocIndex:5},{value:"\u7248\u672C\uFF0C\u4FEE\u6539 package.json:",paraId:21,tocIndex:5},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "buffer": "^5.4.3",
+    "ignore": "^5.1.4",
+    "base64-js": "1.0.1"
+  }
+}
+`,paraId:22,tocIndex:5},{value:"\u6267\u884C npm install \u4E4B\u540E\u7684\u76EE\u5F55\u7ED3\u6784\u5982\u4E0B:",paraId:23,tocIndex:5},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:24,tocIndex:5},{value:"npm-test \u76F4\u63A5\u4F9D\u8D56\u7684",paraId:25,tocIndex:5},{value:"base64-js@ 1.0.1",paraId:25,tocIndex:5},{value:"\u653E\u5728\u4E86\u6839\u76EE\u5F55\u7684 node_modules \u4E0B\uFF0Cbuffer \u6240\u4F9D\u8D56\u7684\u4E0E\u5176\u4E0D\u517C\u5BB9\uFF0C\u5C31\u653E\u5728\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:25,tocIndex:5},{value:"\u4FEE\u6539 package.json\uFF0C\u5728\u5176\u4E2D\u6DFB\u52A0",paraId:26,tocIndex:5},{value:"bops@ 1.0.1",paraId:26,tocIndex:5},{value:"\uFF0C\u5B83\u4F9D\u8D56",paraId:26,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:26,tocIndex:5},{value:"\uFF1B",paraId:26,tocIndex:5},{value:"websocket-util@ 1.0.0",paraId:26,tocIndex:5},{value:"\u4F9D\u8D56",paraId:26,tocIndex:5},{value:"base64-js^1.3.0",paraId:26,tocIndex:5},{value:"\uFF0Cbuffer \u4F9D\u8D56",paraId:26,tocIndex:5},{value:"base64-js^1.3.1",paraId:26,tocIndex:5},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "bops": "1.0.1",
+    "buffer": "^5.4.3",
+    "ignore": "^5.1.4",
+    "websocket-util": "1.0.0"
+  }
+}
+`,paraId:27,tocIndex:5},{value:"\u6267\u884C npm install\uFF0C\u4F1A\u5F97\u5230\u5982\u4E0B\u7684\u76EE\u5F55\u7ED3\u6784\uFF1A",paraId:28,tocIndex:5},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:29,tocIndex:5},{value:"\u4F1A\u53D1\u73B0",paraId:30,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:30,tocIndex:5},{value:"\u88AB\u63D0\u53D6\u5230\u4E86\u7B2C\u4E00\u7EA7\u7684 node_modules \u4E0A\uFF0C\u800C buffer/websocket-util \u4F9D\u8D56\u7684\u4F9D\u65E7\u6302\u5728\u5B83\u81EA\u5DF1\u7684 node_modules \u4E0B",paraId:30,tocIndex:5},{value:`
+package.json \u7684\u5B89\u88C5\u987A\u5E8F\u662F\u6309\u7740`,paraId:30,tocIndex:5},{value:"\u5B57\u6BCD\u987A\u5E8F",paraId:30,tocIndex:5},{value:"\u6765\u7684\uFF0C\u9996\u5148 bops \u7684\u5E95\u5C42\u4F9D\u8D56\u90FD\u4F1A\u88AB\u4F18\u5148\u63D0\u51FA\u6765\uFF0C\u6240\u4EE5 node_modules \u4E0B\u4F1A\u5148\u6709",paraId:30,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:30,tocIndex:5},{value:"\uFF0C\u5230\u4E86\u5904\u7406 buffer/websocket-util \u7684\u5E95\u5C42\u4F9D\u8D56\u65F6\uFF0C\u53D1\u73B0\u5DF2\u7ECF\u5B58\u5728 base64-js \u4E14\u4E0D\u517C\u5BB9\u5C31\u4F1A\u653E\u5230\u5B83\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:30,tocIndex:5},{value:"\u6211\u4EEC\u5728\u5F80 package.json \u4E2D\u52A0\u5165",paraId:31,tocIndex:5},{value:"ag-psd@ 14.3.6",paraId:31,tocIndex:5},{value:"\u5B83\u4F9D\u8D56",paraId:31,tocIndex:5},{value:"base64-js^1.5.1",paraId:31,tocIndex:5},{value:"\u7684\u7248\u672C",paraId:31,tocIndex:5},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "ag-psd": "14.3.6",
+    "bops": "1.0.1",
+    "buffer": "^5.4.3",
+    "ignore": "^5.1.4"
+  }
+}
+`,paraId:32,tocIndex:5},{value:"\u6267\u884C npm install \u4E4B\u540E\uFF0C\u5F97\u5230\u76EE\u5F55\u7ED3\u6784\u5982\u4E0B\uFF1A",paraId:33,tocIndex:5},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE\uFF1A",paraId:34,tocIndex:5},{value:"\u80FD\u591F\u53D1\u73B0\uFF0C\u8FD9\u6B21\u662F",paraId:35,tocIndex:5},{value:"base64-js@ 1.5.1",paraId:35,tocIndex:5},{value:"\u88AB\u63D0\u53D6\u5230\u4E86\u6839\u76EE\u5F55\u4E0B\u7684 node_modules \u4E0B\uFF0Cbuffer \u7684 base64-js \u80FD\u591F\u548C\u5B83\u517C\u5BB9\uFF0C\u6240\u4EE5 buffer \u7684 node_modules \u4E0B\u4E0D\u518D\u5B58\u5728\u4F9D\u8D56\uFF0C\u7136\u800C bops \u4F9D\u8D56\u7684 base64-js \u4E0D\u517C\u5BB9\uFF0C\u6240\u4EE5\u4F1A\u6302\u5728\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:35,tocIndex:5},{value:" \u{1F4A1} \u5B50\u4F9D\u8D56\u9879\u7684\u4F9D\u8D56\u4E0D\u517C\u5BB9\u7684\u60C5\u51B5\u4E0B\uFF0C\u5E95\u5C42\u4F1A\u901A\u8FC7 ",paraId:12},{value:"localeCompare",paraId:12},{value:" \u7684\u65B9\u6CD5\u5BF9\u4F9D\u8D56\u8FDB\u884C\u4E00\u4E2A\u6392\u5E8F\uFF0C\u5B57\u5178\u5E8F\u9760\u524D\u7684 npm \u5305\u7684**\u5E95\u5C42\u4F9D\u8D56**\u4F1A\u4F18\u5148\u88AB\u63D0\u53D6\u51FA\u6765\uFF0C\u653E\u5230\u6839\u76EE\u5F55\u4E0B\u7684 node_modules \u4E2D\uFF0C\u4E4B\u540E\u5982\u679C\u53D1\u73B0\u4E0D\u517C\u5BB9\u7684\u4F9D\u8D56\uFF0C\u5219\u7EE7\u7EED\u91C7\u7528 npm 2 \u7684\u5904\u7406\u65B9\u5F0F\uFF0C\u90FD\u4F1A\u653E\u5728\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:12},{value:"\u2753 \u901A\u8FC7\u4E0A\u9762\u8FD9\u51E0\u4E2A\u4F8B\u5B50\uFF0C\u80FD\u591F\u53D1\u73B0 npm3 \u5728\u89E3\u51B3\u4E86\u4E00\u4E9B\u95EE\u9898\u7684\u540C\u65F6\uFF0C\u4E5F\u5E26\u6765\u65B0\u7684\u95EE\u9898\u3002",paraId:36,tocIndex:5},{value:"npm3 \u4EFF\u4F5B\u89E3\u51B3\u4E86 npm2 \u7684\u5197\u4F59\u95EE\u9898\uFF0C\u4F46\u662F\u4E5F\u6CA1\u6709\u5B8C\u5168\u89E3\u51B3\u3002\u4F8B\u5982\u4E0A\u9762\u7684\u4F8B\u5B50\uFF0C",paraId:37,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:37,tocIndex:5},{value:"\u5148\u88AB\u63D0\u51FA\u6765\uFF0C\u5982\u679C\u540E\u9762\u7684\u5305\u4F9D\u8D56\u7684 base64-js \u548C 1.0.2 \u7248\u672C\u4E0D\u517C\u5BB9\uFF0C\u5C31\u4F1A\u5BFC\u81F4\u6BCF\u4E2A\u5B50\u4F9D\u8D56\u7684 node_modules \u90FD\u4F1A\u5B58\u5728 base64-js \u5305\uFF0C\u53C8\u51FA\u73B0\u4E86 npm2 \u7684\u5197\u4F59\u95EE\u9898",paraId:37,tocIndex:5},{value:"\u5728\u4E4B\u524D\u6211\u4EEC\u8BB2\u4E86 package.json \u6587\u4EF6\uFF0C\u5728 npm5 \u4E2D\uFF0C\u63A8\u51FA\u4E86 package-lock \u6587\u4EF6\uFF0C\u5B83\u5C31\u662F\u6BCF\u4E2A\u4F9D\u8D56\u9879\u7684\u5217\u8868\uFF0C\u5F53\u524D\u5B89\u88C5\u7684\u7248\u672C\uFF0C\u6A21\u5757\u4F4D\u7F6E\uFF0C\u9A8C\u8BC1\u6A21\u5757\u5B8C\u6574\u6027\u7684\u54C8\u5E0C\uFF0C\u4EE5\u53CA\u5BF9\u5E94\u7684\u5305\u5217\u8868/\u4F9D\u8D56\u9879\u5217\u8868\u3002\u5176\u5B9E\u4E5F\u662F\u548C node_modules \u4E00\u4E00\u5BF9\u5E94\u7684\uFF0C\u9879\u76EE\u76EE\u5F55\u4E0B\u5B58\u5728 \xA0package-lock \u53EF\u4EE5\u8BA9\u6BCF\u6B21\u5B89\u88C5\u751F\u6210\u7684\u4F9D\u8D56\u76EE\u5F55\u7ED3\u6784\u4FDD\u6301\u76F8\u540C",paraId:38,tocIndex:6},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "buffer": "^5.4.3",
+    "ignore": "^5.1.4"
+  }
+}
+`,paraId:39,tocIndex:6},{value:"\u4E0A\u8FF0 package.json \u6267\u884C npm install \u4E4B\u540E\u5F97\u5230\u7684 lock \u6587\u4EF6\u5982\u4E0B\uFF1A",paraId:40,tocIndex:6},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "base64-js": {
+      "version": "1.5.1",
+      "resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
+      "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+    },
+    "buffer": {
+      "version": "5.7.1",
+      "resolved": "https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz",
+      "integrity": "sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==",
+      "requires": {
+        "base64-js": "^1.3.1",
+        "ieee754": "^1.1.13"
+      }
+    },
+    "ieee754": {
+      "version": "1.2.1",
+      "resolved": "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz",
+      "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+    },
+    "ignore": {
+      "version": "5.2.0",
+      "resolved": "https://registry.npmjs.org/ignore/-/ignore-5.2.0.tgz",
+      "integrity": "sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ=="
+    }
+  }
+}
+`,paraId:41,tocIndex:6},{value:"resolved",paraId:42,tocIndex:6},{value:": \u4F9D\u8D56\u5305\u7684\u4F4D\u7F6E URI",paraId:42,tocIndex:6},{value:"integrity",paraId:43,tocIndex:6},{value:": \u9A8C\u8BC1\u6A21\u5757\u5B8C\u6574\u6027\u7684\u54C8\u5E0C",paraId:43,tocIndex:6},{value:"\u5F53\u6211\u4EEC\u7684\u9879\u76EE\u4E2D\u5DF2\u7ECF\u5B58\u5728 package-lock.json \u4E4B\u540E\uFF0C\u5C06\u4EE5\u8BE5\u6587\u4EF6\u4E3A\u4E3B\u8FDB\u884C\u89E3\u6790\u5B89\u88C5\u6307\u5B9A\u7248\u672C\u4F9D\u8D56\u5305\uFF0C\u800C\u4E0D\u662F\u4F7F\u7528 \xA0package.json \u6765\u89E3\u6790\u548C\u5B89\u88C5\u6A21\u5757\u3002\u56E0\u4E3A package-lock \u4E3A\u6BCF\u4E2A\u6A21\u5757\u90FD\u6307\u5B9A\u4E86\u7248\u672C/\u4F4D\u7F6E/\u5B8C\u6574\u6027\u54C8\u5E0C\uFF0C\u6240\u4EE5\u6BCF\u6B21\u521B\u5EFA\u7684\u5B89\u88C5\u90FD\u662F\u4E00\u6837\u7684\u3002\u548C\u4F7F\u7528\u7684\u8BBE\u5907\u65E0\u5173\uFF0C\u6BCF\u6B21\u90FD\u80FD\u7ED9\u5230\u76F8\u540C\u7684\u7ED3\u679C\u3002",paraId:44,tocIndex:6},{value:"\u8BE5\u56FE\u4E3A\u7B2C\u4E00\u6B21 install \u548C\u6709\u4E86 package-lock \u6587\u4EF6\u4E4B\u540E install \u65F6\u95F4\u7684\u5BF9\u6BD4\u3002\u5728\u4F9D\u8D56\u5C11\u7684\u60C5\u51B5\u4E0B\u5E76\u4E0D\u660E\u663E\uFF0C\u4F9D\u8D56\u8D8A\u591A\u65F6\u95F4\u5DEE\u4F1A\u66F4\u52A0\u660E\u663E",paraId:45,tocIndex:6},{value:"\u5728 npm5.0.x \u7684\u7248\u672C\u4E2D\uFF0C\u4E0D\u7BA1 \xA0package.json \u4E2D\u4F9D\u8D56\u662F\u5426\u6709\u66F4\u65B0\uFF0C\u90FD\u4F1A\u4EE5 package-lock \u6587\u4EF6\u4E3A\u7B2C\u4E00\u5B89\u88C5\u4F9D\u8D56",paraId:46,tocIndex:6},{value:"\u5728 npm5.1.0 \u4E4B\u540E\u7684\u7248\u672C\u4E2D\uFF0C\u5982\u679C package.json \u4E2D\u7684\u4F9D\u8D56\u9879\u6709\u66F4\u65B0\uFF0Cinstall \u65F6\u4F1A\u65E0\u89C6 package-lock \u76F4\u63A5\u53BB\u4E0B\u8F7D\u65B0\u7248\u672C\u4F9D\u8D56\uFF0C\u7136\u540E\u5728\u66F4\u65B0 package-lock \u6587\u4EF6",paraId:47,tocIndex:6},{value:"\u5176\u5B9E\u4E0A\u9762\u7684\u4E24\u79CD\u65B9\u6848\u90FD\u5B58\u5728\u5BF9\u5E94\u7684\u95EE\u9898\uFF0C\u56E0\u6B64\u5728 5.4.2 \u7684\u7248\u672C\u4E4B\u540E\uFF0C\u66F4\u6539\u4E86\u89C4\u5219",paraId:48,tocIndex:6},{value:"\u6839\u636E package.json \u6587\u4EF6\uFF0C\u8FD0\u884C install \u4F1A\u751F\u6210\u5BF9\u5E94\u7684 package-lock \u6587\u4EF6\uFF0Cpackage-lock \u6587\u4EF6\u6307\u660E\u4E86\u76F4\u63A5\u4F9D\u8D56\u7248\u672C\u548C\u95F4\u63A5\u4F9D\u8D56\u7248\u672C",paraId:49,tocIndex:6},{value:"\u5982\u679C package \u548C lock \u6587\u4EF6\u4E2D\u4F9D\u8D56\u7248\u672C\u517C\u5BB9\uFF0C\u5373\u4F7F package \u4E2D\u6709\u65B0\u7248\u672C\uFF0C\u6267\u884C install \u7684\u65F6\u5019\u4E5F\u4F1A\u6839\u636E lock \u6587\u4EF6\u4E0B\u8F7D",paraId:49,tocIndex:6},{value:"\u5982\u679C\u4E24\u4E2A\u6587\u4EF6\u4E2D\u7684\u7248\u672C\u4E0D\u517C\u5BB9\uFF0C\u90A3\u4E48\u6267\u884C install \u7684\u65F6\u5019\u4F1A\u628A lock \u6587\u4EF6\u66F4\u65B0\u5230\u517C\u5BB9 package.json \u7684\u7248\u672C",paraId:49,tocIndex:6},{value:"\u5728\u6211\u4EEC\u6267\u884C install/update \u65F6\uFF0C\u9664\u4E86\u5C06\u4F9D\u8D56\u5305\u5B89\u88C5\u5728 node_modules \u76EE\u5F55\u4E4B\u5916\uFF0C\u8FD8\u4F1A\u5728\u672C\u5730\u7F13\u5B58\u76EE\u5F55\u7F13\u5B58\u4E00\u4EFD",paraId:50,tocIndex:7},{value:"\u6267\u884C",paraId:51,tocIndex:7},{value:"npm config get cache",paraId:51,tocIndex:7},{value:"\u547D\u4EE4\u53EF\u4EE5\u67E5\u8BE2\u5230\u7F13\u5B58\u76EE\u5F55\uFF0CMac \u9ED8\u8BA4\u662F\u5728\u7528\u6237\u4E3B\u76EE\u4E0B",paraId:51,tocIndex:7},{value:".npm/_cacache",paraId:51,tocIndex:7},{value:"content-v2 \u76EE\u5F55\u7528\u4E8E\u5B58\u50A8 tar \u5305\u7684\u7F13\u5B58\uFF0C\u800C index-v5 \u76EE\u5F55\u7528\u4E8E\u5B58\u50A8 tar \u7684 hash \u503C",paraId:52,tocIndex:7},{value:"npm \u6267\u884C\u5B89\u88C5\u7684\u65F6\u5019\u4F1A\u6839\u636E lock \u6587\u4EF6\u4E2D\u5B58\u50A8\u7684",paraId:53,tocIndex:7},{value:"integrity\u3001version\u3001name",paraId:53,tocIndex:7},{value:"\u751F\u6210\u4E00\u4E2A\u552F\u4E00\u7684",paraId:53,tocIndex:7},{value:"key",paraId:53,tocIndex:7},{value:"\u5BF9\u5E94\u5230",paraId:53,tocIndex:7},{value:"index-v5",paraId:53,tocIndex:7},{value:"\u76EE\u5F55\u4E0B\u7684\u7F13\u5B58\u8BB0\u5F55\uFF0C\u4ECE\u800C\u627E\u5230 tar \u5305\u7684 hash\uFF0C\u5728\u6839\u636E hash \u53BB\u627E\u7F13\u5B58\u7684 tar \u5305\u6765\u4F7F\u7528",paraId:53,tocIndex:7},{value:`grep "https://registry.npmjs.org/base64-js/-/base64-js-1.0.2.tgz" -r index-v5
+`,paraId:54,tocIndex:7},{value:"\u5728 index-v5 \u4E2D\u67E5\u627E base64-js-1.0.2 \u7684\u7F13\u5B58\u8BB0\u5F55\uFF0C\u4F1A\u5F97\u5230\u4E00\u4E2A json \u4E32\uFF0C\u5176\u4E2D",paraId:55,tocIndex:7},{value:"_shasum",paraId:55,tocIndex:7},{value:"\u5C5E\u6027\u5C31\u662F tar \u5305\u7684 hash\uFF0C\u5176\u4E2D\u524D\u56DB\u4F4D\u5C31\u662F\u7F13\u5B58\u7684\u76EE\u5F55\uFF0C\u5728 content-v2 \u4E2D\u8FDB\u5165\u8BE5\u76EE\u5F55\u5C31\u80FD\u627E\u5230\u5BF9\u5E94\u7684\u538B\u7F29\u4F9D\u8D56\u5305\uFF0C\u6267\u884C",paraId:55,tocIndex:7},{value:"tar -xvf file",paraId:55,tocIndex:7},{value:"\u5C31\u80FD\u89E3\u538B\u6587\u4EF6",paraId:55,tocIndex:7},{value:"\u4E0A\u6587\u63D0\u5230\u8FC7\u51E0\u6B21\u6587\u4EF6\u5B8C\u6574\u6027\uFF0C\u90A3\u5177\u4F53\u4EC0\u4E48\u662F\u6587\u4EF6\u5B8C\u6574\u6027\uFF1F",paraId:56,tocIndex:8},{value:"\u5728\u4E0B\u8F7D\u4F9D\u8D56\u5305\u4E4B\u524D\uFF0C\u80FD\u591F\u62FF\u5230 npm \u5BF9\u8BE5\u4F9D\u8D56\u5305\u8BA1\u7B97\u7684 hash \u503C\u3002\u6267\u884C npm info \u547D\u4EE4\uFF0C",paraId:57,tocIndex:8},{value:"shasum",paraId:57,tocIndex:8},{value:"\u5C31\u662F hash",paraId:57,tocIndex:8},{value:"\u7528\u6237\u4E0B\u8F7D\u4F9D\u8D56\u5305\u5230\u672C\u5730\u4E4B\u540E\uFF0C\u8981\u786E\u5B9A\u5728\u4E0B\u8F7D\u7684\u8FC7\u7A0B\u4E2D\u6CA1\u6709\u51FA\u73B0\u9519\u8BEF\uFF0C\u6240\u4EE5\u5728\u4E0B\u8F7D\u5B8C\u6210\u4E4B\u540E\u5728\u672C\u5730\u8BA1\u7B97\u4E00\u6B21\u6587\u4EF6\u7684 hash \u503C\u3002\u5982\u679C\u4E24\u4E2A hash \u503C\u76F8\u540C\u624D\u80FD\u591F\u786E\u4FDD\u4E0B\u8F7D\u7684\u4F9D\u8D56\u662F\u5B8C\u6574\u7684\uFF1B\u5982\u679C\u4E0D\u540C\u5219\u9700\u8981\u91CD\u65B0\u4E0B\u8F7D",paraId:58,tocIndex:8},{value:".npmrc \u6587\u4EF6\u53EF\u4EE5\u7406\u89E3\u6210\u4E3A npm running configuration\uFF0C\u5373 npm \u8FD0\u884C\u65F6\u914D\u7F6E\u6587\u4EF6\u3002",paraId:59,tocIndex:9},{value:"npm \u7684\u4F5C\u7528\u5C31\u662F\u5E2E\u52A9\u5F00\u53D1\u8005\u5B89\u88C5\u9700\u8981\u7684\u4F9D\u8D56\u5305\uFF0C\u4F46\u662F\u8981\u4ECE\u54EA\u91CC\u4E0B\u8F7D\uFF1F\u8FD9\u662F\u53EF\u4EE5\u5728.npmrc \u4E2D\u8FDB\u884C\u914D\u7684\u3002",paraId:60,tocIndex:9},{value:"\u5728\u6211\u4EEC\u5B89\u88C5\u5305\u7684\u65F6\u5019\uFF0Cnpm \u6309\u7167\u5982\u4E0B\u987A\u5E8F\u8BFB\u53D6\u8FD9\u4E9B\u914D\u7F6E\u6587\u4EF6\uFF1A",paraId:61,tocIndex:9},{value:"\u9879\u76EE\u914D\u7F6E\u6587\u4EF6\uFF1A\u4F60\u53EF\u4EE5\u5728\u9879\u76EE\u7684\u6839\u76EE\u5F55\u4E0B\u521B\u5EFA\u4E00\u4E2A.npmrc \u6587\u4EF6\uFF0C\u53EA\u7528\u4E8E\u7BA1\u7406\u8FD9\u4E2A\u9879\u76EE\u7684 npm \u5B89\u88C5\u3002",paraId:62,tocIndex:9},{value:"\u7528\u6237\u914D\u7F6E\u6587\u4EF6\uFF1A\u5728\u4F60\u4F7F\u7528\u4E00\u4E2A\u8D26\u53F7\u767B\u9646\u7684\u7535\u8111\u7684\u65F6\u5019\uFF0C\u53EF\u4EE5\u4E3A\u5F53\u524D\u7528\u6237\u521B\u5EFA\u4E00\u4E2A.npmrc \u6587\u4EF6\uFF0C\u4E4B\u540E\u7528\u8BE5\u7528\u6237\u767B\u5F55\u7535\u8111\uFF0C\u5C31\u53EF\u4EE5\u4F7F\u7528\u8BE5\u914D\u7F6E\u6587\u4EF6\u3002\u53EF\u4EE5\u901A\u8FC7 ",paraId:62,tocIndex:9},{value:"npm config get userconfig",paraId:62,tocIndex:9},{value:" \u6765\u83B7\u53D6\u8BE5\u6587\u4EF6\u7684\u4F4D\u7F6E\u3002",paraId:62,tocIndex:9},{value:"\u5168\u5C40\u914D\u7F6E\u6587\u4EF6\uFF1A \u4E00\u53F0\u7535\u8111\u53EF\u80FD\u6709\u591A\u4E2A\u7528\u6237\uFF0C\u5728\u8FD9\u4E9B\u7528\u6237\u4E4B\u4E0A\uFF0C\u4F60\u53EF\u4EE5\u8BBE\u7F6E\u4E00\u4E2A\u516C\u5171\u7684.npmrc \u6587\u4EF6\uFF0C\u4F9B\u6240\u6709\u7528\u6237\u4F7F\u7528\u3002\u8BE5\u6587\u4EF6\u7684\u8DEF\u5F84\u4E3A\uFF1A ",paraId:62,tocIndex:9},{value:"$PREFIX/etc/npmrc",paraId:62,tocIndex:9},{value:"\uFF0C\u4F7F\u7528 ",paraId:62,tocIndex:9},{value:"npm config get prefix",paraId:62,tocIndex:9},{value:" \u83B7\u53D6$PREFIX\u3002\u5982\u679C\u4F60\u4E0D\u66FE\u914D\u7F6E\u8FC7\u5168\u5C40\u6587\u4EF6\uFF0C\u8BE5\u6587\u4EF6\u4E0D\u5B58\u5728\u3002",paraId:62,tocIndex:9},{value:"npm \u5185\u5D4C\u914D\u7F6E\u6587\u4EF6\uFF1A\u6700\u540E\u8FD8\u6709 npm \u5185\u7F6E\u914D\u7F6E\u6587\u4EF6\uFF0C\u57FA\u672C\u4E0A\u7528\u4E0D\u5230\uFF0C\u4E0D\u7528\u8FC7\u5EA6\u5173\u6CE8\u3002",paraId:62,tocIndex:9},{value:"\u68C0\u67E5 .npmrc \u6587\u4EF6\uFF0C\u4F18\u5148\u7EA7\u4E3A\uFF1A\u9879\u76EE\u7EA7 > \u7528\u6237\u7EA7 > \u5168\u5C40\u7EA7 > npm \u5185\u7F6E",paraId:63,tocIndex:10},{value:"\u68C0\u67E5\u6709\u65E0 lock \u6587\u4EF6",paraId:63,tocIndex:10},{value:`\u65E0 lock \u6587\u4EF6
+`,paraId:63,tocIndex:10},{value:"\u4ECE npm \u8FDC\u7A0B\u4ED3\u5E93\u83B7\u53D6\u5305\u7684\u4FE1\u606F",paraId:64,tocIndex:10},{value:`\u6839\u636E package.json \u6784\u5EFA\u4F9D\u8D56\u6811\uFF0C\u6784\u5EFA\u8FC7\u7A0B\u5982\u4E0B
+`,paraId:64,tocIndex:10},{value:"\u9996\u5148\u786E\u5B9A\u9996\u5C42\u4F9D\u8D56\u6A21\u5757",paraId:65,tocIndex:10},{value:"dependencies/devDependencies/optionalDependencies",paraId:65,tocIndex:10},{value:"\uFF0C\u5DE5\u7A0B\u672C\u8EAB\u662F\u6574\u68F5\u4F9D\u8D56\u6811\u7684\u6839\u8282\u70B9\uFF0C\u6BCF\u4E2A\u9996\u5C42\u6A21\u5757\u90FD\u662F\u6839\u8282\u70B9\u4E0B\u7684\u4E00\u4E2A\u5B50\u6811\uFF0C\u6B64\u65F6\u4F1A\u5F00\u542F\u591A\u8FDB\u7A0B\u4ECE\u6BCF\u4E2A\u9996\u5C42\u4F9D\u8D56\u6A21\u5757\u5F00\u59CB\u9010\u6B65\u5BFB\u627E\u66F4\u6DF1\u5C42\u7EA7\u7684\u8282\u70B9",paraId:65,tocIndex:10},{value:"\u8FD9\u4E00\u6B65\u53EA\u662F\u786E\u5B9A\u903B\u8F91\u4E0A\u7684\u4F9D\u8D56\u6811\uFF0C",paraId:65,tocIndex:10},{value:"\u5E76\u975E\u771F\u6B63\u7684\u5B89\u88C5",paraId:65,tocIndex:10},{value:"\uFF0C\u4E4B\u540E\u6839\u636E\u8FD9\u4E2A\u4F9D\u8D56\u7ED3\u6784\u53BB\u4E0B\u8F7D\u6216\u62FF\u5230\u7F13\u5B58\u4E2D\u7684\u4F9D\u8D56\u5305",paraId:65,tocIndex:10},{value:`\u6A21\u5757\u6241\u5E73\u5316
+\u5728\u4E0A\u4E00\u4E2A\u6B65\u9AA4\u7684\u5230\u7684\u662F\u4E00\u4E2A\u5B8C\u6574\u7684\u4F9D\u8D56\u6811\uFF0C\u5305\u542B\u4E86\u5927\u91CF\u7684\u91CD\u590D\u6A21\u5757\uFF0C\u5728 npm3 \u540E\u5C31\u5F00\u542F\u4E86\u6241\u5E73\u5316\u64CD\u4F5C\uFF0C\u4F1A\u904D\u5386\u6240\u6709\u7684\u8282\u70B9(\u6709`,paraId:64,tocIndex:10},{value:"\u5E7F\u5EA6\u904D\u5386",paraId:64,tocIndex:10},{value:"\u7684\u611F\u89C9)\u5C06\u6A21\u5757\u9010\u4E2A\u653E\u5230\u6839\u8282\u70B9\u4E0B\uFF0C\u6709\u91CD\u590D\u6A21\u5757\u65F6\u5C31\u4E22\u5F03\uFF1B\u4E0D\u517C\u5BB9\u65F6\u5219\u653E\u5230\u5F53\u524D\u8282\u70B9\uFF0C\u4E0D\u505A\u6539\u53D8\u3002",paraId:64,tocIndex:10},{value:`\u5728\u7F13\u5B58\u4E2D\u4F9D\u6B21\u67E5\u627E\u4F9D\u8D56\u6811\u4E2D\u7684\u4F9D\u8D56
+`,paraId:64,tocIndex:10},{value:`\u4E0D\u5B58\u5728\u7F13\u5B58
+`,paraId:66,tocIndex:10},{value:"\u4ECE npm \u8FDC\u7A0B\u4ED3\u5E93\u4E0B\u8F7D\u5305",paraId:67,tocIndex:10},{value:"\u6821\u9A8C\u5305\u7684\u5B8C\u6574\u6027",paraId:67,tocIndex:10},{value:"\u6821\u9A8C\u4E0D\u901A\u8FC7\u91CD\u65B0\u4E0B\u8F7D",paraId:67,tocIndex:10},{value:"\u6821\u9A8C\u901A\u8FC7\uFF0C\u5C06\u4E0B\u8F7D\u7684\u5305\u590D\u5236\u5230 npm \u7F13\u5B58\u76EE\u5F55\uFF1B\u5C06\u4E0B\u8F7D\u7684\u5305\u6309\u7167\u4F9D\u8D56\u7ED3\u6784\u89E3\u538B\u5230 \xA0node_modules",paraId:67,tocIndex:10},{value:`\u5B58\u5728\u7F13\u5B58
+`,paraId:66,tocIndex:10},{value:"\u5C06\u7F13\u5B58\u6309\u7167\u4F9D\u8D56\u7ED3\u6784\u89E3\u538B\u5230 \xA0node_modules",paraId:68,tocIndex:10},{value:"\u751F\u6210 lock \u6587\u4EF6",paraId:64,tocIndex:10},{value:`\u6709 lock \u6587\u4EF6
+`,paraId:63,tocIndex:10},{value:"\u68C0\u67E5 package.json \u4E2D\u7684\u4F9D\u8D56\u7248\u672C\u548C lock \u6587\u4EF6\u662F\u5426\u517C\u5BB9",paraId:69,tocIndex:10},{value:"\u5982\u679C\u517C\u5BB9\uFF0C\u76F4\u63A5\u8DF3\u8FC7\u83B7\u53D6\u5305\u4FE1\u606F\u3001\u6784\u5EFA\u4F9D\u8D56\u6811\u8FC7\u7A0B\uFF0C\u5F00\u59CB\u5728\u7F13\u5B58\u4E2D\u67E5\u627E\u5305\u4FE1\u606F\uFF0C\u540E\u7EED\u8FC7\u7A0B\u76F8\u540C",paraId:69,tocIndex:10},{value:"\u5982\u679C\u4E0D\u517C\u5BB9\uFF0C\u4ECE\u8FDC\u7A0B\u83B7\u53D6\u5305\u4FE1\u606F\uFF0C\u540E\u7EED\u8FC7\u7A0B\u76F8\u540C",paraId:69,tocIndex:10},{value:"yarn \u7684\u53D1\u5E03\u65F6\u95F4\u662F\u5728 2016 \u5E74\uFF0C\u90A3\u65F6\u5019\u7684 npm \u8FD8\u5904\u4E8E v3 \u9636\u6BB5\uFF0C\u8FD8\u6CA1\u6709 package-lock.json \u6587\u4EF6\uFF0C\u5B58\u5728\u7684\u95EE\u9898\u4E0A\u6587\u4E5F\u63D0\u5230\u8FC7\u3002yarn \u5C31\u5728\u6B64\u65F6\u8BDE\u751F\u4E86",paraId:70,tocIndex:11},{value:`
+yarn \u4E5F\u662F\u91C7\u7528\u7684 npm-v3 \u6241\u5E73\u5316\u7ED3\u6784\u6765\u7BA1\u7406\u5305\u4F9D\u8D56\uFF0C\u5B89\u88C5\u5B8C\u6210\u4E4B\u540E\u4F1A\u751F\u6210\u4E00\u4E2A yarn.lock \u6587\u4EF6`,paraId:70,tocIndex:11},{value:`
+\u6267\u884C\u4E0E\u4E0A\u8FF0\u4E00\u6837\u7684 package.json\uFF0C\u5F97\u5230\u5982\u4E0B\u7684 yarn.lock \u6587\u4EF6`,paraId:70,tocIndex:11},{value:`# THIS IS AN AUTOGENERATED FILE. DO NOT EDIT THIS FILE DIRECTLY.
+# yarn lockfile v1
+
+base64-js@^1.3.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
+  integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
+
+buffer@^5.4.3:
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.1.tgz#ba62e7c13133053582197160851a8f648e99eed0"
+  integrity sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.1.13"
+
+ieee754@^1.1.13:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
+  integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
+
+ignore@^5.1.4:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
+  integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
+`,paraId:71,tocIndex:11},{value:"\u548C npm \u4EA7\u751F\u7684 lock \u6587\u4EF6\u8FD8\u662F\u6BD4\u8F83\u76F8\u4F3C\u7684\uFF0C\u4E5F\u6709\u4E00\u4E9B\u533A\u522B",paraId:72,tocIndex:11},{value:"package-lock.json \u662F json \u683C\u5F0F\uFF0Cyarn.lock \u4F7F\u7528\u4E00\u79CD\u81EA\u5B9A\u4E49\u683C\u5F0F",paraId:73,tocIndex:11},{value:"\u6240\u6709\u4F9D\u8D56\uFF0C\u4E0D\u7BA1\u662F\u9879\u76EE\u58F0\u660E\u7684\u4F9D\u8D56\uFF0C\u8FD8\u662F\u4F9D\u8D56\u7684\u4F9D\u8D56\uFF0C\u90FD\u662F\u6241\u5E73\u5316\u7BA1\u7406",paraId:73,tocIndex:11},{value:"\u4F9D\u8D56\u7684\u7248\u672C\u662F\u7531\u6240\u6709\u4F9D\u8D56\u7684\u7248\u672C\u58F0\u660E\u8303\u56F4\u786E\u5B9A\u7684\uFF0C\u5177\u5907\u76F8\u540C\u7248\u672C\u58F0\u660E\u8303\u56F4\u7684\u4F9D\u8D56\u5F52\u7ED3\u4E3A\u4E00\u7C7B\uFF0C\u786E\u5B9A\u4E00\u4E2A\u8BE5\u8303\u56F4\u4E0B\u7684\u4F9D\u8D56\u7248\u672C\u3002\u5982\u679C\u540C\u4E00\u4E2A\u4F9D\u8D56\u591A\u4E2A\u7248\u672C\u5171\u5B58\uFF0C\u90A3\u4E48\u4F1A\u5E76\u5217\u5F52\u7C7B",paraId:73,tocIndex:11},{value:"\u76F8\u6BD4 npm\uFF0CYarn \u4E00\u4E2A\u663E\u8457\u533A\u522B\u662F yarn.lock \u4E2D\u5B50\u4F9D\u8D56\u7684\u7248\u672C\u53F7\u4E0D\u662F\u56FA\u5B9A\u7248\u672C\u3002",paraId:73,tocIndex:11},{value:"\xA0 \u4E5F\u5C31\u662F\u8BF4\u5355\u72EC\u4E00\u4E2A yarn.lock \u786E\u5B9A\u4E0D\u4E86 node_modules \u76EE\u5F55\u7ED3\u6784\uFF0C\u8FD8\u9700\u8981\u548C package.json \u6587\u4EF6\u8FDB\u884C\u914D\u5408",paraId:73,tocIndex:11},{value:`
+yarn.lock \u662F\u6241\u5E73\u5316\u7684\uFF0C\u5373\u4F7F\u6709\u76F8\u540C\u7684\u5305\u4E5F\u4F1A\u5E26\u6709\u7248\u672C\u53F7\u5E76\u5217\u5728\u4E00\u7EA7\uFF1B\u800C package-lock \u662F\u548C node_modules \u4E00\u4E00\u5BF9\u5E94\u7684\u5D4C\u5957\u7ED3\u6784`,paraId:73,tocIndex:11},{value:`
+\u6240\u4EE5 yarn.lock \u5373\u4F7F\u6709\u786E\u5B9A\u7684\u7248\u672C\u53F7\u4E5F\u6CA1\u6CD5\u5F97\u5230\u5BF9\u5E94 node_modules \u7684\u76EE\u5F55\u7ED3\u6784\u6240\u4EE5\u9700\u8981\u7ED3\u5408 package.json`,paraId:73,tocIndex:11},{value:"yarn install \u7684\u8FC7\u7A0B\uFF0C\u53EF\u4EE5\u5728\u7EC8\u7AEF\u770B\u5230\u7531 emoji \u56FE\u6807\u88C5\u9970\u7684\u56DB\u4E2A\u6B65\u9AA4",paraId:74,tocIndex:11},{value:"Resolving packages(\u89E3\u6790\u5305): \u6574\u5408\u4F9D\u8D56\u4FE1\u606F",paraId:75,tocIndex:11},{value:"Fetching packages(\u83B7\u53D6\u5305): \u83B7\u53D6\u4F9D\u8D56\u5305\u5230\u7F13\u5B58\u4E2D",paraId:75,tocIndex:11},{value:"Linking dependencies(\u8FDE\u63A5\u4F9D\u8D56): \u590D\u5236\u4F9D\u8D56\u5230 node_modules",paraId:75,tocIndex:11},{value:"Building fresh packages(\u6784\u5EFA\u5B89\u88C5): \u6267\u884C install \u9636\u6BB5\u7684 scripts",paraId:75,tocIndex:11},{value:"\u53C2\u8003\u94FE\u63A5",paraId:12},{value:"npm \u4F9D\u8D56\u7BA1\u7406\u4E2D\u88AB\u5FFD\u7565\u7684\u90A3\u4E9B\u7EC6\u8282",paraId:76,tocIndex:11},{value:"\u5256\u6790 npm \u7684\u5305\u7BA1\u7406\u673A\u5236",paraId:76,tocIndex:11},{value:"npm \u5DE5\u4F5C\u673A\u5236",paraId:76,tocIndex:11},{value:"npm -- install \u5B89\u88C5\u6D41\u7A0B",paraId:76,tocIndex:11},{value:"yarn install \u5DE5\u4F5C\u6D41\u7A0B\u89E3\u6790",paraId:76,tocIndex:11}]},46024:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(726);const a=[{value:"\u524D\u6587",paraId:0},{value:"\u5256\u6790\u4E86 npm/yarn \u8FD9\u4E24\u79CD\u5305\u7BA1\u7406\u5DE5\u5177\uFF0C\u8FD9\u7BC7\u6587\u7AE0\u8981\u4ECB\u7ECD\u540A\u6253\u5B83\u4EEC\u7684 pnpm!",paraId:1},{value:"\u5176\u5B98\u7F51\u8FD9\u6837\u8BF4\uFF1A",paraId:2,tocIndex:1},{value:"Fast, disk space efficient package manager \u5FEB\u901F\u7684\uFF0C\u8282\u7701\u78C1\u76D8\u7A7A\u95F4\u7684\u5305\u7BA1\u7406\u5DE5\u5177",paraId:3,tocIndex:1},{value:"pnpm \u672C\u8D28\u4E0A\u5C31\u662F\u4E00\u4E2A\u5305\u7BA1\u7406\u5668\uFF0C\u5728\u8FD9\u4E00\u70B9\u548C npm/yarn \u6CA1\u6709\u533A\u522B\uFF0C\u4F46\u662F\u5176\u4E24\u4E2A\u4F18\u52BF\u5728\u4E8E\uFF1A",paraId:4,tocIndex:1},{value:"\u5305\u5B89\u88C5\u6570\u5EA6\u6781\u5FEB",paraId:5,tocIndex:1},{value:`
+\u5B98\u65B9 \xA0`,paraId:5,tocIndex:1},{value:"benchmarks",paraId:5,tocIndex:1},{value:" \u5BF9 npm\u3001pnpm\u3001yarn\u3001yarnPnP \u5BF9\u591A\u4E2A\u60C5\u666F\u4E0B\u7684\u6027\u80FD\u57FA\u51C6\u6D4B\u8BD5\uFF0C\u6DB5\u76D6\u4E86\u5F88\u591A\u4F7F\u7528\u573A\u666F",paraId:5,tocIndex:1},{value:"\u78C1\u76D8\u7A7A\u95F4\u5229\u7528\u975E\u5E38\u9AD8\u6548",paraId:6,tocIndex:1},{value:`
+\u4F7F\u7528 yarn \u5B89\u88C5\u4F9D\u8D56\u65F6\u7684 node_modules`,paraId:6,tocIndex:1},{value:"\u4F7F\u7528 pnpm \u5B89\u88C5\u4F9D\u8D56\u65F6\u7684 node_modules",paraId:7,tocIndex:1},{value:"pnpm \u5185\u90E8\u4F7F\u7528",paraId:8,tocIndex:1},{value:"\u57FA\u4E8E\u5185\u5BB9\u5BFB\u5740",paraId:8,tocIndex:1},{value:"\u7684\u6587\u4EF6\u7CFB\u7EDF\u6765\u5B58\u50A8\u78C1\u76D8\u4E0A\u6240\u6709\u7684\u6587\u4EF6\uFF0C\u8BE5\u6587\u4EF6\u7CFB\u7EDF\u51FA\u8272\u7684\u5730\u65B9\u5728\u4E8E",paraId:8,tocIndex:1},{value:"\u4E0D\u4F1A\u91CD\u590D\u5B89\u88C5\u540C\u4E00\u4E2A\u5305\u3002\u5728 npm/yarn \u4E2D\uFF0C\u6211\u4EEC\u6240\u6709\u7684\u9879\u76EE(10 \u4E2A)\u6709\u4F9D\u8D56\u4E86 dt-common\uFF0Cdt-common \u4F1A\u88AB\u5B89\u88C5 10 \u6B21\uFF0Cdt-common \u8FD9\u4E2A\u5305\u5728\u78C1\u76D8\u4E2D\u5C31\u4F1A\u6709 10 \u4E2A\u5730\u65B9\u5199\u5165\u8BE5\u4EE3\u7801\u3002\u4F46\u662F\u5728 pnpm \u4E2D\u53EA\u4F1A\u88AB\u5B89\u88C5\u4E00\u6B21\uFF0C\u78C1\u76D8\u4E2D\u53EA\u6709\u4E00\u4E2A\u5730\u65B9\u4F1A\u5199\u5165\uFF0C\u540E\u9762\u518D\u6B21\u4F7F\u7528\u90FD\u76F4\u63A5\u4F7F\u7528",paraId:9,tocIndex:1},{value:"\u786C\u8FDE\u63A5 hardlink",paraId:9,tocIndex:1},{value:"\u652F\u6301 monorepo",paraId:10,tocIndex:1},{value:"\u76F8\u5BF9\u5B89\u5168",paraId:11,tocIndex:1},{value:"\u5728 Linux \u4E2D\u6709\u4E24\u79CD\u94FE\u63A5\u65B9\u5F0F\uFF1A",paraId:12,tocIndex:2},{value:"\u786C\u8FDE\u63A5 hard link",paraId:13,tocIndex:2},{value:`\u8F6F\u94FE\u63A5 soft link\uFF0C\u53C8\u79F0\u4E3A\u7B26\u53F7\u94FE\u63A5 symbolic link
+\u4E0D\u8BBA\u662F\u786C\u94FE\u63A5\u6216\u8F6F\u94FE\u63A5\u90FD\u4E0D\u4F1A\u5C06\u539F\u672C\u7684\u6E90\u6587\u4EF6\u590D\u5236\u4E00\u4EFD\uFF0C\u53EA\u4F1A\u5360\u7528\u975E\u5E38\u5C11\u91CF\u7684\u78C1\u76D8\u7A7A\u95F4`,paraId:13,tocIndex:2},{value:"\u6BCF\u4E2A\u6587\u4EF6\u90FD\u6709",paraId:14,tocIndex:3},{value:"\u552F\u4E00\u4E00\u4E2A",paraId:14,tocIndex:3},{value:" inode\uFF0C\u5B83\u5305\u542B\u4E86\u6587\u4EF6\u5143\u4FE1\u606F\uFF0C\u5728\u8BBF\u95EE\u6587\u4EF6\u65F6\uFF0C\u5BF9\u5E94\u7684\u5143\u4FE1\u606F\u4F1A\u88AB copy \u5230\u5185\u5B58\u53BB\u5B9E\u73B0\u6587\u4EF6\u7684\u8BBF\u95EE",paraId:14,tocIndex:3},{value:`
+\u4F7F\u7528`,paraId:14,tocIndex:3},{value:"stat xxx",paraId:14,tocIndex:3},{value:"\u80FD\u591F\u67E5\u5230\u5BF9\u5E94\u7684 inode",paraId:14,tocIndex:3},{value:"\u786C\u94FE\u63A5\u53EF\u4EE5\u7406\u89E3\u6210\u4E3A\u4E00\u4E2A\u76F8\u4E92\u7684\u6307\u9488\uFF0C",paraId:15,tocIndex:4},{value:"\u521B\u5EFA\u7684 hardlink \u6307\u5411\u6E90\u6587\u4EF6\u7684 inode",paraId:15,tocIndex:4},{value:"\uFF0C\u7CFB\u7EDF\u5E76\u4E0D\u4E3A\u4F1A\u5176\u5206\u914D\u65B0\u7684 inode",paraId:15,tocIndex:4},{value:`
+\u786C\u94FE\u63A5\u4E0D\u7BA1\u6709\u591A\u5C11\u4E2A\uFF0C\u90FD\u4F1A\u6307\u5411\u7528\u4E00\u4E2A inode \u8282\u70B9\uFF0C\u8FD9\u7B49\u540C\u4E8E\u4FEE\u6539\u6E90\u6587\u4EF6\u6216\u8005\u94FE\u63A5\u6587\u4EF6\u65F6\u90FD\u4F1A\u88AB\u540C\u6B65\u4FEE\u6539(\u611F\u89C9\u548C JS \u5BF9\u8C61\u5F15\u7528\u5730\u5740\u7565\u5FAE\u76F8\u4F3C`,paraId:15,tocIndex:4},{value:`
+\u6BCF\u65B0\u5EFA\u4E00\u4E2A hardlink \u4F1A\u628A\u8282\u70B9\u8FDE\u63A5\u6570\u589E\u52A0\uFF0C\u53EA\u8981\u8282\u70B9\u7684\u94FE\u63A5\u6570\u975E\u96F6\uFF0C\u6587\u4EF6\u5C31\u4E00\u76F4\u5B58\u5728\uFF0C\u4E0D\u7BA1\u4F60\u5220\u9664\u7684\u662F\u6E90\u6587\u4EF6\u8FD8\u662F hradlink\u3002\u53EA\u8981\u6709\u4E00\u4E2A\u5B58\u5728\uFF0C\u6587\u4EF6\u5C31\u5B58\u5728`,paraId:15,tocIndex:4},{value:"\u8F6F\u94FE\u63A5\u53EF\u4EE5\u7406\u89E3\u4E3A\u5355\u5411\u6307\u9488\uFF0C",paraId:16,tocIndex:5},{value:"\u4E00\u4E2A\u72EC\u7ACB\u7684\u6587\u4EF6\u4E14\u62E5\u6709\u72EC\u7ACB\u7684 inode",paraId:16,tocIndex:5},{value:"\uFF0C\u6C38\u8FDC\u6307\u5411\u6E90\u6587\u4EF6",paraId:16,tocIndex:5},{value:`
+\u4FEE\u6539\u6E90\u6587\u4EF6\u5185\u5BB9\uFF0C\u8F6F\u94FE\u63A5\u5185\u5BB9\u4E5F\u4F1A\u6539\u53D8\u3002\u5F53\u5220\u9664\u6E90\u6587\u4EF6\u65F6\uFF0C\u8BBF\u95EE\u8F6F\u94FE\u63A5\u4F1A\u62A5\u9519`,paraId:16,tocIndex:5},{value:"No such file or directory",paraId:16,tocIndex:5},{value:"\u53EF\u4EE5\u4F7F\u7528",paraId:17,tocIndex:6},{value:"ln",paraId:17,tocIndex:6},{value:`\u547D\u4EE4\u5BF9\u6587\u4EF6\u548C\u76EE\u5F55\u5728\u53E6\u4E00\u4E2A\u4F4D\u7F6E\u5EFA\u7ACB\u4E00\u4E2A\u540C\u6B65\u7684\u94FE\u63A5
+\u8BED\u6CD5\uFF1A\xA0`,paraId:17,tocIndex:6},{value:"ln [\u53C2\u6570][\u6E90\u6587\u4EF6\u6216\u76EE\u5F55][\u76EE\u6807\u6587\u4EF6\u6216\u76EE\u5F55]",paraId:17,tocIndex:6},{value:"\u5728\u67D0\u4E2A\u9879\u76EE\u4E2D\u65B0\u5EFA\u4E24\u4E2A\u6587\u4EF6\u5939 one/two\uFF0C\u76EE\u5F55\u7ED3\u6784\u5982\u4E0B\uFF1A",paraId:18,tocIndex:6},{value:"one/index.js \u4E2D\u5185\u5BB9\u5982\u4E0B\uFF1A",paraId:19,tocIndex:6},{value:`const base64 = require('base64-js');
+console.log(base64);
+`,paraId:20,tocIndex:6},{value:"\u73B0\u5728\u8FD0\u884C\u5F53\u524D one/index.js \u4E00\u5B9A\u4F1A\u62A5\u9519\uFF0C\u56E0\u4E3A\u6211\u4EEC\u7684 one \u6587\u4EF6\u4E0B\u4E0D\u5B58\u5728 base64-js \u4F9D\u8D56",paraId:21,tocIndex:6},{value:`
+\u5206\u522B\u5728 two \u6587\u4EF6\u4E0B\u521B\u5EFA one/index.js \u7684\u786C\u94FE\u63A5/\u8F6F\u94FE\u63A5\u6587\u4EF6`,paraId:21,tocIndex:6},{value:"hard.js \u662F\u4E00\u4E2A\u786C\u94FE\u63A5\uFF0Csoft.js \u662F\u4E00\u4E2A\u8F6F\u94FE\u63A5",paraId:22,tocIndex:6},{value:`
+\u6211\u4EEC\u5206\u522B\u6267\u884C node hard.js/node soft.js`,paraId:22,tocIndex:6},{value:"\u53D1\u73B0\u786C\u94FE\u63A5\u662F\u53EF\u4EE5\u6B63\u5E38\u8FD0\u884C\u7684\uFF0C\u4F46\u662F\u8F6F\u94FE\u63A5\u4E0D\u884C\u3002\u8FD9\u662F\u56E0\u4E3A",paraId:23,tocIndex:6},{value:"\u786C\u94FE\u63A5\u4F1A\u4ECE\u94FE\u63A5\u5230\u7684\u4F4D\u7F6E\u5F00\u59CB\u67E5\u627E\u4F9D\u8D56\uFF0C\u800C\u8F6F\u94FE\u63A5\u4F1A\u4ECE\u6587\u4EF6\u539F\u59CB\u4F4D\u7F6E\u5F00\u59CB\u67E5\u627E\u4F9D\u8D56\u3002",paraId:23,tocIndex:6},{value:"\u4E0A\u8FF0\u7684\u4F8B\u5B50\u8BB2\u6E05\u695A\u4E86 node \u5904\u7406\u8F6F\u786C\u94FE\u63A5\u7684\u4E0D\u540C\u4E4B\u5904\uFF0C\u90A3\u6211\u4EEC\u5C06 two/node_modules \u8F6F\u94FE\u63A5\u5230 one \u7684\u76EE\u5F55\u4E0B\uFF0Cone/index.js \u548C two/soft.js \u80FD\u5426\u6B63\u5E38\u8FD0\u884C\u5462 \u{1F914}",paraId:24,tocIndex:7},{value:`ln -s  ../two/node_modules ./one
+`,paraId:25,tocIndex:7},{value:"\u5BF9\u5E94\u6267\u884C one/index.js \u548C two/soft.js\u3002\u54C7\u54E6\uFF0Cwork well",paraId:26,tocIndex:7},{value:"\u901A\u8FC7\u4E0A\u9762\u7684\u793A\u4F8B\uFF0C\u6211\u4EEC\u53D1\u73B0\u5373\u4F7F\u5F53\u524D node_modules \u662F\u4E00\u4E2A\u8F6F\u94FE\u63A5\u4E5F\u80FD\u591F\u4F5C\u4E3A\u4F9D\u8D56\u88AB\u67E5\u627E\u5230\uFF0C\u8BF4\u660E",paraId:27,tocIndex:7},{value:"\u8F6F\u94FE\u53EF\u4EE5\u5C06\u5176\u4ED6\u5730\u65B9\u7684\u76EE\u5F55\u589E\u52A0\u5230\u4F9D\u8D56\u67E5\u627E\u8DEF\u5F84\u4E2D\u3002",paraId:27,tocIndex:7},{value:`{
+  "name": "npm-test",
+  "dependencies": {
+    "buffer": "^5.4.3"
+  }
+}
+`,paraId:28,tocIndex:8},{value:"\u5728\u6211\u4EEC\u7684 npm-test \u9879\u76EE\u4E2D\u6267\u884C",paraId:29,tocIndex:8},{value:"pnpm i",paraId:29,tocIndex:8},{value:"\u63A7\u5236\u53F0\u4F1A\u6709\u5982\u4E0B\u8F93\u51FA\uFF1A",paraId:29,tocIndex:8},{value:"\u80FD\u591F\u53D1\u73B0\u5728 Progress \u4E2D\uFF0C\u80FD\u591F\u660E\u786E\u6709\u591A\u5C11\u5305\u88AB\u590D\u7528\u548C\u91CD\u65B0\u4E0B\u8F7D\u4E86\u591A\u5C11\u5305",paraId:30,tocIndex:8},{value:`
+\u5E76\u4E14\u5F53\u6211\u4EEC\u8FD0\u884C`,paraId:30,tocIndex:8},{value:"pnpm\xA0install",paraId:30,tocIndex:8},{value:"\u8FDB\u884C node_modules \u5B89\u88C5\u7684\u65F6\u5019\uFF0C\u4F1A\u4F7F\u7528",paraId:30,tocIndex:8},{value:"\u8F6F\u94FE\u63A5 & \u786C\u94FE\u63A5",paraId:30,tocIndex:8},{value:"\u7684\u65B9\u5F0F\u6765\u8282\u7701\u78C1\u76D8\u7A7A\u95F4 & \u63D0\u5347\u5B89\u88C5\u6548\u7387",paraId:30,tocIndex:8},{value:"\u4E0A\u8FF0\u5B89\u88C5\u5F97\u5230\u5982\u56FE\u7684 node_modules\uFF1A.pnpm \u6587\u4EF6 & package.json \u63CF\u8FF0\u7684\u5176\u4ED6\u6587\u4EF6",paraId:31,tocIndex:9},{value:".pnpm \u76EE\u5F55\uFF1A\u5B58\u653E\u4E86\u6240\u6709\u5B9E\u9645\u5B89\u88C5\u7684\u5305\uFF0C\u5B83\u91CC\u9762\u5168\u90E8\u90FD\u662F\u6211\u4EEC\u9879\u76EE\u6240\u9700\u8981\u7684\u4F9D\u8D56\uFF0C",paraId:32,tocIndex:9},{value:"\u552F\u4E00\u4E0D\u540C\u7684\u5B83\u4EEC\u662F\u6765\u81EA store \u76EE\u5F55\u7684\u786C\u94FE\u63A5",paraId:32,tocIndex:9},{value:"\u5176\u4ED6\u6587\u4EF6\uFF1Apackage.json \u4E2D\u58F0\u660E\u7684\u5305\uFF0C",paraId:32,tocIndex:9},{value:"\u53EA\u662F\u751F\u6210\u4E00\u4E2A\u8F6F\u94FE\u63A5\uFF0C\u5B9E\u9645\u6307\u5411.pnpm \u4E2D\u5B89\u88C5\u7684\u5305",paraId:32,tocIndex:9},{value:`
+\u56E0\u4E3A\u6211\u4EEC\u53EA\u4F9D\u8D56\u9879\u4E2D\u76F4\u5B9A\u4E49\u4E86`,paraId:32,tocIndex:9},{value:"buffer",paraId:32,tocIndex:9},{value:"\uFF0C\u6240\u4EE5\u5B83\u662F\u552F\u4E00\u4E00\u4E2A\u4F60\u7684\u5E94\u7528\u5FC5\u987B\u62E5\u6709\u8BBF\u95EE\u6743\u9650\u7684\u5305(\u60F3\u4E86\u89E3\u4E3A\u4EC0\u4E48\u8981\u5BF9\u4F9D\u8D56\u9879\u505A\u4E25\u683C\u63A7\u5236\uFF0C",paraId:32,tocIndex:9},{value:"\u70B9\u51FB\u67E5\u770B",paraId:32,tocIndex:9},{value:")",paraId:32,tocIndex:9},{value:`
+pnpm \u8FD9\u79CD\u4F9D\u8D56\u7BA1\u7406\u7684\u65B9\u5F0F\u4E5F\u5F88\u5DE7\u5999\u5730\u89C4\u907F\u4E86`,paraId:32,tocIndex:9},{value:"\u975E\u6CD5\u8BBF\u95EE\u4F9D\u8D56",paraId:32,tocIndex:9},{value:"\u7684\u95EE\u9898\uFF0C\u4E5F\u5C31\u662F\u53EA\u8981\u4E00\u4E2A\u5305\u672A\u5728 package.json \u4E2D\u58F0\u660E\u4F9D\u8D56\uFF0C\u90A3\u4E48\u5728\u9879\u76EE\u4E2D\u662F\u65E0\u6CD5\u8BBF\u95EE\u7684",paraId:32,tocIndex:9},{value:`
+\u4F46\u662F\u5728 yarn/npm \u4E2D\u56E0\u4E3A\u5B58\u5728\u4F9D\u8D56\u63D0\u5347\u95EE\u9898\uFF0Cbuffer \u4F9D\u8D56 base64-js\uFF0C\u56E0\u6B64 node_modules \u4E2D\u5B58\u5728 base64-js \u7684\u5305\uFF0C\u6211\u4EEC\u5728\u9879\u76EE\u4E2D\u53EF\u4EE5\u76F4\u63A5\u5F15\u7528\u3002\u8FD9\u5C31\u662F\u4E3A\u4EC0\u4E48 pnpm \u7684\u5305\u7BA1\u7406\u66F4\u4E3A\u5B89\u5168\u7684\u539F\u56E0`,paraId:32,tocIndex:9},{value:"\u90A3 buffer \u76EE\u5F55\u4E0B\u90FD\u6709\u4E9B\u5565\u5462\uFF1F\u53D1\u73B0 buffer \u4E0B\u6839\u672C\u6CA1\u6709 node_modules\uFF0C\u5B83\u7684\u4F9D\u8D56\u9879\u90FD\u653E\u5728\u54EA\u91CC\u4E86\uFF1F\u76EE\u5F55\u7ED3\u6784\u7B2C\u4E00\u4E2A\u8BC0\u7A8D\uFF0C",paraId:33,tocIndex:9},{value:"buffer \u662F\u4E00\u4E2A\u8F6F\u94FE\u63A5\uFF0C\u5728 node \u89E3\u6790\u4F9D\u8D56\u7684\u65F6\u5019\uFF0C\u5B83\u4F7F\u7528\u8FD9\u4E9B\u4F9D\u8D56\u7684\u771F\u5B9E\u4F4D\u7F6E\uFF0C\u56E0\u6B64\u5728 buffer \u4E0B\u4E0D\u7528\u4FDD\u7559\u4F9D\u8D56",paraId:33,tocIndex:9},{value:"\u3002",paraId:33,tocIndex:9},{value:"\u90A3\u4F60\u53C8\u4F1A\u95EE buffer \u7684\u771F\u5B9E\u5730\u5740\u5728\u54EA\u91CC?\u{1F9D0}",paraId:34,tocIndex:9},{value:`
+\u56AF\uFF0C\u771F\u5B9E\u5730\u5740\u5728\u8FD9\u91CC: `,paraId:34,tocIndex:9},{value:"node_modules/.pnpm/buffer@ 5.7.1/node_modules/buffer",paraId:34,tocIndex:9},{value:`
+\u6240\u4EE5\u6211\u4EEC\u73B0\u5728\u77E5\u9053\u4E86`,paraId:34,tocIndex:9},{value:".pnpm/",paraId:34,tocIndex:9},{value:"\u6587\u4EF6\u5939\u7684\u7528\u9014\u3002",paraId:34,tocIndex:9},{value:".pnpm/",paraId:34,tocIndex:9},{value:"\u4EE5\u5E73\u94FA\u7684\u5F62\u5F0F\u50A8\u5B58\u7740\u6240\u6709\u7684\u5305\uFF0C\u6240\u4EE5\u6BCF\u4E2A\u5305\u90FD\u53EF\u4EE5\u5728\u8FD9\u79CD\u547D\u540D\u6A21\u5F0F\u7684\u6587\u4EF6\u5939\u4E2D\u88AB\u627E\u5230\uFF1A",paraId:34,tocIndex:9},{value:"node_modules/.pnpm/<name>@ <version>/node_modules/<name>",paraId:34,tocIndex:9},{value:"\u4F7F\u7528\u8FD9\u79CD\u5E73\u94FA\u7684\u7ED3\u6784\u907F\u514D npm2 \u5D4C\u5957\u7ED3\u6784\u5F15\u8D77\u7684\u957F\u8DEF\u5F84\u95EE\u9898\uFF0C\u548C npm3/yarn \u7684\u6241\u5E73\u5316\u7ED3\u6784\u4E0D\u540C\u7684\u662F\u5B83\u4FDD\u7559\u4E86\u5305\u4E4B\u95F4\u7684\u76F8\u4E92\u9694\u79BB",paraId:35,tocIndex:9},{value:`
+\u70B9\u5F00 buffer \u7684\u771F\u5B9E\u5730\u5740\uFF0C\u518D\u4E00\u6B21\u53D1\u73B0\u81EA\u5DF1\u53C8\u88AB\u9A97\u4E86\uFF0C\u771F\u5B9E\u5730\u5740\u4E0B\u9762\u8FD8\u662F\u6CA1\u6709 node_modules`,paraId:35,tocIndex:9},{value:"\u76EE\u5F55\u7ED3\u6784\u7B2C\u4E8C\u4E2A\u8BC0\u7A8D\u6765\u4E86\uFF0C",paraId:36,tocIndex:9},{value:"\u5305\u7684\u4F9D\u8D56\u9879\u4E0E\u4F9D\u8D56\u5305\u7684\u5B9E\u9645\u4F4D\u7F6E\u4F4D\u4E8E\u540C\u4E00\u76EE\u5F55\u7EA7\u522B",paraId:36,tocIndex:9},{value:"\uFF0Cbuffer \u7684\u4F9D\u8D56\u4E0D\u5728",paraId:36,tocIndex:9},{value:".pnpm/buffer@ 5.7.1/node_modules/buffer/node_modules",paraId:36,tocIndex:9},{value:"\uFF0C\u800C\u662F\u5728",paraId:36,tocIndex:9},{value:".pnpm/buffer@ 5.7.1/node_modules/",paraId:36,tocIndex:9},{value:"\u3002buffer \u7684\u6240\u6709\u4F9D\u8D56\u90FD\u88AB\u8F6F\u94FE\u63A5\u5230\u4E86",paraId:36,tocIndex:9},{value:"node_modules/.pnpm",paraId:36,tocIndex:9},{value:"\u7684\u5BF9\u5E94\u76EE\u5F55",paraId:36,tocIndex:9},{value:`
+\u5230\u4E86\u8FD9\u91CC\u4F60\u53EF\u80FD\u4F1A\u95EE\uFF0C\u4E3A\u4EC0\u4E48\u8981\u628A\u5B50\u4F9D\u8D56\u653E\u5728\u7EDF\u4E00\u5C42\u7EA7 \u{1F914}`,paraId:36,tocIndex:9},{value:"\u5047\u5982\u6211\u4EEC\u6709\u4E24\u4E2A\u5305\uFF0Cfoo \u548C bar \u76F8\u4E92\u4F9D\u8D56\uFF0C\u4F7F\u7528\u540C\u4E00\u5C42\u7EA7\u5B89\u88C5\u7684\u76EE\u5F55\u5982\u4E0B\uFF0C\u8FD9\u65F6 foo \u548C bar \u7684\u8F6F\u94FE\u63A5\u4E0D\u662F\u4E00\u4E2A\u5FAA\u73AF",paraId:37,tocIndex:9},{value:`.pnpm
+  bar@1.0.0
+    node_modules
+      bar
+      foo --> ../../foo@1.0.0/node_modules/foo
+  foo@1.0.0
+    node_modules
+      foo
+      bar --> ../../bar@1.0.0/node_modules/bar
+`,paraId:38,tocIndex:9},{value:"\u5047\u8BBE bar/foo \u7684\u4F9D\u8D56\u653E\u5728\u5B83\u7684\u5B50\u6587\u4EF6\u4E2D\uFF0C\u5982\u4E0B\uFF0C\u8FD9\u65F6 foo/bar \u7684\u8F6F\u94FE\u63A5\u5C31\u662F\u4E00\u4E2A\u5FAA\u73AF",paraId:39,tocIndex:9},{value:`.pnpm
+  bar@1.0.0
+    node_modules
+      bar
+        node_modules
+          foo --> ../../foo@1.0.0/node_modules/foo
+  foo@1.0.0
+    node_modules
+      foo
+        node_modules
+          bar --> ../../bar@1.0.0/node_modules/bar
+`,paraId:40,tocIndex:9},{value:"buffer \u4E2D\u6709 base64/ieee754 \u4E24\u4E2A\u5305\uFF0C\u5047\u8BBE\u5728 base64 \u7684 dependencies \u6CA1\u6709\u58F0\u660E ieee754\uFF0C\u90A3\u6211\u4EEC\u5728 base64/index \u4F7F\u7528",paraId:41,tocIndex:10},{value:"requie('ieee754')",paraId:41,tocIndex:10},{value:"\u65F6\uFF0C\u4ED6\u5C31\u662F\u4E00\u4E2A\u5E7D\u7075\u4F9D\u8D56\u3002\u4F1A\u5148\u5BFB\u627E base64 \u4E0A\u7EA7\u7684 node_modules\uFF0C\u82E5\u627E\u5230\u76F4\u63A5\u4F7F\u7528\uFF1B\u5426\u5219\u76F4\u63A5\u5F80\u4E0A\u7EA7\u5BFB\u627E node_modules\uFF0C\u5982\u679C\u4E0A\u7EA7\u4E5F\u6CA1\u6709\u7684\u8BDD\uFF0C\u5F53\u524D\u7684\u4F7F\u7528\u5C31\u4F1A\u6709\u95EE\u9898",paraId:41,tocIndex:10},{value:"\u6240\u4EE5 pnpm \u4F1A\u5C06\u6240\u6709\u7684\u4F9D\u8D56\u90FD\u63D0\u5347\u5230.pnpm/node_modules \u4E0B\uFF0C\u4FDD\u8BC1\u5E7D\u7075\u4F9D\u8D56\u53EF\u4EE5\u88AB\u627E\u5230\uFF0C\u4F5C\u4E3A\u515C\u5E95\u65B9\u6848",paraId:42,tocIndex:10},{value:"discussions",paraId:42,tocIndex:10},{value:"\u5728\u4F7F\u7528 pnpm \u5B89\u88C5\u65F6\uFF0Cpnpm \u4F1A\u5C06\u4F9D\u8D56\u5B58\u50A8\u5728",paraId:43,tocIndex:11},{value:"~/.pnpm-store/v3",paraId:43,tocIndex:11},{value:"\u76EE\u5F55\u4E0B\u3002\u5728\u540C\u4E00\u53F0\u7535\u8111\u4E0B\uFF0C\u4E0B\u4E00\u6B21\u5B89\u88C5\u7684\u65F6\u5019 pnpm \u4F1A\u5148\u68C0\u67E5 store \u76EE\u5F55\uFF0C\u5982\u679C\u6709\u627E\u5230\u6240\u9700\u7684\u4F9D\u8D56\uFF0C\u5219\u4F1A\u901A\u8FC7\u786C\u94FE\u63A5\u653E\u5230\u6211\u4EEC\u7684\u9879\u76EE\u4E2D\u53BB\uFF0C\u800C\u4E0D\u662F\u91CD\u65B0\u5B89\u88C5\u4F9D\u8D56",paraId:43,tocIndex:11},{value:`
+\u56E0\u4E3A pnpm \u5B89\u88C5\u4F9D\u8D56\u65F6\u4F1A\u5C06\u4F9D\u8D56\u5B58\u50A8\u5728 store \u76EE\u5F55\u4E0B\uFF0C`,paraId:43,tocIndex:11},{value:"\u8BE5\u76EE\u5F55\u80FD\u591F\u4F7F\u4E0D\u540C\u7684\u9879\u76EE\u4E4B\u95F4\u5171\u4EAB\u4F9D\u8D56",paraId:43,tocIndex:11},{value:"\u3002\u4F8B\u5982 dt-data-api \u9879\u76EE\u4E2D\u4E2D\u5B89\u88C5\u4E86 dt-common/dt-react-component \u7B49\u4F9D\u8D56\uFF0C\u5F53\u6211\u4EEC\u5728 dt-easy-index \u9879\u76EE\u4E2D\u4E5F\u7528\u4E86\u8BE5\u4E24\u4E2A\u4F9D\u8D56\u65F6\uFF0C\u4F1A\u91CD\u590D\u4F7F\u7528 store \u4E0B\u7684\u4F9D\u8D56\u3002\u800C yarn/npm \u6BCF\u6B21\u90FD\u4F1A\u91CD\u65B0\u5B89\u88C5\u4F9D\u8D56",paraId:43,tocIndex:11},{value:"\u{1F914} \u90A3\u4E48\u95EE\u9898\u6765\u4E86\uFF0C\u4E3A\u4EC0\u4E48\u5728\u8FD9\u91CC\u8981\u4F7F\u7528\u786C\u94FE\u63A5\uFF0C\u800C\u4E0D\u662F\u76F4\u63A5\u521B\u5EFA\u5230\u5168\u5C40\u5B58\u50A8\u7684\u7B26\u53F7\u94FE\u63A5",paraId:44,tocIndex:11},{value:`
+\u901A\u8FC7\u4E0A\u6587\u6211\u4EEC\u77E5\u9053 node \u5BF9\u8F6F\u786C\u94FE\u63A5\u67E5\u8BE2\u4F4D\u7F6E\u7684\u5904\u7406\u4E0D\u540C\u3002\u5047\u8BBE\u6211\u4EEC\u6709\u5982\u4E0B\u7684\u4E24\u4E2A\u9879\u76EE\uFF1A`,paraId:44,tocIndex:11},{value:"foo",paraId:45,tocIndex:11},{value:`"react": "16.8.0",
+"dt-react-component": "1.0.0"
+`,paraId:46,tocIndex:11},{value:"bar",paraId:47,tocIndex:11},{value:`"react": "17.0.0",
+"dt-react-component": "1.0.0"
+`,paraId:48,tocIndex:11},{value:"\u5728",paraId:49,tocIndex:11},{value:"dt-react-component",paraId:49,tocIndex:11},{value:"\u91CC\u9762\uFF0C\u4F1A\u4F7F\u7528",paraId:49,tocIndex:11},{value:"import React from 'react'",paraId:49,tocIndex:11},{value:"\uFF0C\u5047\u8BBE",paraId:49,tocIndex:11},{value:"foo/node_modules/dt-react-component",paraId:49,tocIndex:11},{value:"\u548C",paraId:49,tocIndex:11},{value:"bar/node_modules/dt-react-component",paraId:49,tocIndex:11},{value:"\u90FD\u4F7F\u7528\u8F6F\u94FE\u63A5\u5230",paraId:49,tocIndex:11},{value:"./pnpm-store/v3",paraId:49,tocIndex:11},{value:"\uFF0C\u90A3\u4ED6\u4EEC\u90FD\u4F1A\u4F7F\u7528\u540C\u4E00\u4E2A\u7248\u672C\u7684 react\uFF0C\u8FD9\u4E0D\u662F\u6211\u4EEC\u6240\u671F\u671B\u7684\u3002\u6240\u4EE5\u4F7F\u7528\u786C\u94FE\u63A5\uFF0C\u5728",paraId:49,tocIndex:11},{value:"dt-react-component",paraId:49,tocIndex:11},{value:"\u4E2D\u5728\u4F7F\u7528",paraId:49,tocIndex:11},{value:"import React from 'react'",paraId:49,tocIndex:11},{value:"\u65F6\uFF0C\u4F1A\u6839\u636E\u5F53\u524D\u7684\u4F4D\u7F6E\u53BB\u5BFB\u627E\u4F9D\u8D56\uFF0C\u8FD9\u6837\u4F7F\u5F97 foo \u548C bar \u53EF\u4EE5\u4F9D\u8D56\u4E0D\u540C\u7684 react \u7684\u7248\u672C",paraId:49,tocIndex:11},{value:"\u53C2\u8003\u94FE\u63A5",paraId:50},{value:"npm \u4F9D\u8D56\u7BA1\u7406\u4E2D\u88AB\u5FFD\u7565\u7684\u90A3\u4E9B\u7EC6\u8282",paraId:51,tocIndex:12},{value:"\u5256\u6790 npm \u7684\u5305\u7BA1\u7406\u673A\u5236",paraId:51,tocIndex:12},{value:"npm \u5DE5\u4F5C\u673A\u5236",paraId:51,tocIndex:12},{value:"npm -- install \u5B89\u88C5\u6D41\u7A0B",paraId:51,tocIndex:12},{value:"yarn install \u5DE5\u4F5C\u6D41\u7A0B\u89E3\u6790",paraId:51,tocIndex:12},{value:"\u5B9E\u8DF5\uFF1Apnpm \u89E3\u51B3\u4E86\u6211\u7684\u54EA\u4E9B\u75DB\u70B9\uFF1F",paraId:51,tocIndex:12},{value:"\u5173\u4E8E\u73B0\u4EE3\u5305\u7BA1\u7406\u5668\u7684\u6DF1\u5EA6\u601D\u8003\u2014\u2014\u4E3A\u4EC0\u4E48\u73B0\u5728\u6211\u66F4\u63A8\u8350 pnpm \u800C\u4E0D\u662F npm/yarn?",paraId:51,tocIndex:12},{value:"\u8F6F\u94FE\u63A5&\u786C\u94FE\u63A5\u5728\u524D\u7AEF\u4E2D\u7684\u5E94\u7528",paraId:51,tocIndex:12}]},71917:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(15064);const a=[{value:"\u968F\u7740\u5728\u7F16\u8BD1\u4E2D\u8D8A\u6765\u8D8A\u5377\uFF0CSWC \u7531\u4E8E\u901F\u5EA6\u6781\u5FEB\u4E5F\u51FA\u73B0\u5728\u5927\u4F17\u7684\u89C6\u91CE\u4E2D\uFF0C\u672C\u6587\u4F1A\u7B80\u5355\u4ECB\u7ECD\u4E00\u4E0B SWC\u3002",paraId:0},{value:"\u524D\u6587",paraId:1},{value:"\u4E2D\u6709\u5BF9 Babel \u505A\u76F8\u5173\u4ECB\u7ECD\uFF0C\u5927\u5BB6\u53EF\u4EE5\u4E00\u8D77\u9605\u8BFB\u3002",paraId:0},{value:`
 \u{1F4A1} SWC(Speedy Web Complier) is a super-fast TypeScript / JavaScript compiler written in Rust.
 `,paraId:0},{value:"SWC \u51FA\u73B0\u7684\u5F88\u5927\u90E8\u5206\u539F\u56E0\u5176\u5B9E\u662F\u66FF\u6362\u6389\u5DE5\u7A0B\u4E2D\u7684 Babel\uFF0C\u56E0\u6B64\u5B83\u7684\u529F\u80FD\u548C Babel \u5DEE\u4E0D\u591A\u3002",paraId:2,tocIndex:0},{value:"\u6700\u5927\u7684\u533A\u522B\u53EF\u80FD\u5C31\u662F\uFF1ASWC is father than Babel",paraId:3,tocIndex:0},{value:`
 \u{1F3CE}\uFE0F SWC is\xA020x faster than Babel\xA0on a single thread and\xA070x faster\xA0on four cores.
@@ -5748,221 +5923,210 @@ const dom = <div>\u971C\u5E8F</div>;
 const dom1 = <Customer name="\u971C\u5E8F" />;
 `,paraId:3,tocIndex:1},{value:"\u867D\u7136\u6709\u5F88\u591A\u60C5\u51B5\u4E0B\u4F1A\u51FA\u73B0\u4E2D\u6587\uFF0C\u5728\u4EE3\u7801\u4E2D\u5B58\u5728\u7684\u65F6\u5019\u5927\u90E8\u5206\u662F",paraId:4,tocIndex:1},{value:"string",paraId:4,tocIndex:1},{value:"\u6216\u8005\u6A21\u7248\u5B57\u7B26\u4E32\uFF0C\u5728",paraId:4,tocIndex:1},{value:"react",paraId:4,tocIndex:1},{value:"\u4E2D\u7684\u65F6\u5019\u4E00\u4E2A\u662F",paraId:4,tocIndex:1},{value:"dom",paraId:4,tocIndex:1},{value:"\u7684\u5B50\u8282\u70B9\u8FD8\u662F\u4E00\u79CD\u662F",paraId:4,tocIndex:1},{value:"props",paraId:4,tocIndex:1},{value:"\u4E0A\u7684\u5C5E\u6027\u5305\u542B\u4E2D\u6587\u3002",paraId:4,tocIndex:1},{value:`// const a = '\u971C\u5E8F';
 {
-    "type": "StringLiteral",
-    "start": 10,
-    "end": 14,
-    "extra": {
-        "rawValue": "\u971C\u5E8F",
-        "raw": "'\u971C\u5E8F'"
-    },
-    "value": "\u971C\u5E8F"
+  "type": "StringLiteral",
+  "start": 10,
+  "end": 14,
+  "extra": {
+    "rawValue": "\u971C\u5E8F",
+    "raw": "'\u971C\u5E8F'"
+  },
+  "value": "\u971C\u5E8F"
 }
 `,paraId:5,tocIndex:1},{value:"StringLiteral",paraId:6,tocIndex:1},{value:"\u5BF9\u5E94\u7684",paraId:7,tocIndex:1},{value:"AST",paraId:7,tocIndex:1},{value:"\u8282\u70B9\u4E3A",paraId:7,tocIndex:1},{value:"StringLiteral",paraId:7,tocIndex:1},{value:"\uFF0C\u9700\u8981\u53BB\u904D\u5386\u6240\u6709\u7684",paraId:7,tocIndex:1},{value:"StringLiteral",paraId:7,tocIndex:1},{value:"\u8282\u70B9\uFF0C\u5C06\u5F53\u524D\u7684\u8282\u70B9\u66FF\u6362\u4E3A\u6211\u4EEC\u9700\u8981\u7684",paraId:7,tocIndex:1},{value:"I18N.key",paraId:7,tocIndex:1},{value:"\u8FD9\u79CD\u8282\u70B9\u3002",paraId:7,tocIndex:1},{value:`// const b = \`\${finalRoles}(\u8D28\u91CF\u9879\u76EE\uFF1A\${projects})\`
 {
-    "type": "TemplateLiteral",
-    "start": 10,
-    "end": 43,
-    "expressions": [
-        {
-            "type": "Identifier",
-            "start": 13,
-            "end": 23,
-            "name": "finalRoles"
-        },
-        {
-            "type": "Identifier",
-            "start": 32,
-            "end": 40,
-            "name": "projects"
-        }
-    ],
-    "quasis": [
-        {
-            "type": "TemplateElement",
-            "start": 11,
-            "end": 11,
-            "value": {
-                "raw": "",
-                "cooked": ""
-            }
-        },
-        {
-            "type": "TemplateElement",
-            "start": 24,
-            "end": 30,
-            "value": {
-                "raw": "(\u8D28\u91CF\u9879\u76EE\uFF1A",
-                "cooked": "(\u8D28\u91CF\u9879\u76EE\uFF1A"
-            }
-        },
-        {
-            "type": "TemplateElement",
-            "start": 41,
-            "end": 42,
-            "value": {
-                "raw": ")",
-                "cooked": ")"
-            }
-        }
-    ]
+  "type": "TemplateLiteral",
+  "start": 10,
+  "end": 43,
+  "expressions": [
+    {
+      "type": "Identifier",
+      "start": 13,
+      "end": 23,
+      "name": "finalRoles"
+    },
+    {
+      "type": "Identifier",
+      "start": 32,
+      "end": 40,
+      "name": "projects"
+    }
+  ],
+  "quasis": [
+    {
+      "type": "TemplateElement",
+      "start": 11,
+      "end": 11,
+      "value": {
+        "raw": "",
+        "cooked": ""
+      }
+    },
+    {
+      "type": "TemplateElement",
+      "start": 24,
+      "end": 30,
+      "value": {
+        "raw": "(\u8D28\u91CF\u9879\u76EE\uFF1A",
+        "cooked": "(\u8D28\u91CF\u9879\u76EE\uFF1A"
+      }
+    },
+    {
+      "type": "TemplateElement",
+      "start": 41,
+      "end": 42,
+      "value": {
+        "raw": ")",
+        "cooked": ")"
+      }
+    }
+  ]
 }
-`,paraId:8,tocIndex:1},{value:"TemplateLiteral",paraId:9,tocIndex:1},{value:"\u76F8\u5BF9\u4E8E\u5B57\u7B26\u4E32\u60C5\u51B5\u4F1A\u590D\u6742\u4E00\u4E9B\uFF0C",paraId:10,tocIndex:1},{value:"TemplateLiteral",paraId:10,tocIndex:1},{value:"\u4E2D\u4F1A\u51FA\u73B0\u53D8\u91CF\u7684\u60C5\u51B5\uFF0C\u80FD\u591F\u770B\u5230\u5728",paraId:10,tocIndex:1},{value:"TemplateLiteral",paraId:10,tocIndex:1},{value:"\u8282\u70B9\u4E2D\u5B58\u5728",paraId:10,tocIndex:1},{value:"expressions",paraId:10,tocIndex:1},{value:"\u548C",paraId:10,tocIndex:1},{value:"quasis",paraId:10,tocIndex:1},{value:"\u4E24\u4E2A\u5B57\u6BB5\u5206\u522B\u8868\u793A\u53D8\u91CF\u548C\u5B57\u7B26\u4E32",paraId:10,tocIndex:1},{value:"\u5176\u5B9E\u53EF\u4EE5\u53D1\u73B0\u5BF9\u4E8E\u5B57\u7B26\u4E32\u6765\u8BF4\u5168\u90E8\u90FD\u5728",paraId:11,tocIndex:1},{value:"TemplateElement",paraId:11,tocIndex:1},{value:"\u8282\u70B9\u4E0A\uFF0C\u90A3\u4E48\u662F\u5426\u53EF\u4EE5\u76F4\u63A5\u904D\u5386\u6240\u6709\u7684",paraId:11,tocIndex:1},{value:"TemplateElement",paraId:11,tocIndex:1},{value:"\u8282\u70B9\uFF0C\u548C",paraId:11,tocIndex:1},{value:"StringLiteral",paraId:11,tocIndex:1},{value:"\u4E00\u6837\u3002",paraId:11,tocIndex:1},{value:"\u76F4\u63A5\u904D\u5386",paraId:12,tocIndex:1},{value:"TemplateElement",paraId:12,tocIndex:1},{value:"\u7684\u65F6\u5019\uFF0C\u5904\u7406\u4E4B\u540E\u7684\u6548\u679C\u5982\u4E0B:",paraId:12,tocIndex:1},{value:'const b = `${finalRoles}(\u8D28\u91CF\u9879\u76EE\uFF1A${projects})`\n\nconst b = `${finalRoles}${I18N.K}${projects})`\n\n// I18N.K = "(\u8D28\u91CF\u9879\u76EE\uFF1A"\n',paraId:13,tocIndex:1},{value:"\u90A3\u4E48\u8FD9\u79CD\u53EA\u63D0\u53D6\u4E2D\u6587\u4E0D\u7BA1\u53D8\u91CF\u7684\u60C5\u51B5\uFF0C\u4F1A\u5BFC\u81F4\u7FFB\u8BD1\u4E0D\u5230\u7684\u95EE\u9898\uFF0C\u4E0A\u4E0B\u6587\u5F88\u7F3A\u5931\u3002",paraId:14,tocIndex:1},{value:"\u6700\u540E\u6211\u4EEC\u4F1A\u5904\u7406\u6210",paraId:15,tocIndex:1},{value:"{val1}(\u8D28\u91CF\u9879\u76EE\uFF1A{val2})",paraId:15,tocIndex:1},{value:"\u7684\u60C5\u51B5\uFF0C\u5C06\u5BF9\u5E94",paraId:15,tocIndex:1},{value:"val1",paraId:15,tocIndex:1},{value:"\u548C",paraId:15,tocIndex:1},{value:"val2",paraId:15,tocIndex:1},{value:"\u4F20\u5165",paraId:15,tocIndex:1},{value:`I18N.get(I18N.K, {
-    val1: finalRoles,
-    val2: projects,
-})
+`,paraId:8,tocIndex:1},{value:"TemplateLiteral",paraId:9,tocIndex:1},{value:"\u76F8\u5BF9\u4E8E\u5B57\u7B26\u4E32\u60C5\u51B5\u4F1A\u590D\u6742\u4E00\u4E9B\uFF0C",paraId:10,tocIndex:1},{value:"TemplateLiteral",paraId:10,tocIndex:1},{value:"\u4E2D\u4F1A\u51FA\u73B0\u53D8\u91CF\u7684\u60C5\u51B5\uFF0C\u80FD\u591F\u770B\u5230\u5728",paraId:10,tocIndex:1},{value:"TemplateLiteral",paraId:10,tocIndex:1},{value:"\u8282\u70B9\u4E2D\u5B58\u5728",paraId:10,tocIndex:1},{value:"expressions",paraId:10,tocIndex:1},{value:"\u548C",paraId:10,tocIndex:1},{value:"quasis",paraId:10,tocIndex:1},{value:"\u4E24\u4E2A\u5B57\u6BB5\u5206\u522B\u8868\u793A\u53D8\u91CF\u548C\u5B57\u7B26\u4E32",paraId:10,tocIndex:1},{value:"\u5176\u5B9E\u53EF\u4EE5\u53D1\u73B0\u5BF9\u4E8E\u5B57\u7B26\u4E32\u6765\u8BF4\u5168\u90E8\u90FD\u5728",paraId:11,tocIndex:1},{value:"TemplateElement",paraId:11,tocIndex:1},{value:"\u8282\u70B9\u4E0A\uFF0C\u90A3\u4E48\u662F\u5426\u53EF\u4EE5\u76F4\u63A5\u904D\u5386\u6240\u6709\u7684",paraId:11,tocIndex:1},{value:"TemplateElement",paraId:11,tocIndex:1},{value:"\u8282\u70B9\uFF0C\u548C",paraId:11,tocIndex:1},{value:"StringLiteral",paraId:11,tocIndex:1},{value:"\u4E00\u6837\u3002",paraId:11,tocIndex:1},{value:"\u76F4\u63A5\u904D\u5386",paraId:12,tocIndex:1},{value:"TemplateElement",paraId:12,tocIndex:1},{value:"\u7684\u65F6\u5019\uFF0C\u5904\u7406\u4E4B\u540E\u7684\u6548\u679C\u5982\u4E0B:",paraId:12,tocIndex:1},{value:'const b = `${finalRoles}(\u8D28\u91CF\u9879\u76EE\uFF1A${projects})`;\n\nconst b = `${finalRoles}${I18N.K}${projects})`;\n\n// I18N.K = "(\u8D28\u91CF\u9879\u76EE\uFF1A"\n',paraId:13,tocIndex:1},{value:"\u90A3\u4E48\u8FD9\u79CD\u53EA\u63D0\u53D6\u4E2D\u6587\u4E0D\u7BA1\u53D8\u91CF\u7684\u60C5\u51B5\uFF0C\u4F1A\u5BFC\u81F4\u7FFB\u8BD1\u4E0D\u5230\u7684\u95EE\u9898\uFF0C\u4E0A\u4E0B\u6587\u5F88\u7F3A\u5931\u3002",paraId:14,tocIndex:1},{value:"\u6700\u540E\u6211\u4EEC\u4F1A\u5904\u7406\u6210",paraId:15,tocIndex:1},{value:"{val1}(\u8D28\u91CF\u9879\u76EE\uFF1A{val2})",paraId:15,tocIndex:1},{value:"\u7684\u60C5\u51B5\uFF0C\u5C06\u5BF9\u5E94",paraId:15,tocIndex:1},{value:"val1",paraId:15,tocIndex:1},{value:"\u548C",paraId:15,tocIndex:1},{value:"val2",paraId:15,tocIndex:1},{value:"\u4F20\u5165",paraId:15,tocIndex:1},{value:`I18N.get(I18N.K, {
+  val1: finalRoles,
+  val2: projects,
+});
 `,paraId:16,tocIndex:1},{value:"JSXText",paraId:17,tocIndex:1},{value:"\u5BF9\u5E94\u7684",paraId:18,tocIndex:1},{value:"AST",paraId:18,tocIndex:1},{value:"\u8282\u70B9\u4E3A",paraId:18,tocIndex:1},{value:"JSXText",paraId:18,tocIndex:1},{value:"\uFF0C\u53BB\u904D\u5386",paraId:18,tocIndex:1},{value:"JSXElement",paraId:18,tocIndex:1},{value:"\u8282\u70B9\uFF0C\u5728\u904D\u5386\u5BF9\u5E94\u7684",paraId:18,tocIndex:1},{value:"children",paraId:18,tocIndex:1},{value:"\u4E2D\u7684",paraId:18,tocIndex:1},{value:"JSXText",paraId:18,tocIndex:1},{value:"\u5904\u7406\u4E2D\u6587\u6587\u672C",paraId:18,tocIndex:1},{value:`{
-    "type": "JSXElement",
-    "start": 12,
-    "end": 25,
-    "children": [
-        {
-            "type": "JSXText",
-            "start": 17,
-            "end": 19,
-            "extra": {
-                "rawValue": "\u971C\u5E8F",
-                "raw": "\u971C\u5E8F"
-            },
-            "value": "\u971C\u5E8F"
-        }
-    ]
+  "type": "JSXElement",
+  "start": 12,
+  "end": 25,
+  "children": [
+    {
+      "type": "JSXText",
+      "start": 17,
+      "end": 19,
+      "extra": {
+        "rawValue": "\u971C\u5E8F",
+        "raw": "\u971C\u5E8F"
+      },
+      "value": "\u971C\u5E8F"
+    }
+  ]
 }
 `,paraId:19,tocIndex:1},{value:"JSXAttribute",paraId:20,tocIndex:1},{value:"\u5BF9\u5E94\u7684",paraId:21,tocIndex:1},{value:"AST",paraId:21,tocIndex:1},{value:"\u8282\u70B9\u4E3A",paraId:21,tocIndex:1},{value:"JSXAttribute",paraId:21,tocIndex:1},{value:"\uFF0C\u4E2D\u6587\u5B58\u5728\u7684\u8282\u70B9\u8FD8\u662F",paraId:21,tocIndex:1},{value:"StringLiteral",paraId:21,tocIndex:1},{value:"\uFF0C\u4F46\u662F\u5728\u5904\u7406\u7684\u65F6\u5019\u8FD8\u662F\u7279\u6B8A\u5904\u7406",paraId:21,tocIndex:1},{value:"JSXAttribute",paraId:21,tocIndex:1},{value:"\u4E2D\u7684",paraId:21,tocIndex:1},{value:"StringLiteral",paraId:21,tocIndex:1},{value:"\uFF0C\u56E0\u4E3A\u5BF9\u4E8E\u8FD9\u79CD",paraId:21,tocIndex:1},{value:"JSX",paraId:21,tocIndex:1},{value:"\u4E2D\u7684\u6570\u636E\u6765\u8BF4\u6211\u4EEC\u9700\u8981\u5305\u88F9",paraId:21,tocIndex:1},{value:"{}",paraId:21,tocIndex:1},{value:"\uFF0C\u4E0D\u662F\u76F4\u63A5\u505A\u6587\u672C\u66FF\u6362\u7684",paraId:21,tocIndex:1},{value:`{
-    "type": "JSXOpeningElement",
-    "start": 13,
-    "end": 35,
-    "name": {
+  "type": "JSXOpeningElement",
+  "start": 13,
+  "end": 35,
+  "name": {
+    "type": "JSXIdentifier",
+    "start": 14,
+    "end": 22,
+    "name": "Customer"
+  },
+  "attributes": [
+    {
+      "type": "JSXAttribute",
+      "start": 23,
+      "end": 32,
+      "name": {
         "type": "JSXIdentifier",
-        "start": 14,
-        "end": 22,
-        "name": "Customer"
-    },
-    "attributes": [
-        {
-            "type": "JSXAttribute",
-            "start": 23,
-            "end": 32,
-            "name": {
-                "type": "JSXIdentifier",
-                "start": 23,
-                "end": 27,
-                "name": "name"
-            },
-            "value": {
-                "type": "StringLiteral",
-                "start": 28,
-                "end": 32,
-                "extra": {
-                    "rawValue": "\u971C\u5E8F",
-                    "raw": "\\"\u971C\u5E8F\\""
-                },
-                "value": "\u971C\u5E8F"
-            }
-        }
-    ],
-    "selfClosing": true
+        "start": 23,
+        "end": 27,
+        "name": "name"
+      },
+      "value": {
+        "type": "StringLiteral",
+        "start": 28,
+        "end": 32,
+        "extra": {
+          "rawValue": "\u971C\u5E8F",
+          "raw": "\\"\u971C\u5E8F\\""
+        },
+        "value": "\u971C\u5E8F"
+      }
+    }
+  ],
+  "selfClosing": true
 }
-`,paraId:22,tocIndex:1},{value:`\u4F7F\u7528 @babel/parser \u5C06\u6E90\u4EE3\u7801\u8F6C\u8BD1\u4E3A AST
-`,paraId:23,tocIndex:2},{value:`const plugins: ParserOptions['plugins'] = [
-    'decorators-legacy',
-    'typescript',
-];
+`,paraId:22,tocIndex:1},{value:`const plugins: ParserOptions['plugins'] = ['decorators-legacy', 'typescript'];
 if (fileName.endsWith('text') || fileName.endsWith('text')) {
-    plugins.push('text');
+  plugins.push('text');
 }
 const ast = parse(sourceCode, {
-    sourceType: 'module',
-    plugins,
+  sourceType: 'module',
+  plugins,
 });
-`,paraId:24,tocIndex:2},{value:`@babel/traverse \u7279\u6B8A\u5904\u7406\u4E0A\u8FF0\u7684\u8282\u70B9\uFF0C\u8F6C\u5316 AST
-`,paraId:23,tocIndex:2},{value:`babelTraverse(ast, {
-    StringLiteral(path) {
-        const { node } = path;
-        const { value } = node;
-        if (
-            !value.match(DOUBLE_BYTE_REGEX) ||
-            (path.parentPath.node.type === 'CallExpression' &&
-                path.parentPath.toString().includes('console'))
-        ) {
-            return;
+`,paraId:23,tocIndex:3},{value:`babelTraverse(ast, {
+  StringLiteral(path) {
+    const { node } = path;
+    const { value } = node;
+    if (
+      !value.match(DOUBLE_BYTE_REGEX) ||
+      (path.parentPath.node.type === 'CallExpression' &&
+        path.parentPath.toString().includes('console'))
+    ) {
+      return;
+    }
+    path.replaceWithMultiple(template.ast(\`I18N.\${key}\`));
+  },
+  TemplateLiteral(path) {
+    const { node } = path;
+    const { start, end } = node;
+    if (!start || !end) return;
+    let templateContent = sourceCode.slice(start + 1, end - 1);
+    if (
+      !templateContent.match(DOUBLE_BYTE_REGEX) ||
+      (path.parentPath.node.type === 'CallExpression' &&
+        path.parentPath.toString().includes('console')) ||
+      path.parentPath.node.type === 'TaggedTemplateExpression'
+    ) {
+      return;
+    }
+    if (!node.expressions.length) {
+      path.replaceWithMultiple(template.ast(\`I18N.\${key}\`));
+      path.skip();
+      return;
+    }
+    const expressions = node.expressions.map((expression) => {
+      const { start, end } = expression;
+      if (!start || !end) return;
+      return sourceCode.slice(start, end);
+    });
+    const kvPair = expressions.map((expression, index) => {
+      templateContent = templateContent.replace(
+        \`\\\${\${expression}}\`,
+        \`{val\${index + 1}}\`,
+      );
+      return \`val\${index + 1}: \${expression}\`;
+    });
+    path.replaceWithMultiple(
+      template.ast(\`I18N.get(I18N.\${key},{\${kvPair.join(',\\n')}})\`),
+    );
+  },
+  JSXElement(path) {
+    const children = path.node.children;
+    const newChild = children.map((child) => {
+      if (babelTypes.isJSXText(child)) {
+        const { value } = child;
+        if (value.match(DOUBLE_BYTE_REGEX)) {
+          const newExpression = babelTypes.jsxExpressionContainer(
+            babelTypes.identifier(\`I18N.\${key}\`),
+          );
+          return newExpression;
         }
-        path.replaceWithMultiple(template.ast(\`I18N.\${key}\`));
-    },
-    TemplateLiteral(path) {
-        const { node } = path;
-        const { start, end } = node;
-        if (!start || !end) return;
-        let templateContent = sourceCode.slice(start + 1, end - 1);
-        if (
-            !templateContent.match(DOUBLE_BYTE_REGEX) ||
-            (path.parentPath.node.type === 'CallExpression' &&
-                path.parentPath.toString().includes('console')) ||
-            path.parentPath.node.type === 'TaggedTemplateExpression'
-        ) {
-            return;
-        }
-        if (!node.expressions.length) {
-            path.replaceWithMultiple(template.ast(\`I18N.\${key}\`));
-            path.skip();
-            return;
-        }
-        const expressions = node.expressions.map((expression) => {
-            const { start, end } = expression;
-            if (!start || !end) return;
-            return sourceCode.slice(start, end);
-        });
-        const kvPair = expressions.map((expression, index) => {
-            templateContent = templateContent.replace(
-                \`\\\${\${expression}}\`,
-                \`{val\${index + 1}}\`,
-            );
-            return \`val\${index + 1}: \${expression}\`;
-        });
-        path.replaceWithMultiple(
-            template.ast(
-                \`I18N.get(I18N.\${key},{\${kvPair.join(',\\n')}})\`,
-            ),
-        );
-    },
-    JSXElement(path) {
-        const children = path.node.children;
-        const newChild = children.map((child) => {
-            if (babelTypes.isJSXText(child)) {
-                const { value } = child;
-                if (value.match(DOUBLE_BYTE_REGEX)) {
-                    const newExpression = babelTypes.jsxExpressionContainer(
-                        babelTypes.identifier(\`I18N.\${key}\`),
-                    );
-                    return newExpression;
-                }
-            }
-            return child;
-        });
-        path.node.children = newChild;
-    },
-    JSXAttribute(path) {
-        const { node } = path;
-        if (
-            babelTypes.isStringLiteral(node.value) &&
-            node.value.value.match(DOUBLE_BYTE_REGEX)
-        ) {
-            const expression = babelTypes.jsxExpressionContainer(
-                babelTypes.memberExpression(
-                    babelTypes.identifier('I18N'),
-                    babelTypes.identifier(\`\${key}\`),
-                ),
-            );
-            node.value = expression;
-        }
-    },
+      }
+      return child;
+    });
+    path.node.children = newChild;
+  },
+  JSXAttribute(path) {
+    const { node } = path;
+    if (
+      babelTypes.isStringLiteral(node.value) &&
+      node.value.value.match(DOUBLE_BYTE_REGEX)
+    ) {
+      const expression = babelTypes.jsxExpressionContainer(
+        babelTypes.memberExpression(
+          babelTypes.identifier('I18N'),
+          babelTypes.identifier(\`\${key}\`),
+        ),
+      );
+      node.value = expression;
+    }
+  },
 });
-`,paraId:25,tocIndex:2},{value:`
-\u5BF9\u4E8E`,paraId:23,tocIndex:2},{value:"TemplateLiteral",paraId:23,tocIndex:2},{value:"\u6765\u8BF4\u9700\u8981\u5904\u7406",paraId:23,tocIndex:2},{value:"expression",paraId:23,tocIndex:2},{value:"\uFF0C\u901A\u8FC7\u622A\u53D6\u7684\u65B9\u5F0F\u83B7\u53D6\u5230\u5BF9\u5E94\u7684\u6A21\u7248\u5B57\u7B26\u4E32 ",paraId:23,tocIndex:2},{value:"templateContent",paraId:23,tocIndex:2},{value:"\uFF0C\u5982\u679C\u4E0D\u5B58\u5728",paraId:23,tocIndex:2},{value:"expressions",paraId:23,tocIndex:2},{value:"\uFF0C\u76F4\u63A5\u7C7B\u4F3C",paraId:23,tocIndex:2},{value:"StringLiteral",paraId:23,tocIndex:2},{value:"\u5904\u7406\uFF1B\u5B58\u5728",paraId:23,tocIndex:2},{value:"expressions",paraId:23,tocIndex:2},{value:"\u7684\u60C5\u51B5\u4E0B\uFF0C\u904D\u5386",paraId:23,tocIndex:2},{value:"expressions",paraId:23,tocIndex:2},{value:"\u901A\u8FC7",paraId:23,tocIndex:2},{value:"${val(index)}",paraId:23,tocIndex:2},{value:"\u66FF\u6362\u6389",paraId:23,tocIndex:2},{value:"templateContent",paraId:23,tocIndex:2},{value:"\u4E2D\u7684",paraId:23,tocIndex:2},{value:"expression",paraId:23,tocIndex:2},{value:"\uFF0C\u6700\u540E\u4F7F\u7528",paraId:23,tocIndex:2},{value:"I18N.get",paraId:23,tocIndex:2},{value:`\u7684\u65B9\u5F0F\u83B7\u53D6\u5BF9\u5E94\u7684\u503C
-`,paraId:23,tocIndex:2},{value:'const name = `${a}\u971C\u5E8F`;\n// const name = I18N.get(I18N.test.A, { val1: a });\n\nconst name1 = `${a ? "\u971C" : "\u5E8F"}\u971C\u5E8F`;\n// const name1 = I18N.get(I18N.test.B, { val1: a ? I18N.test.C : I18N.test.D });\n',paraId:26,tocIndex:2},{value:`
-\u5BF9\u4E8E`,paraId:23,tocIndex:2},{value:"TemplateLiteral",paraId:23,tocIndex:2},{value:`\u8282\u70B9\u6765\u8BF4\uFF0C\u5982\u679C\u662F\u5D4C\u5957\u7684\u60C5\u51B5\uFF0C\u4F1A\u51FA\u73B0\u95EE\u9898\u3002
-`,paraId:23,tocIndex:2},{value:"const name1 = `${a ? `\u971C` : `\u5E8F`}\u971C\u5E8F`;\n// const name1 = I18N.get(I18N.test.B, { val1: a ? `\u971C` : `\u5E8F` });\n",paraId:27,tocIndex:2},{value:"\u{1F914}\xA0 \u4E3A\u4F55\u5BF9\u4E8E",paraId:28,tocIndex:2},{value:"TemplateLiteral",paraId:28,tocIndex:2},{value:"\u4E2D\u5D4C\u5957\u7684",paraId:28,tocIndex:2},{value:"StringLiteral",paraId:28,tocIndex:2},{value:"\u4F1A\u5904\u7406\uFF0C\u800C",paraId:28,tocIndex:2},{value:"TemplateLiteral",paraId:28,tocIndex:2},{value:`\u5C31\u4E0D\u5904\u7406\u5462\uFF1F
-\u{1F4A1}\xA0 \u5BFC\u81F4\u539F\u56E0\u4E3A`,paraId:28,tocIndex:2},{value:"babel",paraId:28,tocIndex:2},{value:"\u4E0D\u4F1A\u81EA\u52A8\u9012\u5F52\u5904\u7406",paraId:28,tocIndex:2},{value:"TemplateLiteral",paraId:28,tocIndex:2},{value:`\u7684\u5B50\u7EA7\u5D4C\u5957\u6A21\u677F\u3002
-\u4E0A\u8FF0\u7684\u4EE3\u7801\u4E2D\u901A\u8FC7\u904D\u5386\u4E00\u4E9B`,paraId:28,tocIndex:2},{value:"AST",paraId:28,tocIndex:2},{value:"\u5904\u7406\u5B8C\u4E86\u4E4B\u540E\uFF0C\u6211\u4EEC\u9700\u8981\u7EDF\u4E00\u5F15\u5165\u5F53\u524D",paraId:28,tocIndex:2},{value:"I18N",paraId:28,tocIndex:2},{value:"\u8FD9\u4E2A\u53D8\u91CF\u3002\u90A3\u4E48\u6CA1\u6211\u4EEC\u9700\u8981\u5728\u5F53\u524D\u6587\u4EF6\u7684",paraId:28,tocIndex:2},{value:"AST",paraId:28,tocIndex:2},{value:"\u9876\u90E8\u7684",paraId:28,tocIndex:2},{value:"import",paraId:28,tocIndex:2},{value:"\u8BED\u53E5\u540E\u63D2\u5165\u5F53\u524D\u7684",paraId:28,tocIndex:2},{value:"importStatement",paraId:28,tocIndex:2},{value:`Program: {
+`,paraId:24,tocIndex:4},{value:"\u5BF9\u4E8E",paraId:25,tocIndex:4},{value:"TemplateLiteral",paraId:25,tocIndex:4},{value:"\u6765\u8BF4\u9700\u8981\u5904\u7406",paraId:25,tocIndex:4},{value:"expression",paraId:25,tocIndex:4},{value:"\uFF0C\u901A\u8FC7\u622A\u53D6\u7684\u65B9\u5F0F\u83B7\u53D6\u5230\u5BF9\u5E94\u7684\u6A21\u7248\u5B57\u7B26\u4E32 ",paraId:25,tocIndex:4},{value:"templateContent",paraId:25,tocIndex:4},{value:"\uFF0C\u5982\u679C\u4E0D\u5B58\u5728",paraId:25,tocIndex:4},{value:"expressions",paraId:25,tocIndex:4},{value:"\uFF0C\u76F4\u63A5\u7C7B\u4F3C",paraId:25,tocIndex:4},{value:"StringLiteral",paraId:25,tocIndex:4},{value:"\u5904\u7406\uFF1B\u5B58\u5728",paraId:25,tocIndex:4},{value:"expressions",paraId:25,tocIndex:4},{value:"\u7684\u60C5\u51B5\u4E0B\uFF0C\u904D\u5386",paraId:25,tocIndex:4},{value:"expressions",paraId:25,tocIndex:4},{value:"\u901A\u8FC7",paraId:25,tocIndex:4},{value:"${val(index)}",paraId:25,tocIndex:4},{value:"\u66FF\u6362\u6389",paraId:25,tocIndex:4},{value:"templateContent",paraId:25,tocIndex:4},{value:"\u4E2D\u7684",paraId:25,tocIndex:4},{value:"expression",paraId:25,tocIndex:4},{value:"\uFF0C\u6700\u540E\u4F7F\u7528",paraId:25,tocIndex:4},{value:"I18N.get",paraId:25,tocIndex:4},{value:"\u7684\u65B9\u5F0F\u83B7\u53D6\u5BF9\u5E94\u7684\u503C",paraId:25,tocIndex:4},{value:"const name = `${a}\u971C\u5E8F`;\n// const name = I18N.get(I18N.test.A, { val1: a });\n\nconst name1 = `${a ? '\u971C' : '\u5E8F'}\u971C\u5E8F`;\n// const name1 = I18N.get(I18N.test.B, { val1: a ? I18N.test.C : I18N.test.D });\n",paraId:26,tocIndex:4},{value:"\u5BF9\u4E8E",paraId:27,tocIndex:4},{value:"TemplateLiteral",paraId:27,tocIndex:4},{value:"\u8282\u70B9\u6765\u8BF4\uFF0C\u5982\u679C\u662F\u5D4C\u5957\u7684\u60C5\u51B5\uFF0C\u4F1A\u51FA\u73B0\u95EE\u9898\u3002",paraId:27,tocIndex:4},{value:"const name1 = `${a ? `\u971C` : `\u5E8F`}\u971C\u5E8F`;\n// const name1 = I18N.get(I18N.test.B, { val1: a ? `\u971C` : `\u5E8F` });\n",paraId:28,tocIndex:4},{value:"\u{1F914}\xA0 \u4E3A\u4F55\u5BF9\u4E8E",paraId:29,tocIndex:4},{value:"TemplateLiteral",paraId:29,tocIndex:4},{value:"\u4E2D\u5D4C\u5957\u7684",paraId:29,tocIndex:4},{value:"StringLiteral",paraId:29,tocIndex:4},{value:"\u4F1A\u5904\u7406\uFF0C\u800C",paraId:29,tocIndex:4},{value:"TemplateLiteral",paraId:29,tocIndex:4},{value:`\u5C31\u4E0D\u5904\u7406\u5462\uFF1F
+\u{1F4A1}\xA0 \u5BFC\u81F4\u539F\u56E0\u4E3A`,paraId:29,tocIndex:4},{value:"babel",paraId:29,tocIndex:4},{value:"\u4E0D\u4F1A\u81EA\u52A8\u9012\u5F52\u5904\u7406",paraId:29,tocIndex:4},{value:"TemplateLiteral",paraId:29,tocIndex:4},{value:`\u7684\u5B50\u7EA7\u5D4C\u5957\u6A21\u677F\u3002
+\u4E0A\u8FF0\u7684\u4EE3\u7801\u4E2D\u901A\u8FC7\u904D\u5386\u4E00\u4E9B`,paraId:29,tocIndex:4},{value:"AST",paraId:29,tocIndex:4},{value:"\u5904\u7406\u5B8C\u4E86\u4E4B\u540E\uFF0C\u6211\u4EEC\u9700\u8981\u7EDF\u4E00\u5F15\u5165\u5F53\u524D",paraId:29,tocIndex:4},{value:"I18N",paraId:29,tocIndex:4},{value:"\u8FD9\u4E2A\u53D8\u91CF\u3002\u90A3\u4E48\u6CA1\u6211\u4EEC\u9700\u8981\u5728\u5F53\u524D\u6587\u4EF6\u7684",paraId:29,tocIndex:4},{value:"AST",paraId:29,tocIndex:4},{value:"\u9876\u90E8\u7684",paraId:29,tocIndex:4},{value:"import",paraId:29,tocIndex:4},{value:"\u8BED\u53E5\u540E\u63D2\u5165\u5F53\u524D\u7684",paraId:29,tocIndex:4},{value:"importStatement",paraId:29,tocIndex:4},{value:`Program: {
     exit(path) {
         const importStatement = projectConfig.importStatement;
         const result = importStatement
@@ -5989,37 +6153,36 @@ const ast = parse(sourceCode, {
         }
     },
 }
-`,paraId:29,tocIndex:2},{value:`\u8F6C\u4E3A\u4EE3\u7801
-`,paraId:23,tocIndex:2},{value:`const { code } = generate(ast, {
-    retainLines: true,
-    comments: true,
+`,paraId:30,tocIndex:4},{value:`const { code } = generate(ast, {
+  retainLines: true,
+  comments: true,
 });
-`,paraId:30,tocIndex:2},{value:"\u56E0\u4E3A\u6211\u4EEC\u7684\u573A\u666F\u4E0D\u9002\u5408\u5C06\u8BE5\u529F\u80FD\u5C01\u88C5\u6210",paraId:31,tocIndex:2},{value:"plugin",paraId:31,tocIndex:2},{value:"\uFF0C\u4F46\u662F\u6574\u4F53\u548C\u5199",paraId:31,tocIndex:2},{value:"plugin",paraId:31,tocIndex:2},{value:"\u7684\u601D\u8DEF\u5DEE\u4E0D\u591A\u3002\u5728",paraId:31,tocIndex:2},{value:".babelrc",paraId:31,tocIndex:2},{value:"\u4E2D\u914D\u7F6E\u5BF9\u5E94\u7684",paraId:31,tocIndex:2},{value:"plugin",paraId:31,tocIndex:2},{value:"\u5373\u53EF",paraId:31,tocIndex:2},{value:`const i18nPlugin = () => {
-    return {
-        visitor: {
-            StringLiteral(path) {},
-            TemplateLiteral(path) {},
-            JSXElement(path) {},
-            JSXAttribute(path) {},
-            Program: {},
-        },
-    };
+`,paraId:31,tocIndex:5},{value:"\u56E0\u4E3A\u6211\u4EEC\u7684\u573A\u666F\u4E0D\u9002\u5408\u5C06\u8BE5\u529F\u80FD\u5C01\u88C5\u6210",paraId:32,tocIndex:5},{value:"plugin",paraId:32,tocIndex:5},{value:"\uFF0C\u4F46\u662F\u6574\u4F53\u548C\u5199",paraId:32,tocIndex:5},{value:"plugin",paraId:32,tocIndex:5},{value:"\u7684\u601D\u8DEF\u5DEE\u4E0D\u591A\u3002\u5728",paraId:32,tocIndex:5},{value:".babelrc",paraId:32,tocIndex:5},{value:"\u4E2D\u914D\u7F6E\u5BF9\u5E94\u7684",paraId:32,tocIndex:5},{value:"plugin",paraId:32,tocIndex:5},{value:"\u5373\u53EF",paraId:32,tocIndex:5},{value:`const i18nPlugin = () => {
+  return {
+    visitor: {
+      StringLiteral(path) {},
+      TemplateLiteral(path) {},
+      JSXElement(path) {},
+      JSXAttribute(path) {},
+      Program: {},
+    },
+  };
 };
-`,paraId:32,tocIndex:2},{value:"\u52A8\u6001\u751F\u6210 key",paraId:33,tocIndex:3},{value:"\u6BCF\u4E00\u4E2A\u4E2D\u6587\u751F\u6210",paraId:34,tocIndex:3},{value:"key",paraId:34,tocIndex:3},{value:"\u7684\u65B9\u5F0F\u90FD\u662F\u56FA\u5B9A\u7684\uFF0C\u7C7B\u4F3C",paraId:34,tocIndex:3},{value:"excel",paraId:34,tocIndex:3},{value:"\u5217\u540D",paraId:34,tocIndex:3},{value:`export const getSortKey = (n: number, extractMap = {}): string => {
-    let label = '';
-    let num = n;
-    while (num > 0) {
-        num--;
-        label = String.fromCharCode((num % 26) + 65) + label;
-        num = Math.floor(num / 26);
-    }
-    const key = \`\${label}\`;
-    if (_.get(extractMap, key)) {
-        return getSortKey(n + 1, extractMap);
-    }
-    return key;
+`,paraId:33,tocIndex:5},{value:"\u52A8\u6001\u751F\u6210 key",paraId:34,tocIndex:6},{value:"\u6BCF\u4E00\u4E2A\u4E2D\u6587\u751F\u6210",paraId:35,tocIndex:6},{value:"key",paraId:35,tocIndex:6},{value:"\u7684\u65B9\u5F0F\u90FD\u662F\u56FA\u5B9A\u7684\uFF0C\u7C7B\u4F3C",paraId:35,tocIndex:6},{value:"excel",paraId:35,tocIndex:6},{value:"\u5217\u540D",paraId:35,tocIndex:6},{value:`export const getSortKey = (n: number, extractMap = {}): string => {
+  let label = '';
+  let num = n;
+  while (num > 0) {
+    num--;
+    label = String.fromCharCode((num % 26) + 65) + label;
+    num = Math.floor(num / 26);
+  }
+  const key = \`\${label}\`;
+  if (_.get(extractMap, key)) {
+    return getSortKey(n + 1, extractMap);
+  }
+  return key;
 };
-`,paraId:35,tocIndex:3},{value:"\u6BCF\u4E00\u4E2A\u6587\u4EF6\u7684\u524D\u7F00\u90FD\u662F\u4E00\u5B9A\u7684\uFF0C\u6309\u7740\u8DEF\u5F84\u751F\u6210\u7684\uFF0C\u4E0D\u4F1A\u5305\u542B",paraId:36,tocIndex:3},{value:"extractDir",paraId:36,tocIndex:3},{value:"\u4E4B\u524D\u7684\u5185\u5BB9",paraId:36,tocIndex:3},{value:`export const getFileKey = (filePath: string) => {
+`,paraId:36,tocIndex:6},{value:"\u6BCF\u4E00\u4E2A\u6587\u4EF6\u7684\u524D\u7F00\u90FD\u662F\u4E00\u5B9A\u7684\uFF0C\u6309\u7740\u8DEF\u5F84\u751F\u6210\u7684\uFF0C\u4E0D\u4F1A\u5305\u542B",paraId:37,tocIndex:6},{value:"extractDir",paraId:37,tocIndex:6},{value:"\u4E4B\u524D\u7684\u5185\u5BB9",paraId:37,tocIndex:6},{value:`export const getFileKey = (filePath: string) => {
     const extractDir = getProjectConfig().extractDir;
 
     const basePath = path.resolve(process.cwd(), extractDir);
@@ -6033,16 +6196,16 @@ const ast = parse(sourceCode, {
     if (dir) fileKey = names.slice(0, -1).concat(fileKey).join('.');
     return fileKey.replace(/-/g, '_');
 };
-`,paraId:37,tocIndex:3},{value:"i18n-extract-cli",paraId:38,tocIndex:4},{value:"\u76EE\u524D\u652F\u6301\u4E24\u4E2A\u547D\u4EE4",paraId:39,tocIndex:4},{value:"init",paraId:39,tocIndex:4},{value:"/",paraId:39,tocIndex:4},{value:"extract",paraId:39,tocIndex:4},{value:`npx i18n-extract-cli init
-`,paraId:40,tocIndex:4},{value:"\u4F1A\u521D\u59CB\u5316\u4E00\u4EFD",paraId:41,tocIndex:4},{value:"i18n.config.json",paraId:41,tocIndex:4},{value:`{
+`,paraId:38,tocIndex:6},{value:"i18n-extract-cli",paraId:39,tocIndex:7},{value:"\u76EE\u524D\u652F\u6301\u4E24\u4E2A\u547D\u4EE4",paraId:40,tocIndex:7},{value:"init",paraId:40,tocIndex:7},{value:"/",paraId:40,tocIndex:7},{value:"extract",paraId:40,tocIndex:7},{value:`npx i18n-extract-cli init
+`,paraId:41,tocIndex:7},{value:"\u4F1A\u521D\u59CB\u5316\u4E00\u4EFD",paraId:42,tocIndex:7},{value:"i18n.config.json",paraId:42,tocIndex:7},{value:`{
   "localeDir": "locales",
   "extractDir": "./",
   "importStatement": "import I18N from @/utils/i18n",
   "excludeFile": [],
   "excludeDir": []
 }
-`,paraId:42,tocIndex:4},{value:"\u6267\u884C\u5982\u4E0B\u547D\u4EE4\uFF0C\u5F00\u59CB\u63D0\u53D6",paraId:43,tocIndex:4},{value:"extractDir",paraId:43,tocIndex:4},{value:"\u76EE\u5F55\u4E0B\u7684\u4E2D\u6587\u6587\u672C\u5230",paraId:43,tocIndex:4},{value:"localeDir/zh-CN",paraId:43,tocIndex:4},{value:`npx i18n-extract-cli extract
-`,paraId:44,tocIndex:4}]},40930:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(79588);const a=[{value:"Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.",paraId:0},{value:"ICU",paraId:1,tocIndex:0},{value:" \u662F International Components for Unicode \u7684\u7B80\u79F0\u3002\u5904\u7406\u591A\u8BED\u8A00\u548C\u590D\u6742\u6587\u672C\u6A21\u677F\u63D0\u4F9B\u4E86\u4E00\u79CD\u6807\u51C6\u5316\u7684\u8BED\u6CD5\u3002\u5B83\u7684\u4E3B\u8981\u7528\u9014\u662F\u901A\u8FC7\u6A21\u677F\u63CF\u8FF0\u6D88\u606F\u5185\u5BB9\uFF0C\u5E76\u6839\u636E\u4E0A\u4E0B\u6587\uFF08\u5982\u8BED\u8A00\u3001\u590D\u6570\u89C4\u5219\u3001\u6027\u522B\u7B49\uFF09\u52A8\u6001\u751F\u6210\u683C\u5F0F\u5316\u7684\u5B57\u7B26\u4E32\u3002",paraId:1,tocIndex:0},{value:"\u52A8\u6001\u63D2\u503C",paraId:2,tocIndex:1},{value:"\u5728\u6A21\u677F\u4E2D\u63D2\u5165\u53D8\u91CF\u503C\uFF0C\u683C\u5F0F\u4E3A",paraId:3,tocIndex:1},{value:"{key, type, format}",paraId:3,tocIndex:1},{value:`Hello, {name}!
+`,paraId:43,tocIndex:7},{value:"\u6267\u884C\u5982\u4E0B\u547D\u4EE4\uFF0C\u5F00\u59CB\u63D0\u53D6",paraId:44,tocIndex:7},{value:"extractDir",paraId:44,tocIndex:7},{value:"\u76EE\u5F55\u4E0B\u7684\u4E2D\u6587\u6587\u672C\u5230",paraId:44,tocIndex:7},{value:"localeDir/zh-CN",paraId:44,tocIndex:7},{value:`npx i18n-extract-cli extract
+`,paraId:45,tocIndex:7}]},40930:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(79588);const a=[{value:"Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.",paraId:0},{value:"ICU",paraId:1,tocIndex:0},{value:" \u662F International Components for Unicode \u7684\u7B80\u79F0\u3002\u5904\u7406\u591A\u8BED\u8A00\u548C\u590D\u6742\u6587\u672C\u6A21\u677F\u63D0\u4F9B\u4E86\u4E00\u79CD\u6807\u51C6\u5316\u7684\u8BED\u6CD5\u3002\u5B83\u7684\u4E3B\u8981\u7528\u9014\u662F\u901A\u8FC7\u6A21\u677F\u63CF\u8FF0\u6D88\u606F\u5185\u5BB9\uFF0C\u5E76\u6839\u636E\u4E0A\u4E0B\u6587\uFF08\u5982\u8BED\u8A00\u3001\u590D\u6570\u89C4\u5219\u3001\u6027\u522B\u7B49\uFF09\u52A8\u6001\u751F\u6210\u683C\u5F0F\u5316\u7684\u5B57\u7B26\u4E32\u3002",paraId:1,tocIndex:0},{value:"\u52A8\u6001\u63D2\u503C",paraId:2,tocIndex:1},{value:"\u5728\u6A21\u677F\u4E2D\u63D2\u5165\u53D8\u91CF\u503C\uFF0C\u683C\u5F0F\u4E3A",paraId:3,tocIndex:1},{value:"{key, type, format}",paraId:3,tocIndex:1},{value:`Hello, {name}!
 I have {workNum, number} things to do
 Almost {pctBlack, number, percent} of them are black.
 `,paraId:4,tocIndex:1},{value:"\u53D8\u91CF",paraId:5,tocIndex:1},{value:"{key}",paraId:5,tocIndex:1},{value:"\u4F1A\u88AB\u5B9E\u9645\u503C\u66FF\u6362\uFF0C\u4F8B\u5982\uFF1A",paraId:5,tocIndex:1},{value:"Hello, FBB!",paraId:5,tocIndex:1},{value:"\u590D\u6570\u89C4\u5219(Plurals)",paraId:6,tocIndex:1},{value:"\u5904\u7406\u4E0E\u6570\u91CF\u76F8\u5173\u7684\u6D88\u606F\u53D8\u5316\uFF0C\u683C\u5F0F\u4E3A",paraId:7,tocIndex:1},{value:"{key, plural, matches}",paraId:7,tocIndex:1},{value:`{count, plural, =0{no items} one {1 item} other {# items}}
@@ -6180,182 +6343,7 @@ if (isDateElement(el)) {
     value: formatters.getDateTimeFormat(locales, style).format(value as number),
   })
 }
-`,paraId:45,tocIndex:9},{value:"Intl MessageFormat",paraId:46,tocIndex:10},{value:"\u662F\u4E00\u4E2A\u529F\u80FD\u5F3A\u5927\u4E14\u6210\u719F\u7684\u56FD\u9645\u5316\u5DE5\u5177\u3002\u901A\u8FC7\u7ED3\u5408",paraId:46,tocIndex:10},{value:"ICU",paraId:46,tocIndex:10},{value:"\u4FE1\u606F\u8BED\u6CD5\u548C JS \u7684",paraId:46,tocIndex:10},{value:"Intl API",paraId:46,tocIndex:10},{value:"\uFF0C\u5B83\u80FD\u591F\u4E3A\u591A\u8BED\u8A00\u5E94\u7528\u63D0\u4F9B\u9AD8\u6548\u3001\u7075\u6D3B\u7684\u6D88\u606F\u683C\u5F0F\u5316\u89E3\u51B3\u65B9\u6848",paraId:46,tocIndex:10}]},33866:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(58907);const a=[{value:"\u5728\u4F9D\u8D56\u5305\u76DB\u884C\u7684\u4ECA\u5929\uFF0C\u5B89\u88C5\u5305\u7684\u65B9\u5F0F\u4E5F\u662F\u591A\u79CD\u591A\u6837\u7684\uFF0C\u4ECE npm->yarn->pnpm\uFF0C\u6BCF\u4E00\u6B21\u7684\u5347\u7EA7\u90FD\u5E26\u6765\u7740\u4E0D\u4E00\u6837\u7684\u4FBF\u5229\uFF0C\u8FD9\u7BC7\u6587\u7AE0\u5C06\u4ECE npm2 \u5F00\u59CB\uFF0C\u5256\u6790\u5230\u73B0\u5728\u706B\u70ED\u7684 pnpm\u3002",paraId:0},{value:"\u5728 npm2 \u4E2D\uFF0Cnpm \u7684\u5904\u7406\u4F9D\u8D56\u7684\u65B9\u5F0F\u5F88\u7C97\u66B4\uFF0C\u76F4\u63A5\u91C7\u7528\u9012\u5F52\u7684\u65B9\u5F0F\uFF0C\u4E25\u683C\u7684\u6309\u7167 package.json \u7ED3\u6784\u4EE5\u53CA\u5B50\u4F9D\u8D56\u5305\u4E2D\u7684 package.json \u7ED3\u6784\u5C06\u4F9D\u8D56\u5B89\u88C5\u5230\u5404\u81EA\u7684 node_modules \u4E2D",paraId:1,tocIndex:1},{value:"\u4E3E\u4E2A \u{1F330} \u6765\u8BF4\uFF0Cnpm-test \u9879\u76EE\u4F9D\u8D56\u5982\u4E0B\u4E09\u4E2A\u6A21\u5757\uFF1A",paraId:2,tocIndex:1},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "buffer": "^5.4.3",
-    "ignore": "^5.1.4"
-  }
-}
-`,paraId:3,tocIndex:1},{value:"buffer",paraId:4,tocIndex:1},{value:"\u6A21\u5757\u4F9D\u8D56\u4E86",paraId:4,tocIndex:1},{value:"base64-js",paraId:4,tocIndex:1},{value:"\u548C",paraId:4,tocIndex:1},{value:"ieee754",paraId:4,tocIndex:1},{value:"\u6A21\u5757",paraId:4,tocIndex:1},{value:`{
-  "name": "buffer",
-  "dependencies": {
-    "base64-js": "^1.3.1",
-    "ieee754": "^1.1.13"
-  }
-}
-`,paraId:5,tocIndex:1},{value:"\u6267\u884C npm install \u4E4B\u540E\uFF0C\u6211\u4EEC\u4F1A\u5F97\u5230\u5982\u4E0B\u56FE\u7684\u76EE\u5F55\u7ED3\u6784:",paraId:6,tocIndex:1},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:7,tocIndex:1},{value:"\u8FD9\u79CD\u65B9\u5F0F\u7684\u4F18\u52A3\u5F0F\u90FD\u975E\u5E38\u7684\u660E\u663E\u3002",paraId:8,tocIndex:1},{value:"\u4F18\u70B9",paraId:8,tocIndex:1},{value:"\u5C31\u662F node_modules \u7684\u7ED3\u6784\u548C package.json \u7684\u7ED3\u6784\u662F\u4E00\u4E00\u5BF9\u5E94\u7684\uFF0C\u7ED3\u6784\u5C42\u7EA7\u5F88\u660E\u663E\uFF0C\u5E76\u4E14\u80FD\u591F\u4FDD\u8BC1\u6BCF\u6B21 install \u7684\u76EE\u5F55\u90FD\u662F\u76F8\u540C\u7684\u3002",paraId:8,tocIndex:1},{value:"\u8BD5\u60F3\u4E00\u4E0B\uFF0C\u4F9D\u8D56\u7684\u6A21\u5757\u975E\u5E38\u591A\uFF0C\u9879\u76EE\u7684 node_modules \u4F1A\u975E\u5E38\u7684\u5E9E\u5927\uFF0C\u5D4C\u5957\u4F1A\u5F88\u6DF1",paraId:9,tocIndex:1},{value:"\u4ECE\u4E0A\u56FE\u4E2D\uFF0C\u6211\u4EEC\u53EF\u4EE5\u770B\u51FA\u6765\u5D4C\u5957\u7ED3\u6784\u7684\u52A3\u52BF",paraId:10,tocIndex:1},{value:"\u5728\u4E0D\u540C\u5C42\u7EA7\u7684\u4F9D\u8D56\u4E2D\uFF0C\u53EF\u80FD\u5F15\u7528\u4E86\u540C\u4E00\u4E2A\u6A21\u5757\uFF0C\u5BFC\u81F4\u5927\u91CF\u7684\u6A21\u5757\u5197\u4F59",paraId:11,tocIndex:1},{value:"\u5728 windows \u7CFB\u7EDF\u4E2D\uFF0C\u6587\u4EF6\u8DEF\u5F84\u6700\u5927\u957F\u5EA6\u4E3A 260 \u5B57\u7B26\uFF0C\u5D4C\u5957\u5C42\u7EA7\u8FC7\u6DF1\u53EF\u80FD\u5BFC\u81F4\u4E0D\u53EF\u9884\u77E5\u7684\u95EE\u9898",paraId:11,tocIndex:1},{value:" \u{1F4A1} \u5728 npm2 \u4E2D\uFF0C\u6309\u7167\u9012\u5F52\u7684\u65B9\u5F0F\uFF0C\u4E25\u683C\u5C06 package.json \u4E2D\u7684\u4F9D\u8D56\u5B89\u88C5\u5230\u5BF9\u5E94\u6A21\u5757\u4E0B\u3002\u5E76\u4E0D\u4F1A\u5904\u7406\u67D0\u51E0\u4E2A\u6A21\u5757\u4E2D\u7684\u76F8\u540C\u7248\u672C\u4F9D\u8D56\uFF0C\u76F4\u63A5\u65E0\u8111\u751F\u6210\u5BF9\u5E94\u6811\u7ED3\u6784",paraId:12},{value:"\u5728\u6B64\u4E4B\u540E\u7684 npm3 \u505A\u4E86\u8F83\u5927\u7684\u66F4\u65B0\uFF0C\u5C06 npm2 \u7684\u5D4C\u5957\u7ED3\u6784\u6539\u6210\u4E86\u6241\u5E73\u7ED3\u6784",paraId:13,tocIndex:2},{value:"\u5B89\u88C5\u6A21\u5757\u65F6\uFF0C\u4E0D\u7BA1\u5176\u662F\u76F4\u63A5\u4F9D\u8D56\u6A21\u5757\u8FD8\u662F\u5B50\u4F9D\u8D56\u7684\u4F9D\u8D56\u6A21\u5757\uFF0C\u90FD\u4F18\u5148\u5B89\u88C5\u5728 node_modules \u6839\u76EE\u5F55\u4E0B",paraId:14,tocIndex:3},{value:"\u6267\u884C npm install \u4E4B\u540E\uFF0C\u4F1A\u5F97\u5230\u5982\u4E0B\u7684\u76EE\u5F55\u7ED3\u6784",paraId:15,tocIndex:3},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:16,tocIndex:3},{value:" \u{1F4A1} \u5982\u679C package.json \u4E2D\u7684\u4F9D\u8D56\u7684\u5B50\u4F9D\u8D56\u65E0\u76F8\u540C\u4F9D\u8D56\uFF0C\u90A3\u4E48\u6240\u6709\u7684\u4F9D\u8D56\u90FD\u4F1A\u88AB\u6241\u5E73\u5316\u5230\u6839\u76EE\u5F55\u7684 node_modules \u4E0B",paraId:12},{value:"\u4FEE\u6539 npm-test \u7684 package.json \u6587\u4EF6\uFF0C\u6DFB\u52A0",paraId:17,tocIndex:4},{value:"websocket-util",paraId:17,tocIndex:4},{value:"\uFF0Cwebsocket-util \u4E5F\u4F9D\u8D56\u4E86 ",paraId:17,tocIndex:4},{value:"base64-js^1.3.0",paraId:17,tocIndex:4},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "buffer": "^5.4.3",
-    "ignore": "^5.1.4",
-    "websocket-util": "1.0.0"
-  }
-}
-`,paraId:18,tocIndex:4},{value:"\u6267\u884C npm install\uFF0C\u4F1A\u5F97\u5230\u5982\u4E0B\u7684\u76EE\u5F55\u7ED3\u6784\uFF1A",paraId:19,tocIndex:4},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:20,tocIndex:4},{value:" \u{1F4A1} \u5982\u679C package.json \u4E2D\u7684\u4F9D\u8D56\u7684\u5B50\u4F9D\u8D56\u6709\u76F8\u540C\u6216\u8005\u517C\u5BB9\u7248\u672C\u4F9D\u8D56\uFF0C\u90A3\u4E48\u6240\u6709\u7684\u4F9D\u8D56\u90FD\u4F1A\u88AB\u6241\u5E73\u5316\u5230\u6839\u76EE\u5F55\u7684 node_modules \u4E0B",paraId:12},{value:"\u6211\u4EEC\u5728\u9879\u76EE npm-test \u4E2D\uFF0C\u53C8\u4F9D\u8D56\u4E86",paraId:21,tocIndex:5},{value:"base64-js@ 1.0.1",paraId:21,tocIndex:5},{value:"\u7248\u672C\uFF0C\u4FEE\u6539 package.json:",paraId:21,tocIndex:5},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "buffer": "^5.4.3",
-    "ignore": "^5.1.4",
-    "base64-js": "1.0.1"
-  }
-}
-`,paraId:22,tocIndex:5},{value:"\u6267\u884C npm install \u4E4B\u540E\u7684\u76EE\u5F55\u7ED3\u6784\u5982\u4E0B:",paraId:23,tocIndex:5},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:24,tocIndex:5},{value:"npm-test \u76F4\u63A5\u4F9D\u8D56\u7684",paraId:25,tocIndex:5},{value:"base64-js@ 1.0.1",paraId:25,tocIndex:5},{value:"\u653E\u5728\u4E86\u6839\u76EE\u5F55\u7684 node_modules \u4E0B\uFF0Cbuffer \u6240\u4F9D\u8D56\u7684\u4E0E\u5176\u4E0D\u517C\u5BB9\uFF0C\u5C31\u653E\u5728\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:25,tocIndex:5},{value:"\u4FEE\u6539 package.json\uFF0C\u5728\u5176\u4E2D\u6DFB\u52A0",paraId:26,tocIndex:5},{value:"bops@ 1.0.1",paraId:26,tocIndex:5},{value:"\uFF0C\u5B83\u4F9D\u8D56",paraId:26,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:26,tocIndex:5},{value:"\uFF1B",paraId:26,tocIndex:5},{value:"websocket-util@ 1.0.0",paraId:26,tocIndex:5},{value:"\u4F9D\u8D56",paraId:26,tocIndex:5},{value:"base64-js^1.3.0",paraId:26,tocIndex:5},{value:"\uFF0Cbuffer \u4F9D\u8D56",paraId:26,tocIndex:5},{value:"base64-js^1.3.1",paraId:26,tocIndex:5},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "bops": "1.0.1",
-    "buffer": "^5.4.3",
-    "ignore": "^5.1.4",
-    "websocket-util": "1.0.0"
-  }
-}
-`,paraId:27,tocIndex:5},{value:"\u6267\u884C npm install\uFF0C\u4F1A\u5F97\u5230\u5982\u4E0B\u7684\u76EE\u5F55\u7ED3\u6784\uFF1A",paraId:28,tocIndex:5},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE:",paraId:29,tocIndex:5},{value:"\u4F1A\u53D1\u73B0",paraId:30,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:30,tocIndex:5},{value:"\u88AB\u63D0\u53D6\u5230\u4E86\u7B2C\u4E00\u7EA7\u7684 node_modules \u4E0A\uFF0C\u800C buffer/websocket-util \u4F9D\u8D56\u7684\u4F9D\u65E7\u6302\u5728\u5B83\u81EA\u5DF1\u7684 node_modules \u4E0B",paraId:30,tocIndex:5},{value:`
-package.json \u7684\u5B89\u88C5\u987A\u5E8F\u662F\u6309\u7740`,paraId:30,tocIndex:5},{value:"\u5B57\u6BCD\u987A\u5E8F",paraId:30,tocIndex:5},{value:"\u6765\u7684\uFF0C\u9996\u5148 bops \u7684\u5E95\u5C42\u4F9D\u8D56\u90FD\u4F1A\u88AB\u4F18\u5148\u63D0\u51FA\u6765\uFF0C\u6240\u4EE5 node_modules \u4E0B\u4F1A\u5148\u6709",paraId:30,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:30,tocIndex:5},{value:"\uFF0C\u5230\u4E86\u5904\u7406 buffer/websocket-util \u7684\u5E95\u5C42\u4F9D\u8D56\u65F6\uFF0C\u53D1\u73B0\u5DF2\u7ECF\u5B58\u5728 base64-js \u4E14\u4E0D\u517C\u5BB9\u5C31\u4F1A\u653E\u5230\u5B83\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:30,tocIndex:5},{value:"\u6211\u4EEC\u5728\u5F80 package.json \u4E2D\u52A0\u5165",paraId:31,tocIndex:5},{value:"ag-psd@ 14.3.6",paraId:31,tocIndex:5},{value:"\u5B83\u4F9D\u8D56",paraId:31,tocIndex:5},{value:"base64-js^1.5.1",paraId:31,tocIndex:5},{value:"\u7684\u7248\u672C",paraId:31,tocIndex:5},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "ag-psd": "14.3.6",
-    "bops": "1.0.1",
-    "buffer": "^5.4.3",
-    "ignore": "^5.1.4"
-  }
-}
-`,paraId:32,tocIndex:5},{value:"\u6267\u884C npm install \u4E4B\u540E\uFF0C\u5F97\u5230\u76EE\u5F55\u7ED3\u6784\u5982\u4E0B\uFF1A",paraId:33,tocIndex:5},{value:"\u5C06\u5176\u5185\u90E8\u7684\u4F9D\u8D56\u5168\u90E8\u753B\u51FA\u6765\u4F1A\u6210\u4E3A\u5982\u4E0B\u56FE\uFF1A",paraId:34,tocIndex:5},{value:"\u80FD\u591F\u53D1\u73B0\uFF0C\u8FD9\u6B21\u662F",paraId:35,tocIndex:5},{value:"base64-js@ 1.5.1",paraId:35,tocIndex:5},{value:"\u88AB\u63D0\u53D6\u5230\u4E86\u6839\u76EE\u5F55\u4E0B\u7684 node_modules \u4E0B\uFF0Cbuffer \u7684 base64-js \u80FD\u591F\u548C\u5B83\u517C\u5BB9\uFF0C\u6240\u4EE5 buffer \u7684 node_modules \u4E0B\u4E0D\u518D\u5B58\u5728\u4F9D\u8D56\uFF0C\u7136\u800C bops \u4F9D\u8D56\u7684 base64-js \u4E0D\u517C\u5BB9\uFF0C\u6240\u4EE5\u4F1A\u6302\u5728\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:35,tocIndex:5},{value:" \u{1F4A1} \u5B50\u4F9D\u8D56\u9879\u7684\u4F9D\u8D56\u4E0D\u517C\u5BB9\u7684\u60C5\u51B5\u4E0B\uFF0C\u5E95\u5C42\u4F1A\u901A\u8FC7 ",paraId:12},{value:"localeCompare",paraId:12},{value:" \u7684\u65B9\u6CD5\u5BF9\u4F9D\u8D56\u8FDB\u884C\u4E00\u4E2A\u6392\u5E8F\uFF0C\u5B57\u5178\u5E8F\u9760\u524D\u7684 npm \u5305\u7684**\u5E95\u5C42\u4F9D\u8D56**\u4F1A\u4F18\u5148\u88AB\u63D0\u53D6\u51FA\u6765\uFF0C\u653E\u5230\u6839\u76EE\u5F55\u4E0B\u7684 node_modules \u4E2D\uFF0C\u4E4B\u540E\u5982\u679C\u53D1\u73B0\u4E0D\u517C\u5BB9\u7684\u4F9D\u8D56\uFF0C\u5219\u7EE7\u7EED\u91C7\u7528 npm 2 \u7684\u5904\u7406\u65B9\u5F0F\uFF0C\u90FD\u4F1A\u653E\u5728\u81EA\u8EAB\u7684 node_modules \u4E0B",paraId:12},{value:"\u2753 \u901A\u8FC7\u4E0A\u9762\u8FD9\u51E0\u4E2A\u4F8B\u5B50\uFF0C\u80FD\u591F\u53D1\u73B0 npm3 \u5728\u89E3\u51B3\u4E86\u4E00\u4E9B\u95EE\u9898\u7684\u540C\u65F6\uFF0C\u4E5F\u5E26\u6765\u65B0\u7684\u95EE\u9898\u3002",paraId:36,tocIndex:5},{value:"npm3 \u4EFF\u4F5B\u89E3\u51B3\u4E86 npm2 \u7684\u5197\u4F59\u95EE\u9898\uFF0C\u4F46\u662F\u4E5F\u6CA1\u6709\u5B8C\u5168\u89E3\u51B3\u3002\u4F8B\u5982\u4E0A\u9762\u7684\u4F8B\u5B50\uFF0C",paraId:37,tocIndex:5},{value:"base64-js@ 1.0.2",paraId:37,tocIndex:5},{value:"\u5148\u88AB\u63D0\u51FA\u6765\uFF0C\u5982\u679C\u540E\u9762\u7684\u5305\u4F9D\u8D56\u7684 base64-js \u548C 1.0.2 \u7248\u672C\u4E0D\u517C\u5BB9\uFF0C\u5C31\u4F1A\u5BFC\u81F4\u6BCF\u4E2A\u5B50\u4F9D\u8D56\u7684 node_modules \u90FD\u4F1A\u5B58\u5728 base64-js \u5305\uFF0C\u53C8\u51FA\u73B0\u4E86 npm2 \u7684\u5197\u4F59\u95EE\u9898",paraId:37,tocIndex:5},{value:"\u5728\u4E4B\u524D\u6211\u4EEC\u8BB2\u4E86 package.json \u6587\u4EF6\uFF0C\u5728 npm5 \u4E2D\uFF0C\u63A8\u51FA\u4E86 package-lock \u6587\u4EF6\uFF0C\u5B83\u5C31\u662F\u6BCF\u4E2A\u4F9D\u8D56\u9879\u7684\u5217\u8868\uFF0C\u5F53\u524D\u5B89\u88C5\u7684\u7248\u672C\uFF0C\u6A21\u5757\u4F4D\u7F6E\uFF0C\u9A8C\u8BC1\u6A21\u5757\u5B8C\u6574\u6027\u7684\u54C8\u5E0C\uFF0C\u4EE5\u53CA\u5BF9\u5E94\u7684\u5305\u5217\u8868/\u4F9D\u8D56\u9879\u5217\u8868\u3002\u5176\u5B9E\u4E5F\u662F\u548C node_modules \u4E00\u4E00\u5BF9\u5E94\u7684\uFF0C\u9879\u76EE\u76EE\u5F55\u4E0B\u5B58\u5728 \xA0package-lock \u53EF\u4EE5\u8BA9\u6BCF\u6B21\u5B89\u88C5\u751F\u6210\u7684\u4F9D\u8D56\u76EE\u5F55\u7ED3\u6784\u4FDD\u6301\u76F8\u540C",paraId:38,tocIndex:6},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "buffer": "^5.4.3",
-    "ignore": "^5.1.4"
-  }
-}
-`,paraId:39,tocIndex:6},{value:"\u4E0A\u8FF0 package.json \u6267\u884C npm install \u4E4B\u540E\u5F97\u5230\u7684 lock \u6587\u4EF6\u5982\u4E0B\uFF1A",paraId:40,tocIndex:6},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "base64-js": {
-      "version": "1.5.1",
-      "resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
-      "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
-    },
-    "buffer": {
-      "version": "5.7.1",
-      "resolved": "https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz",
-      "integrity": "sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==",
-      "requires": {
-        "base64-js": "^1.3.1",
-        "ieee754": "^1.1.13"
-      }
-    },
-    "ieee754": {
-      "version": "1.2.1",
-      "resolved": "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz",
-      "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
-    },
-    "ignore": {
-      "version": "5.2.0",
-      "resolved": "https://registry.npmjs.org/ignore/-/ignore-5.2.0.tgz",
-      "integrity": "sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ=="
-    }
-  }
-}
-`,paraId:41,tocIndex:6},{value:"resolved",paraId:42,tocIndex:6},{value:": \u4F9D\u8D56\u5305\u7684\u4F4D\u7F6E URI",paraId:42,tocIndex:6},{value:"integrity",paraId:43,tocIndex:6},{value:": \u9A8C\u8BC1\u6A21\u5757\u5B8C\u6574\u6027\u7684\u54C8\u5E0C",paraId:43,tocIndex:6},{value:"\u5F53\u6211\u4EEC\u7684\u9879\u76EE\u4E2D\u5DF2\u7ECF\u5B58\u5728 package-lock.json \u4E4B\u540E\uFF0C\u5C06\u4EE5\u8BE5\u6587\u4EF6\u4E3A\u4E3B\u8FDB\u884C\u89E3\u6790\u5B89\u88C5\u6307\u5B9A\u7248\u672C\u4F9D\u8D56\u5305\uFF0C\u800C\u4E0D\u662F\u4F7F\u7528 \xA0package.json \u6765\u89E3\u6790\u548C\u5B89\u88C5\u6A21\u5757\u3002\u56E0\u4E3A package-lock \u4E3A\u6BCF\u4E2A\u6A21\u5757\u90FD\u6307\u5B9A\u4E86\u7248\u672C/\u4F4D\u7F6E/\u5B8C\u6574\u6027\u54C8\u5E0C\uFF0C\u6240\u4EE5\u6BCF\u6B21\u521B\u5EFA\u7684\u5B89\u88C5\u90FD\u662F\u4E00\u6837\u7684\u3002\u548C\u4F7F\u7528\u7684\u8BBE\u5907\u65E0\u5173\uFF0C\u6BCF\u6B21\u90FD\u80FD\u7ED9\u5230\u76F8\u540C\u7684\u7ED3\u679C\u3002",paraId:44,tocIndex:6},{value:"\u8BE5\u56FE\u4E3A\u7B2C\u4E00\u6B21 install \u548C\u6709\u4E86 package-lock \u6587\u4EF6\u4E4B\u540E install \u65F6\u95F4\u7684\u5BF9\u6BD4\u3002\u5728\u4F9D\u8D56\u5C11\u7684\u60C5\u51B5\u4E0B\u5E76\u4E0D\u660E\u663E\uFF0C\u4F9D\u8D56\u8D8A\u591A\u65F6\u95F4\u5DEE\u4F1A\u66F4\u52A0\u660E\u663E",paraId:45,tocIndex:6},{value:"\u5728 npm5.0.x \u7684\u7248\u672C\u4E2D\uFF0C\u4E0D\u7BA1 \xA0package.json \u4E2D\u4F9D\u8D56\u662F\u5426\u6709\u66F4\u65B0\uFF0C\u90FD\u4F1A\u4EE5 package-lock \u6587\u4EF6\u4E3A\u7B2C\u4E00\u5B89\u88C5\u4F9D\u8D56",paraId:46,tocIndex:6},{value:"\u5728 npm5.1.0 \u4E4B\u540E\u7684\u7248\u672C\u4E2D\uFF0C\u5982\u679C package.json \u4E2D\u7684\u4F9D\u8D56\u9879\u6709\u66F4\u65B0\uFF0Cinstall \u65F6\u4F1A\u65E0\u89C6 package-lock \u76F4\u63A5\u53BB\u4E0B\u8F7D\u65B0\u7248\u672C\u4F9D\u8D56\uFF0C\u7136\u540E\u5728\u66F4\u65B0 package-lock \u6587\u4EF6",paraId:47,tocIndex:6},{value:"\u5176\u5B9E\u4E0A\u9762\u7684\u4E24\u79CD\u65B9\u6848\u90FD\u5B58\u5728\u5BF9\u5E94\u7684\u95EE\u9898\uFF0C\u56E0\u6B64\u5728 5.4.2 \u7684\u7248\u672C\u4E4B\u540E\uFF0C\u66F4\u6539\u4E86\u89C4\u5219",paraId:48,tocIndex:6},{value:"\u6839\u636E package.json \u6587\u4EF6\uFF0C\u8FD0\u884C install \u4F1A\u751F\u6210\u5BF9\u5E94\u7684 package-lock \u6587\u4EF6\uFF0Cpackage-lock \u6587\u4EF6\u6307\u660E\u4E86\u76F4\u63A5\u4F9D\u8D56\u7248\u672C\u548C\u95F4\u63A5\u4F9D\u8D56\u7248\u672C",paraId:49,tocIndex:6},{value:"\u5982\u679C package \u548C lock \u6587\u4EF6\u4E2D\u4F9D\u8D56\u7248\u672C\u517C\u5BB9\uFF0C\u5373\u4F7F package \u4E2D\u6709\u65B0\u7248\u672C\uFF0C\u6267\u884C install \u7684\u65F6\u5019\u4E5F\u4F1A\u6839\u636E lock \u6587\u4EF6\u4E0B\u8F7D",paraId:49,tocIndex:6},{value:"\u5982\u679C\u4E24\u4E2A\u6587\u4EF6\u4E2D\u7684\u7248\u672C\u4E0D\u517C\u5BB9\uFF0C\u90A3\u4E48\u6267\u884C install \u7684\u65F6\u5019\u4F1A\u628A lock \u6587\u4EF6\u66F4\u65B0\u5230\u517C\u5BB9 package.json \u7684\u7248\u672C",paraId:49,tocIndex:6},{value:"\u5728\u6211\u4EEC\u6267\u884C install/update \u65F6\uFF0C\u9664\u4E86\u5C06\u4F9D\u8D56\u5305\u5B89\u88C5\u5728 node_modules \u76EE\u5F55\u4E4B\u5916\uFF0C\u8FD8\u4F1A\u5728\u672C\u5730\u7F13\u5B58\u76EE\u5F55\u7F13\u5B58\u4E00\u4EFD",paraId:50,tocIndex:7},{value:"\u6267\u884C",paraId:51,tocIndex:7},{value:"npm config get cache",paraId:51,tocIndex:7},{value:"\u547D\u4EE4\u53EF\u4EE5\u67E5\u8BE2\u5230\u7F13\u5B58\u76EE\u5F55\uFF0CMac \u9ED8\u8BA4\u662F\u5728\u7528\u6237\u4E3B\u76EE\u4E0B",paraId:51,tocIndex:7},{value:".npm/_cacache",paraId:51,tocIndex:7},{value:"content-v2 \u76EE\u5F55\u7528\u4E8E\u5B58\u50A8 tar \u5305\u7684\u7F13\u5B58\uFF0C\u800C index-v5 \u76EE\u5F55\u7528\u4E8E\u5B58\u50A8 tar \u7684 hash \u503C",paraId:52,tocIndex:7},{value:"npm \u6267\u884C\u5B89\u88C5\u7684\u65F6\u5019\u4F1A\u6839\u636E lock \u6587\u4EF6\u4E2D\u5B58\u50A8\u7684",paraId:53,tocIndex:7},{value:"integrity\u3001version\u3001name",paraId:53,tocIndex:7},{value:"\u751F\u6210\u4E00\u4E2A\u552F\u4E00\u7684",paraId:53,tocIndex:7},{value:"key",paraId:53,tocIndex:7},{value:"\u5BF9\u5E94\u5230",paraId:53,tocIndex:7},{value:"index-v5",paraId:53,tocIndex:7},{value:"\u76EE\u5F55\u4E0B\u7684\u7F13\u5B58\u8BB0\u5F55\uFF0C\u4ECE\u800C\u627E\u5230 tar \u5305\u7684 hash\uFF0C\u5728\u6839\u636E hash \u53BB\u627E\u7F13\u5B58\u7684 tar \u5305\u6765\u4F7F\u7528",paraId:53,tocIndex:7},{value:`grep "https://registry.npmjs.org/base64-js/-/base64-js-1.0.2.tgz" -r index-v5
-`,paraId:54,tocIndex:7},{value:"\u5728 index-v5 \u4E2D\u67E5\u627E base64-js-1.0.2 \u7684\u7F13\u5B58\u8BB0\u5F55\uFF0C\u4F1A\u5F97\u5230\u4E00\u4E2A json \u4E32\uFF0C\u5176\u4E2D",paraId:55,tocIndex:7},{value:"_shasum",paraId:55,tocIndex:7},{value:"\u5C5E\u6027\u5C31\u662F tar \u5305\u7684 hash\uFF0C\u5176\u4E2D\u524D\u56DB\u4F4D\u5C31\u662F\u7F13\u5B58\u7684\u76EE\u5F55\uFF0C\u5728 content-v2 \u4E2D\u8FDB\u5165\u8BE5\u76EE\u5F55\u5C31\u80FD\u627E\u5230\u5BF9\u5E94\u7684\u538B\u7F29\u4F9D\u8D56\u5305\uFF0C\u6267\u884C",paraId:55,tocIndex:7},{value:"tar -xvf file",paraId:55,tocIndex:7},{value:"\u5C31\u80FD\u89E3\u538B\u6587\u4EF6",paraId:55,tocIndex:7},{value:"\u4E0A\u6587\u63D0\u5230\u8FC7\u51E0\u6B21\u6587\u4EF6\u5B8C\u6574\u6027\uFF0C\u90A3\u5177\u4F53\u4EC0\u4E48\u662F\u6587\u4EF6\u5B8C\u6574\u6027\uFF1F",paraId:56,tocIndex:8},{value:"\u5728\u4E0B\u8F7D\u4F9D\u8D56\u5305\u4E4B\u524D\uFF0C\u80FD\u591F\u62FF\u5230 npm \u5BF9\u8BE5\u4F9D\u8D56\u5305\u8BA1\u7B97\u7684 hash \u503C\u3002\u6267\u884C npm info \u547D\u4EE4\uFF0C",paraId:57,tocIndex:8},{value:"shasum",paraId:57,tocIndex:8},{value:"\u5C31\u662F hash",paraId:57,tocIndex:8},{value:"\u7528\u6237\u4E0B\u8F7D\u4F9D\u8D56\u5305\u5230\u672C\u5730\u4E4B\u540E\uFF0C\u8981\u786E\u5B9A\u5728\u4E0B\u8F7D\u7684\u8FC7\u7A0B\u4E2D\u6CA1\u6709\u51FA\u73B0\u9519\u8BEF\uFF0C\u6240\u4EE5\u5728\u4E0B\u8F7D\u5B8C\u6210\u4E4B\u540E\u5728\u672C\u5730\u8BA1\u7B97\u4E00\u6B21\u6587\u4EF6\u7684 hash \u503C\u3002\u5982\u679C\u4E24\u4E2A hash \u503C\u76F8\u540C\u624D\u80FD\u591F\u786E\u4FDD\u4E0B\u8F7D\u7684\u4F9D\u8D56\u662F\u5B8C\u6574\u7684\uFF1B\u5982\u679C\u4E0D\u540C\u5219\u9700\u8981\u91CD\u65B0\u4E0B\u8F7D",paraId:58,tocIndex:8},{value:".npmrc \u6587\u4EF6\u53EF\u4EE5\u7406\u89E3\u6210\u4E3A npm running configuration\uFF0C\u5373 npm \u8FD0\u884C\u65F6\u914D\u7F6E\u6587\u4EF6\u3002",paraId:59,tocIndex:9},{value:"npm \u7684\u4F5C\u7528\u5C31\u662F\u5E2E\u52A9\u5F00\u53D1\u8005\u5B89\u88C5\u9700\u8981\u7684\u4F9D\u8D56\u5305\uFF0C\u4F46\u662F\u8981\u4ECE\u54EA\u91CC\u4E0B\u8F7D\uFF1F\u8FD9\u662F\u53EF\u4EE5\u5728.npmrc \u4E2D\u8FDB\u884C\u914D\u7684\u3002",paraId:60,tocIndex:9},{value:"\u5728\u6211\u4EEC\u5B89\u88C5\u5305\u7684\u65F6\u5019\uFF0Cnpm \u6309\u7167\u5982\u4E0B\u987A\u5E8F\u8BFB\u53D6\u8FD9\u4E9B\u914D\u7F6E\u6587\u4EF6\uFF1A",paraId:61,tocIndex:9},{value:"\u9879\u76EE\u914D\u7F6E\u6587\u4EF6\uFF1A\u4F60\u53EF\u4EE5\u5728\u9879\u76EE\u7684\u6839\u76EE\u5F55\u4E0B\u521B\u5EFA\u4E00\u4E2A.npmrc \u6587\u4EF6\uFF0C\u53EA\u7528\u4E8E\u7BA1\u7406\u8FD9\u4E2A\u9879\u76EE\u7684 npm \u5B89\u88C5\u3002",paraId:62,tocIndex:9},{value:"\u7528\u6237\u914D\u7F6E\u6587\u4EF6\uFF1A\u5728\u4F60\u4F7F\u7528\u4E00\u4E2A\u8D26\u53F7\u767B\u9646\u7684\u7535\u8111\u7684\u65F6\u5019\uFF0C\u53EF\u4EE5\u4E3A\u5F53\u524D\u7528\u6237\u521B\u5EFA\u4E00\u4E2A.npmrc \u6587\u4EF6\uFF0C\u4E4B\u540E\u7528\u8BE5\u7528\u6237\u767B\u5F55\u7535\u8111\uFF0C\u5C31\u53EF\u4EE5\u4F7F\u7528\u8BE5\u914D\u7F6E\u6587\u4EF6\u3002\u53EF\u4EE5\u901A\u8FC7 ",paraId:62,tocIndex:9},{value:"npm config get userconfig",paraId:62,tocIndex:9},{value:" \u6765\u83B7\u53D6\u8BE5\u6587\u4EF6\u7684\u4F4D\u7F6E\u3002",paraId:62,tocIndex:9},{value:"\u5168\u5C40\u914D\u7F6E\u6587\u4EF6\uFF1A \u4E00\u53F0\u7535\u8111\u53EF\u80FD\u6709\u591A\u4E2A\u7528\u6237\uFF0C\u5728\u8FD9\u4E9B\u7528\u6237\u4E4B\u4E0A\uFF0C\u4F60\u53EF\u4EE5\u8BBE\u7F6E\u4E00\u4E2A\u516C\u5171\u7684.npmrc \u6587\u4EF6\uFF0C\u4F9B\u6240\u6709\u7528\u6237\u4F7F\u7528\u3002\u8BE5\u6587\u4EF6\u7684\u8DEF\u5F84\u4E3A\uFF1A ",paraId:62,tocIndex:9},{value:"$PREFIX/etc/npmrc",paraId:62,tocIndex:9},{value:"\uFF0C\u4F7F\u7528 ",paraId:62,tocIndex:9},{value:"npm config get prefix",paraId:62,tocIndex:9},{value:" \u83B7\u53D6$PREFIX\u3002\u5982\u679C\u4F60\u4E0D\u66FE\u914D\u7F6E\u8FC7\u5168\u5C40\u6587\u4EF6\uFF0C\u8BE5\u6587\u4EF6\u4E0D\u5B58\u5728\u3002",paraId:62,tocIndex:9},{value:"npm \u5185\u5D4C\u914D\u7F6E\u6587\u4EF6\uFF1A\u6700\u540E\u8FD8\u6709 npm \u5185\u7F6E\u914D\u7F6E\u6587\u4EF6\uFF0C\u57FA\u672C\u4E0A\u7528\u4E0D\u5230\uFF0C\u4E0D\u7528\u8FC7\u5EA6\u5173\u6CE8\u3002",paraId:62,tocIndex:9},{value:"\u68C0\u67E5 .npmrc \u6587\u4EF6\uFF0C\u4F18\u5148\u7EA7\u4E3A\uFF1A\u9879\u76EE\u7EA7 > \u7528\u6237\u7EA7 > \u5168\u5C40\u7EA7 > npm \u5185\u7F6E",paraId:63,tocIndex:10},{value:"\u68C0\u67E5\u6709\u65E0 lock \u6587\u4EF6",paraId:63,tocIndex:10},{value:`\u65E0 lock \u6587\u4EF6
-`,paraId:63,tocIndex:10},{value:"\u4ECE npm \u8FDC\u7A0B\u4ED3\u5E93\u83B7\u53D6\u5305\u7684\u4FE1\u606F",paraId:64,tocIndex:10},{value:`\u6839\u636E package.json \u6784\u5EFA\u4F9D\u8D56\u6811\uFF0C\u6784\u5EFA\u8FC7\u7A0B\u5982\u4E0B
-`,paraId:64,tocIndex:10},{value:"\u9996\u5148\u786E\u5B9A\u9996\u5C42\u4F9D\u8D56\u6A21\u5757",paraId:65,tocIndex:10},{value:"dependencies/devDependencies/optionalDependencies",paraId:65,tocIndex:10},{value:"\uFF0C\u5DE5\u7A0B\u672C\u8EAB\u662F\u6574\u68F5\u4F9D\u8D56\u6811\u7684\u6839\u8282\u70B9\uFF0C\u6BCF\u4E2A\u9996\u5C42\u6A21\u5757\u90FD\u662F\u6839\u8282\u70B9\u4E0B\u7684\u4E00\u4E2A\u5B50\u6811\uFF0C\u6B64\u65F6\u4F1A\u5F00\u542F\u591A\u8FDB\u7A0B\u4ECE\u6BCF\u4E2A\u9996\u5C42\u4F9D\u8D56\u6A21\u5757\u5F00\u59CB\u9010\u6B65\u5BFB\u627E\u66F4\u6DF1\u5C42\u7EA7\u7684\u8282\u70B9",paraId:65,tocIndex:10},{value:"\u8FD9\u4E00\u6B65\u53EA\u662F\u786E\u5B9A\u903B\u8F91\u4E0A\u7684\u4F9D\u8D56\u6811\uFF0C",paraId:65,tocIndex:10},{value:"\u5E76\u975E\u771F\u6B63\u7684\u5B89\u88C5",paraId:65,tocIndex:10},{value:"\uFF0C\u4E4B\u540E\u6839\u636E\u8FD9\u4E2A\u4F9D\u8D56\u7ED3\u6784\u53BB\u4E0B\u8F7D\u6216\u62FF\u5230\u7F13\u5B58\u4E2D\u7684\u4F9D\u8D56\u5305",paraId:65,tocIndex:10},{value:`\u6A21\u5757\u6241\u5E73\u5316
-\u5728\u4E0A\u4E00\u4E2A\u6B65\u9AA4\u7684\u5230\u7684\u662F\u4E00\u4E2A\u5B8C\u6574\u7684\u4F9D\u8D56\u6811\uFF0C\u5305\u542B\u4E86\u5927\u91CF\u7684\u91CD\u590D\u6A21\u5757\uFF0C\u5728 npm3 \u540E\u5C31\u5F00\u542F\u4E86\u6241\u5E73\u5316\u64CD\u4F5C\uFF0C\u4F1A\u904D\u5386\u6240\u6709\u7684\u8282\u70B9(\u6709`,paraId:64,tocIndex:10},{value:"\u5E7F\u5EA6\u904D\u5386",paraId:64,tocIndex:10},{value:"\u7684\u611F\u89C9)\u5C06\u6A21\u5757\u9010\u4E2A\u653E\u5230\u6839\u8282\u70B9\u4E0B\uFF0C\u6709\u91CD\u590D\u6A21\u5757\u65F6\u5C31\u4E22\u5F03\uFF1B\u4E0D\u517C\u5BB9\u65F6\u5219\u653E\u5230\u5F53\u524D\u8282\u70B9\uFF0C\u4E0D\u505A\u6539\u53D8\u3002",paraId:64,tocIndex:10},{value:`\u5728\u7F13\u5B58\u4E2D\u4F9D\u6B21\u67E5\u627E\u4F9D\u8D56\u6811\u4E2D\u7684\u4F9D\u8D56
-`,paraId:64,tocIndex:10},{value:`\u4E0D\u5B58\u5728\u7F13\u5B58
-`,paraId:66,tocIndex:10},{value:"\u4ECE npm \u8FDC\u7A0B\u4ED3\u5E93\u4E0B\u8F7D\u5305",paraId:67,tocIndex:10},{value:"\u6821\u9A8C\u5305\u7684\u5B8C\u6574\u6027",paraId:67,tocIndex:10},{value:"\u6821\u9A8C\u4E0D\u901A\u8FC7\u91CD\u65B0\u4E0B\u8F7D",paraId:67,tocIndex:10},{value:"\u6821\u9A8C\u901A\u8FC7\uFF0C\u5C06\u4E0B\u8F7D\u7684\u5305\u590D\u5236\u5230 npm \u7F13\u5B58\u76EE\u5F55\uFF1B\u5C06\u4E0B\u8F7D\u7684\u5305\u6309\u7167\u4F9D\u8D56\u7ED3\u6784\u89E3\u538B\u5230 \xA0node_modules",paraId:67,tocIndex:10},{value:`\u5B58\u5728\u7F13\u5B58
-`,paraId:66,tocIndex:10},{value:"\u5C06\u7F13\u5B58\u6309\u7167\u4F9D\u8D56\u7ED3\u6784\u89E3\u538B\u5230 \xA0node_modules",paraId:68,tocIndex:10},{value:"\u751F\u6210 lock \u6587\u4EF6",paraId:64,tocIndex:10},{value:`\u6709 lock \u6587\u4EF6
-`,paraId:63,tocIndex:10},{value:"\u68C0\u67E5 package.json \u4E2D\u7684\u4F9D\u8D56\u7248\u672C\u548C lock \u6587\u4EF6\u662F\u5426\u517C\u5BB9",paraId:69,tocIndex:10},{value:"\u5982\u679C\u517C\u5BB9\uFF0C\u76F4\u63A5\u8DF3\u8FC7\u83B7\u53D6\u5305\u4FE1\u606F\u3001\u6784\u5EFA\u4F9D\u8D56\u6811\u8FC7\u7A0B\uFF0C\u5F00\u59CB\u5728\u7F13\u5B58\u4E2D\u67E5\u627E\u5305\u4FE1\u606F\uFF0C\u540E\u7EED\u8FC7\u7A0B\u76F8\u540C",paraId:69,tocIndex:10},{value:"\u5982\u679C\u4E0D\u517C\u5BB9\uFF0C\u4ECE\u8FDC\u7A0B\u83B7\u53D6\u5305\u4FE1\u606F\uFF0C\u540E\u7EED\u8FC7\u7A0B\u76F8\u540C",paraId:69,tocIndex:10},{value:"yarn \u7684\u53D1\u5E03\u65F6\u95F4\u662F\u5728 2016 \u5E74\uFF0C\u90A3\u65F6\u5019\u7684 npm \u8FD8\u5904\u4E8E v3 \u9636\u6BB5\uFF0C\u8FD8\u6CA1\u6709 package-lock.json \u6587\u4EF6\uFF0C\u5B58\u5728\u7684\u95EE\u9898\u4E0A\u6587\u4E5F\u63D0\u5230\u8FC7\u3002yarn \u5C31\u5728\u6B64\u65F6\u8BDE\u751F\u4E86",paraId:70,tocIndex:11},{value:`
-yarn \u4E5F\u662F\u91C7\u7528\u7684 npm-v3 \u6241\u5E73\u5316\u7ED3\u6784\u6765\u7BA1\u7406\u5305\u4F9D\u8D56\uFF0C\u5B89\u88C5\u5B8C\u6210\u4E4B\u540E\u4F1A\u751F\u6210\u4E00\u4E2A yarn.lock \u6587\u4EF6`,paraId:70,tocIndex:11},{value:`
-\u6267\u884C\u4E0E\u4E0A\u8FF0\u4E00\u6837\u7684 package.json\uFF0C\u5F97\u5230\u5982\u4E0B\u7684 yarn.lock \u6587\u4EF6`,paraId:70,tocIndex:11},{value:`# THIS IS AN AUTOGENERATED FILE. DO NOT EDIT THIS FILE DIRECTLY.
-# yarn lockfile v1
-
-base64-js@^1.3.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
-  integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
-
-buffer@^5.4.3:
-  version "5.7.1"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.1.tgz#ba62e7c13133053582197160851a8f648e99eed0"
-  integrity sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.1.13"
-
-ieee754@^1.1.13:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
-  integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
-
-ignore@^5.1.4:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
-  integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
-`,paraId:71,tocIndex:11},{value:"\u548C npm \u4EA7\u751F\u7684 lock \u6587\u4EF6\u8FD8\u662F\u6BD4\u8F83\u76F8\u4F3C\u7684\uFF0C\u4E5F\u6709\u4E00\u4E9B\u533A\u522B",paraId:72,tocIndex:11},{value:"package-lock.json \u662F json \u683C\u5F0F\uFF0Cyarn.lock \u4F7F\u7528\u4E00\u79CD\u81EA\u5B9A\u4E49\u683C\u5F0F",paraId:73,tocIndex:11},{value:"\u6240\u6709\u4F9D\u8D56\uFF0C\u4E0D\u7BA1\u662F\u9879\u76EE\u58F0\u660E\u7684\u4F9D\u8D56\uFF0C\u8FD8\u662F\u4F9D\u8D56\u7684\u4F9D\u8D56\uFF0C\u90FD\u662F\u6241\u5E73\u5316\u7BA1\u7406",paraId:73,tocIndex:11},{value:"\u4F9D\u8D56\u7684\u7248\u672C\u662F\u7531\u6240\u6709\u4F9D\u8D56\u7684\u7248\u672C\u58F0\u660E\u8303\u56F4\u786E\u5B9A\u7684\uFF0C\u5177\u5907\u76F8\u540C\u7248\u672C\u58F0\u660E\u8303\u56F4\u7684\u4F9D\u8D56\u5F52\u7ED3\u4E3A\u4E00\u7C7B\uFF0C\u786E\u5B9A\u4E00\u4E2A\u8BE5\u8303\u56F4\u4E0B\u7684\u4F9D\u8D56\u7248\u672C\u3002\u5982\u679C\u540C\u4E00\u4E2A\u4F9D\u8D56\u591A\u4E2A\u7248\u672C\u5171\u5B58\uFF0C\u90A3\u4E48\u4F1A\u5E76\u5217\u5F52\u7C7B",paraId:73,tocIndex:11},{value:"\u76F8\u6BD4 npm\uFF0CYarn \u4E00\u4E2A\u663E\u8457\u533A\u522B\u662F yarn.lock \u4E2D\u5B50\u4F9D\u8D56\u7684\u7248\u672C\u53F7\u4E0D\u662F\u56FA\u5B9A\u7248\u672C\u3002",paraId:73,tocIndex:11},{value:"\xA0 \u4E5F\u5C31\u662F\u8BF4\u5355\u72EC\u4E00\u4E2A yarn.lock \u786E\u5B9A\u4E0D\u4E86 node_modules \u76EE\u5F55\u7ED3\u6784\uFF0C\u8FD8\u9700\u8981\u548C package.json \u6587\u4EF6\u8FDB\u884C\u914D\u5408",paraId:73,tocIndex:11},{value:`
-yarn.lock \u662F\u6241\u5E73\u5316\u7684\uFF0C\u5373\u4F7F\u6709\u76F8\u540C\u7684\u5305\u4E5F\u4F1A\u5E26\u6709\u7248\u672C\u53F7\u5E76\u5217\u5728\u4E00\u7EA7\uFF1B\u800C package-lock \u662F\u548C node_modules \u4E00\u4E00\u5BF9\u5E94\u7684\u5D4C\u5957\u7ED3\u6784`,paraId:73,tocIndex:11},{value:`
-\u6240\u4EE5 yarn.lock \u5373\u4F7F\u6709\u786E\u5B9A\u7684\u7248\u672C\u53F7\u4E5F\u6CA1\u6CD5\u5F97\u5230\u5BF9\u5E94 node_modules \u7684\u76EE\u5F55\u7ED3\u6784\u6240\u4EE5\u9700\u8981\u7ED3\u5408 package.json`,paraId:73,tocIndex:11},{value:"yarn install \u7684\u8FC7\u7A0B\uFF0C\u53EF\u4EE5\u5728\u7EC8\u7AEF\u770B\u5230\u7531 emoji \u56FE\u6807\u88C5\u9970\u7684\u56DB\u4E2A\u6B65\u9AA4",paraId:74,tocIndex:11},{value:"Resolving packages(\u89E3\u6790\u5305): \u6574\u5408\u4F9D\u8D56\u4FE1\u606F",paraId:75,tocIndex:11},{value:"Fetching packages(\u83B7\u53D6\u5305): \u83B7\u53D6\u4F9D\u8D56\u5305\u5230\u7F13\u5B58\u4E2D",paraId:75,tocIndex:11},{value:"Linking dependencies(\u8FDE\u63A5\u4F9D\u8D56): \u590D\u5236\u4F9D\u8D56\u5230 node_modules",paraId:75,tocIndex:11},{value:"Building fresh packages(\u6784\u5EFA\u5B89\u88C5): \u6267\u884C install \u9636\u6BB5\u7684 scripts",paraId:75,tocIndex:11},{value:"\u5176\u5B98\u7F51\u8FD9\u6837\u8BF4\uFF1A",paraId:76,tocIndex:13},{value:"Fast, disk space efficient package manager \u5FEB\u901F\u7684\uFF0C\u8282\u7701\u78C1\u76D8\u7A7A\u95F4\u7684\u5305\u7BA1\u7406\u5DE5\u5177",paraId:77,tocIndex:13},{value:"pnpm \u672C\u8D28\u4E0A\u5C31\u662F\u4E00\u4E2A\u5305\u7BA1\u7406\u5668\uFF0C\u5728\u8FD9\u4E00\u70B9\u548C npm/yarn \u6CA1\u6709\u533A\u522B\uFF0C\u4F46\u662F\u5176\u4E24\u4E2A\u4F18\u52BF\u5728\u4E8E\uFF1A",paraId:78,tocIndex:13},{value:"\u5305\u5B89\u88C5\u6570\u5EA6\u6781\u5FEB",paraId:79,tocIndex:13},{value:`
-\u5B98\u65B9 \xA0`,paraId:79,tocIndex:13},{value:"benchmarks",paraId:79,tocIndex:13},{value:" \u5BF9 npm\u3001pnpm\u3001yarn\u3001yarnPnP \u5BF9\u591A\u4E2A\u60C5\u666F\u4E0B\u7684\u6027\u80FD\u57FA\u51C6\u6D4B\u8BD5\uFF0C\u6DB5\u76D6\u4E86\u5F88\u591A\u4F7F\u7528\u573A\u666F",paraId:79,tocIndex:13},{value:"\u78C1\u76D8\u7A7A\u95F4\u5229\u7528\u975E\u5E38\u9AD8\u6548",paraId:80,tocIndex:13},{value:`
-\u4F7F\u7528 yarn \u5B89\u88C5\u4F9D\u8D56\u65F6\u7684 node_modules`,paraId:80,tocIndex:13},{value:"\u4F7F\u7528 pnpm \u5B89\u88C5\u4F9D\u8D56\u65F6\u7684 node_modules",paraId:81,tocIndex:13},{value:"pnpm \u5185\u90E8\u4F7F\u7528",paraId:82,tocIndex:13},{value:"\u57FA\u4E8E\u5185\u5BB9\u5BFB\u5740",paraId:82,tocIndex:13},{value:"\u7684\u6587\u4EF6\u7CFB\u7EDF\u6765\u5B58\u50A8\u78C1\u76D8\u4E0A\u6240\u6709\u7684\u6587\u4EF6\uFF0C\u8BE5\u6587\u4EF6\u7CFB\u7EDF\u51FA\u8272\u7684\u5730\u65B9\u5728\u4E8E",paraId:82,tocIndex:13},{value:"\u4E0D\u4F1A\u91CD\u590D\u5B89\u88C5\u540C\u4E00\u4E2A\u5305\u3002\u5728 npm/yarn \u4E2D\uFF0C\u6211\u4EEC\u6240\u6709\u7684\u9879\u76EE(10 \u4E2A)\u6709\u4F9D\u8D56\u4E86 dt-common\uFF0Cdt-common \u4F1A\u88AB\u5B89\u88C5 10 \u6B21\uFF0Cdt-common \u8FD9\u4E2A\u5305\u5728\u78C1\u76D8\u4E2D\u5C31\u4F1A\u6709 10 \u4E2A\u5730\u65B9\u5199\u5165\u8BE5\u4EE3\u7801\u3002\u4F46\u662F\u5728 pnpm \u4E2D\u53EA\u4F1A\u88AB\u5B89\u88C5\u4E00\u6B21\uFF0C\u78C1\u76D8\u4E2D\u53EA\u6709\u4E00\u4E2A\u5730\u65B9\u4F1A\u5199\u5165\uFF0C\u540E\u9762\u518D\u6B21\u4F7F\u7528\u90FD\u76F4\u63A5\u4F7F\u7528",paraId:83,tocIndex:13},{value:"\u786C\u8FDE\u63A5 hardlink",paraId:83,tocIndex:13},{value:"\u652F\u6301 monorepo",paraId:84,tocIndex:13},{value:"\u76F8\u5BF9\u5B89\u5168",paraId:85,tocIndex:13},{value:"\u5728 Linux \u4E2D\u6709\u4E24\u79CD\u94FE\u63A5\u65B9\u5F0F\uFF1A",paraId:86,tocIndex:14},{value:"\u786C\u8FDE\u63A5 hard link",paraId:87,tocIndex:14},{value:`\u8F6F\u94FE\u63A5 soft link\uFF0C\u53C8\u79F0\u4E3A\u7B26\u53F7\u94FE\u63A5 symbolic link
-\u4E0D\u8BBA\u662F\u786C\u94FE\u63A5\u6216\u8F6F\u94FE\u63A5\u90FD\u4E0D\u4F1A\u5C06\u539F\u672C\u7684\u6E90\u6587\u4EF6\u590D\u5236\u4E00\u4EFD\uFF0C\u53EA\u4F1A\u5360\u7528\u975E\u5E38\u5C11\u91CF\u7684\u78C1\u76D8\u7A7A\u95F4`,paraId:87,tocIndex:14},{value:"\u6BCF\u4E2A\u6587\u4EF6\u90FD\u6709",paraId:88,tocIndex:15},{value:"\u552F\u4E00\u4E00\u4E2A",paraId:88,tocIndex:15},{value:" inode\uFF0C\u5B83\u5305\u542B\u4E86\u6587\u4EF6\u5143\u4FE1\u606F\uFF0C\u5728\u8BBF\u95EE\u6587\u4EF6\u65F6\uFF0C\u5BF9\u5E94\u7684\u5143\u4FE1\u606F\u4F1A\u88AB copy \u5230\u5185\u5B58\u53BB\u5B9E\u73B0\u6587\u4EF6\u7684\u8BBF\u95EE",paraId:88,tocIndex:15},{value:`
-\u4F7F\u7528`,paraId:88,tocIndex:15},{value:"stat xxx",paraId:88,tocIndex:15},{value:"\u80FD\u591F\u67E5\u5230\u5BF9\u5E94\u7684 inode",paraId:88,tocIndex:15},{value:"\u786C\u94FE\u63A5\u53EF\u4EE5\u7406\u89E3\u6210\u4E3A\u4E00\u4E2A\u76F8\u4E92\u7684\u6307\u9488\uFF0C",paraId:89,tocIndex:16},{value:"\u521B\u5EFA\u7684 hardlink \u6307\u5411\u6E90\u6587\u4EF6\u7684 inode",paraId:89,tocIndex:16},{value:"\uFF0C\u7CFB\u7EDF\u5E76\u4E0D\u4E3A\u4F1A\u5176\u5206\u914D\u65B0\u7684 inode",paraId:89,tocIndex:16},{value:`
-\u786C\u94FE\u63A5\u4E0D\u7BA1\u6709\u591A\u5C11\u4E2A\uFF0C\u90FD\u4F1A\u6307\u5411\u7528\u4E00\u4E2A inode \u8282\u70B9\uFF0C\u8FD9\u7B49\u540C\u4E8E\u4FEE\u6539\u6E90\u6587\u4EF6\u6216\u8005\u94FE\u63A5\u6587\u4EF6\u65F6\u90FD\u4F1A\u88AB\u540C\u6B65\u4FEE\u6539(\u611F\u89C9\u548C JS \u5BF9\u8C61\u5F15\u7528\u5730\u5740\u7565\u5FAE\u76F8\u4F3C`,paraId:89,tocIndex:16},{value:`
-\u6BCF\u65B0\u5EFA\u4E00\u4E2A hardlink \u4F1A\u628A\u8282\u70B9\u8FDE\u63A5\u6570\u589E\u52A0\uFF0C\u53EA\u8981\u8282\u70B9\u7684\u94FE\u63A5\u6570\u975E\u96F6\uFF0C\u6587\u4EF6\u5C31\u4E00\u76F4\u5B58\u5728\uFF0C\u4E0D\u7BA1\u4F60\u5220\u9664\u7684\u662F\u6E90\u6587\u4EF6\u8FD8\u662F hradlink\u3002\u53EA\u8981\u6709\u4E00\u4E2A\u5B58\u5728\uFF0C\u6587\u4EF6\u5C31\u5B58\u5728`,paraId:89,tocIndex:16},{value:"\u8F6F\u94FE\u63A5\u53EF\u4EE5\u7406\u89E3\u4E3A\u5355\u5411\u6307\u9488\uFF0C",paraId:90,tocIndex:17},{value:"\u4E00\u4E2A\u72EC\u7ACB\u7684\u6587\u4EF6\u4E14\u62E5\u6709\u72EC\u7ACB\u7684 inode",paraId:90,tocIndex:17},{value:"\uFF0C\u6C38\u8FDC\u6307\u5411\u6E90\u6587\u4EF6",paraId:90,tocIndex:17},{value:`
-\u4FEE\u6539\u6E90\u6587\u4EF6\u5185\u5BB9\uFF0C\u8F6F\u94FE\u63A5\u5185\u5BB9\u4E5F\u4F1A\u6539\u53D8\u3002\u5F53\u5220\u9664\u6E90\u6587\u4EF6\u65F6\uFF0C\u8BBF\u95EE\u8F6F\u94FE\u63A5\u4F1A\u62A5\u9519`,paraId:90,tocIndex:17},{value:"No such file or directory",paraId:90,tocIndex:17},{value:"\u53EF\u4EE5\u4F7F\u7528",paraId:91,tocIndex:18},{value:"ln",paraId:91,tocIndex:18},{value:`\u547D\u4EE4\u5BF9\u6587\u4EF6\u548C\u76EE\u5F55\u5728\u53E6\u4E00\u4E2A\u4F4D\u7F6E\u5EFA\u7ACB\u4E00\u4E2A\u540C\u6B65\u7684\u94FE\u63A5
-\u8BED\u6CD5\uFF1A\xA0`,paraId:91,tocIndex:18},{value:"ln [\u53C2\u6570][\u6E90\u6587\u4EF6\u6216\u76EE\u5F55][\u76EE\u6807\u6587\u4EF6\u6216\u76EE\u5F55]",paraId:91,tocIndex:18},{value:"\u5728\u67D0\u4E2A\u9879\u76EE\u4E2D\u65B0\u5EFA\u4E24\u4E2A\u6587\u4EF6\u5939 one/two\uFF0C\u76EE\u5F55\u7ED3\u6784\u5982\u4E0B\uFF1A",paraId:92,tocIndex:18},{value:"one/index.js \u4E2D\u5185\u5BB9\u5982\u4E0B\uFF1A",paraId:93,tocIndex:18},{value:`const base64 = require('base64-js');
-console.log(base64);
-`,paraId:94,tocIndex:18},{value:"\u73B0\u5728\u8FD0\u884C\u5F53\u524D one/index.js \u4E00\u5B9A\u4F1A\u62A5\u9519\uFF0C\u56E0\u4E3A\u6211\u4EEC\u7684 one \u6587\u4EF6\u4E0B\u4E0D\u5B58\u5728 base64-js \u4F9D\u8D56",paraId:95,tocIndex:18},{value:`
-\u5206\u522B\u5728 two \u6587\u4EF6\u4E0B\u521B\u5EFA one/index.js \u7684\u786C\u94FE\u63A5/\u8F6F\u94FE\u63A5\u6587\u4EF6`,paraId:95,tocIndex:18},{value:"hard.js \u662F\u4E00\u4E2A\u786C\u94FE\u63A5\uFF0Csoft.js \u662F\u4E00\u4E2A\u8F6F\u94FE\u63A5",paraId:96,tocIndex:18},{value:`
-\u6211\u4EEC\u5206\u522B\u6267\u884C node hard.js/node soft.js`,paraId:96,tocIndex:18},{value:"\u53D1\u73B0\u786C\u94FE\u63A5\u662F\u53EF\u4EE5\u6B63\u5E38\u8FD0\u884C\u7684\uFF0C\u4F46\u662F\u8F6F\u94FE\u63A5\u4E0D\u884C\u3002\u8FD9\u662F\u56E0\u4E3A",paraId:97,tocIndex:18},{value:"\u786C\u94FE\u63A5\u4F1A\u4ECE\u94FE\u63A5\u5230\u7684\u4F4D\u7F6E\u5F00\u59CB\u67E5\u627E\u4F9D\u8D56\uFF0C\u800C\u8F6F\u94FE\u63A5\u4F1A\u4ECE\u6587\u4EF6\u539F\u59CB\u4F4D\u7F6E\u5F00\u59CB\u67E5\u627E\u4F9D\u8D56\u3002",paraId:97,tocIndex:18},{value:"\u4E0A\u8FF0\u7684\u4F8B\u5B50\u8BB2\u6E05\u695A\u4E86 node \u5904\u7406\u8F6F\u786C\u94FE\u63A5\u7684\u4E0D\u540C\u4E4B\u5904\uFF0C\u90A3\u6211\u4EEC\u5C06 two/node_modules \u8F6F\u94FE\u63A5\u5230 one \u7684\u76EE\u5F55\u4E0B\uFF0Cone/index.js \u548C two/soft.js \u80FD\u5426\u6B63\u5E38\u8FD0\u884C\u5462 \u{1F914}",paraId:98,tocIndex:19},{value:`ln -s  ../two/node_modules ./one
-`,paraId:99,tocIndex:19},{value:"\u5BF9\u5E94\u6267\u884C one/index.js \u548C two/soft.js\u3002\u54C7\u54E6\uFF0Cwork well",paraId:100,tocIndex:19},{value:"\u901A\u8FC7\u4E0A\u9762\u7684\u793A\u4F8B\uFF0C\u6211\u4EEC\u53D1\u73B0\u5373\u4F7F\u5F53\u524D node_modules \u662F\u4E00\u4E2A\u8F6F\u94FE\u63A5\u4E5F\u80FD\u591F\u4F5C\u4E3A\u4F9D\u8D56\u88AB\u67E5\u627E\u5230\uFF0C\u8BF4\u660E",paraId:101,tocIndex:19},{value:"\u8F6F\u94FE\u53EF\u4EE5\u5C06\u5176\u4ED6\u5730\u65B9\u7684\u76EE\u5F55\u589E\u52A0\u5230\u4F9D\u8D56\u67E5\u627E\u8DEF\u5F84\u4E2D\u3002",paraId:101,tocIndex:19},{value:`{
-  "name": "npm-test",
-  "dependencies": {
-    "buffer": "^5.4.3"
-  }
-}
-`,paraId:102,tocIndex:20},{value:"\u5728\u6211\u4EEC\u7684 npm-test \u9879\u76EE\u4E2D\u6267\u884C",paraId:103,tocIndex:20},{value:"pnpm i",paraId:103,tocIndex:20},{value:"\u63A7\u5236\u53F0\u4F1A\u6709\u5982\u4E0B\u8F93\u51FA\uFF1A",paraId:103,tocIndex:20},{value:"\u80FD\u591F\u53D1\u73B0\u5728 Progress \u4E2D\uFF0C\u80FD\u591F\u660E\u786E\u6709\u591A\u5C11\u5305\u88AB\u590D\u7528\u548C\u91CD\u65B0\u4E0B\u8F7D\u4E86\u591A\u5C11\u5305",paraId:104,tocIndex:20},{value:`
-\u5E76\u4E14\u5F53\u6211\u4EEC\u8FD0\u884C`,paraId:104,tocIndex:20},{value:"pnpm\xA0install",paraId:104,tocIndex:20},{value:"\u8FDB\u884C node_modules \u5B89\u88C5\u7684\u65F6\u5019\uFF0C\u4F1A\u4F7F\u7528",paraId:104,tocIndex:20},{value:"\u8F6F\u94FE\u63A5 & \u786C\u94FE\u63A5",paraId:104,tocIndex:20},{value:"\u7684\u65B9\u5F0F\u6765\u8282\u7701\u78C1\u76D8\u7A7A\u95F4 & \u63D0\u5347\u5B89\u88C5\u6548\u7387",paraId:104,tocIndex:20},{value:"\u4E0A\u8FF0\u5B89\u88C5\u5F97\u5230\u5982\u56FE\u7684 node_modules\uFF1A.pnpm \u6587\u4EF6 & package.json \u63CF\u8FF0\u7684\u5176\u4ED6\u6587\u4EF6",paraId:105,tocIndex:21},{value:".pnpm \u76EE\u5F55\uFF1A\u5B58\u653E\u4E86\u6240\u6709\u5B9E\u9645\u5B89\u88C5\u7684\u5305\uFF0C\u5B83\u91CC\u9762\u5168\u90E8\u90FD\u662F\u6211\u4EEC\u9879\u76EE\u6240\u9700\u8981\u7684\u4F9D\u8D56\uFF0C",paraId:106,tocIndex:21},{value:"\u552F\u4E00\u4E0D\u540C\u7684\u5B83\u4EEC\u662F\u6765\u81EA store \u76EE\u5F55\u7684\u786C\u94FE\u63A5",paraId:106,tocIndex:21},{value:"\u5176\u4ED6\u6587\u4EF6\uFF1Apackage.json \u4E2D\u58F0\u660E\u7684\u5305\uFF0C",paraId:106,tocIndex:21},{value:"\u53EA\u662F\u751F\u6210\u4E00\u4E2A\u8F6F\u94FE\u63A5\uFF0C\u5B9E\u9645\u6307\u5411.pnpm \u4E2D\u5B89\u88C5\u7684\u5305",paraId:106,tocIndex:21},{value:`
-\u56E0\u4E3A\u6211\u4EEC\u53EA\u4F9D\u8D56\u9879\u4E2D\u76F4\u5B9A\u4E49\u4E86`,paraId:106,tocIndex:21},{value:"buffer",paraId:106,tocIndex:21},{value:"\uFF0C\u6240\u4EE5\u5B83\u662F\u552F\u4E00\u4E00\u4E2A\u4F60\u7684\u5E94\u7528\u5FC5\u987B\u62E5\u6709\u8BBF\u95EE\u6743\u9650\u7684\u5305(\u60F3\u4E86\u89E3\u4E3A\u4EC0\u4E48\u8981\u5BF9\u4F9D\u8D56\u9879\u505A\u4E25\u683C\u63A7\u5236\uFF0C",paraId:106,tocIndex:21},{value:"\u70B9\u51FB\u67E5\u770B",paraId:106,tocIndex:21},{value:")",paraId:106,tocIndex:21},{value:`
-pnpm \u8FD9\u79CD\u4F9D\u8D56\u7BA1\u7406\u7684\u65B9\u5F0F\u4E5F\u5F88\u5DE7\u5999\u5730\u89C4\u907F\u4E86`,paraId:106,tocIndex:21},{value:"\u975E\u6CD5\u8BBF\u95EE\u4F9D\u8D56",paraId:106,tocIndex:21},{value:"\u7684\u95EE\u9898\uFF0C\u4E5F\u5C31\u662F\u53EA\u8981\u4E00\u4E2A\u5305\u672A\u5728 package.json \u4E2D\u58F0\u660E\u4F9D\u8D56\uFF0C\u90A3\u4E48\u5728\u9879\u76EE\u4E2D\u662F\u65E0\u6CD5\u8BBF\u95EE\u7684",paraId:106,tocIndex:21},{value:`
-\u4F46\u662F\u5728 yarn/npm \u4E2D\u56E0\u4E3A\u5B58\u5728\u4F9D\u8D56\u63D0\u5347\u95EE\u9898\uFF0Cbuffer \u4F9D\u8D56 base64-js\uFF0C\u56E0\u6B64 node_modules \u4E2D\u5B58\u5728 base64-js \u7684\u5305\uFF0C\u6211\u4EEC\u5728\u9879\u76EE\u4E2D\u53EF\u4EE5\u76F4\u63A5\u5F15\u7528\u3002\u8FD9\u5C31\u662F\u4E3A\u4EC0\u4E48 pnpm \u7684\u5305\u7BA1\u7406\u66F4\u4E3A\u5B89\u5168\u7684\u539F\u56E0`,paraId:106,tocIndex:21},{value:"\u90A3 buffer \u76EE\u5F55\u4E0B\u90FD\u6709\u4E9B\u5565\u5462\uFF1F\u53D1\u73B0 buffer \u4E0B\u6839\u672C\u6CA1\u6709 node_modules\uFF0C\u5B83\u7684\u4F9D\u8D56\u9879\u90FD\u653E\u5728\u54EA\u91CC\u4E86\uFF1F\u76EE\u5F55\u7ED3\u6784\u7B2C\u4E00\u4E2A\u8BC0\u7A8D\uFF0C",paraId:107,tocIndex:21},{value:"buffer \u662F\u4E00\u4E2A\u8F6F\u94FE\u63A5\uFF0C\u5728 node \u89E3\u6790\u4F9D\u8D56\u7684\u65F6\u5019\uFF0C\u5B83\u4F7F\u7528\u8FD9\u4E9B\u4F9D\u8D56\u7684\u771F\u5B9E\u4F4D\u7F6E\uFF0C\u56E0\u6B64\u5728 buffer \u4E0B\u4E0D\u7528\u4FDD\u7559\u4F9D\u8D56",paraId:107,tocIndex:21},{value:"\u3002",paraId:107,tocIndex:21},{value:"\u90A3\u4F60\u53C8\u4F1A\u95EE buffer \u7684\u771F\u5B9E\u5730\u5740\u5728\u54EA\u91CC?\u{1F9D0}",paraId:108,tocIndex:21},{value:`
-\u56AF\uFF0C\u771F\u5B9E\u5730\u5740\u5728\u8FD9\u91CC: `,paraId:108,tocIndex:21},{value:"node_modules/.pnpm/buffer@ 5.7.1/node_modules/buffer",paraId:108,tocIndex:21},{value:`
-\u6240\u4EE5\u6211\u4EEC\u73B0\u5728\u77E5\u9053\u4E86`,paraId:108,tocIndex:21},{value:".pnpm/",paraId:108,tocIndex:21},{value:"\u6587\u4EF6\u5939\u7684\u7528\u9014\u3002",paraId:108,tocIndex:21},{value:".pnpm/",paraId:108,tocIndex:21},{value:"\u4EE5\u5E73\u94FA\u7684\u5F62\u5F0F\u50A8\u5B58\u7740\u6240\u6709\u7684\u5305\uFF0C\u6240\u4EE5\u6BCF\u4E2A\u5305\u90FD\u53EF\u4EE5\u5728\u8FD9\u79CD\u547D\u540D\u6A21\u5F0F\u7684\u6587\u4EF6\u5939\u4E2D\u88AB\u627E\u5230\uFF1A",paraId:108,tocIndex:21},{value:"node_modules/.pnpm/<name>@ <version>/node_modules/<name>",paraId:108,tocIndex:21},{value:"\u4F7F\u7528\u8FD9\u79CD\u5E73\u94FA\u7684\u7ED3\u6784\u907F\u514D npm2 \u5D4C\u5957\u7ED3\u6784\u5F15\u8D77\u7684\u957F\u8DEF\u5F84\u95EE\u9898\uFF0C\u548C npm3/yarn \u7684\u6241\u5E73\u5316\u7ED3\u6784\u4E0D\u540C\u7684\u662F\u5B83\u4FDD\u7559\u4E86\u5305\u4E4B\u95F4\u7684\u76F8\u4E92\u9694\u79BB",paraId:109,tocIndex:21},{value:`
-\u70B9\u5F00 buffer \u7684\u771F\u5B9E\u5730\u5740\uFF0C\u518D\u4E00\u6B21\u53D1\u73B0\u81EA\u5DF1\u53C8\u88AB\u9A97\u4E86\uFF0C\u771F\u5B9E\u5730\u5740\u4E0B\u9762\u8FD8\u662F\u6CA1\u6709 node_modules`,paraId:109,tocIndex:21},{value:"\u76EE\u5F55\u7ED3\u6784\u7B2C\u4E8C\u4E2A\u8BC0\u7A8D\u6765\u4E86\uFF0C",paraId:110,tocIndex:21},{value:"\u5305\u7684\u4F9D\u8D56\u9879\u4E0E\u4F9D\u8D56\u5305\u7684\u5B9E\u9645\u4F4D\u7F6E\u4F4D\u4E8E\u540C\u4E00\u76EE\u5F55\u7EA7\u522B",paraId:110,tocIndex:21},{value:"\uFF0Cbuffer \u7684\u4F9D\u8D56\u4E0D\u5728",paraId:110,tocIndex:21},{value:".pnpm/buffer@ 5.7.1/node_modules/buffer/node_modules",paraId:110,tocIndex:21},{value:"\uFF0C\u800C\u662F\u5728",paraId:110,tocIndex:21},{value:".pnpm/buffer@ 5.7.1/node_modules/",paraId:110,tocIndex:21},{value:"\u3002buffer \u7684\u6240\u6709\u4F9D\u8D56\u90FD\u88AB\u8F6F\u94FE\u63A5\u5230\u4E86",paraId:110,tocIndex:21},{value:"node_modules/.pnpm",paraId:110,tocIndex:21},{value:"\u7684\u5BF9\u5E94\u76EE\u5F55",paraId:110,tocIndex:21},{value:`
-\u5230\u4E86\u8FD9\u91CC\u4F60\u53EF\u80FD\u4F1A\u95EE\uFF0C\u4E3A\u4EC0\u4E48\u8981\u628A\u5B50\u4F9D\u8D56\u653E\u5728\u7EDF\u4E00\u5C42\u7EA7 \u{1F914}`,paraId:110,tocIndex:21},{value:"\u5047\u5982\u6211\u4EEC\u6709\u4E24\u4E2A\u5305\uFF0Cfoo \u548C bar \u76F8\u4E92\u4F9D\u8D56\uFF0C\u4F7F\u7528\u540C\u4E00\u5C42\u7EA7\u5B89\u88C5\u7684\u76EE\u5F55\u5982\u4E0B\uFF0C\u8FD9\u65F6 foo \u548C bar \u7684\u8F6F\u94FE\u63A5\u4E0D\u662F\u4E00\u4E2A\u5FAA\u73AF",paraId:111,tocIndex:21},{value:`.pnpm
-  bar@1.0.0
-    node_modules
-      bar
-      foo --> ../../foo@1.0.0/node_modules/foo
-  foo@1.0.0
-    node_modules
-      foo
-      bar --> ../../bar@1.0.0/node_modules/bar
-`,paraId:112,tocIndex:21},{value:"\u5047\u8BBE bar/foo \u7684\u4F9D\u8D56\u653E\u5728\u5B83\u7684\u5B50\u6587\u4EF6\u4E2D\uFF0C\u5982\u4E0B\uFF0C\u8FD9\u65F6 foo/bar \u7684\u8F6F\u94FE\u63A5\u5C31\u662F\u4E00\u4E2A\u5FAA\u73AF",paraId:113,tocIndex:21},{value:`.pnpm
-  bar@1.0.0
-    node_modules
-      bar
-        node_modules
-          foo --> ../../foo@1.0.0/node_modules/foo
-  foo@1.0.0
-    node_modules
-      foo
-        node_modules
-          bar --> ../../bar@1.0.0/node_modules/bar
-`,paraId:114,tocIndex:21},{value:"buffer \u4E2D\u6709 base64/ieee754 \u4E24\u4E2A\u5305\uFF0C\u5047\u8BBE\u5728 base64 \u7684 dependencies \u6CA1\u6709\u58F0\u660E ieee754\uFF0C\u90A3\u6211\u4EEC\u5728 base64/index \u4F7F\u7528",paraId:115,tocIndex:22},{value:"requie('ieee754')",paraId:115,tocIndex:22},{value:"\u65F6\uFF0C\u4ED6\u5C31\u662F\u4E00\u4E2A\u5E7D\u7075\u4F9D\u8D56\u3002\u4F1A\u5148\u5BFB\u627E base64 \u4E0A\u7EA7\u7684 node_modules\uFF0C\u82E5\u627E\u5230\u76F4\u63A5\u4F7F\u7528\uFF1B\u5426\u5219\u76F4\u63A5\u5F80\u4E0A\u7EA7\u5BFB\u627E node_modules\uFF0C\u5982\u679C\u4E0A\u7EA7\u4E5F\u6CA1\u6709\u7684\u8BDD\uFF0C\u5F53\u524D\u7684\u4F7F\u7528\u5C31\u4F1A\u6709\u95EE\u9898",paraId:115,tocIndex:22},{value:"\u6240\u4EE5 pnpm \u4F1A\u5C06\u6240\u6709\u7684\u4F9D\u8D56\u90FD\u63D0\u5347\u5230.pnpm/node_modules \u4E0B\uFF0C\u4FDD\u8BC1\u5E7D\u7075\u4F9D\u8D56\u53EF\u4EE5\u88AB\u627E\u5230\uFF0C\u4F5C\u4E3A\u515C\u5E95\u65B9\u6848",paraId:116,tocIndex:22},{value:"discussions",paraId:116,tocIndex:22},{value:"\u5728\u4F7F\u7528 pnpm \u5B89\u88C5\u65F6\uFF0Cpnpm \u4F1A\u5C06\u4F9D\u8D56\u5B58\u50A8\u5728",paraId:117,tocIndex:23},{value:"~/.pnpm-store/v3",paraId:117,tocIndex:23},{value:"\u76EE\u5F55\u4E0B\u3002\u5728\u540C\u4E00\u53F0\u7535\u8111\u4E0B\uFF0C\u4E0B\u4E00\u6B21\u5B89\u88C5\u7684\u65F6\u5019 pnpm \u4F1A\u5148\u68C0\u67E5 store \u76EE\u5F55\uFF0C\u5982\u679C\u6709\u627E\u5230\u6240\u9700\u7684\u4F9D\u8D56\uFF0C\u5219\u4F1A\u901A\u8FC7\u786C\u94FE\u63A5\u653E\u5230\u6211\u4EEC\u7684\u9879\u76EE\u4E2D\u53BB\uFF0C\u800C\u4E0D\u662F\u91CD\u65B0\u5B89\u88C5\u4F9D\u8D56",paraId:117,tocIndex:23},{value:`
-\u56E0\u4E3A pnpm \u5B89\u88C5\u4F9D\u8D56\u65F6\u4F1A\u5C06\u4F9D\u8D56\u5B58\u50A8\u5728 store \u76EE\u5F55\u4E0B\uFF0C`,paraId:117,tocIndex:23},{value:"\u8BE5\u76EE\u5F55\u80FD\u591F\u4F7F\u4E0D\u540C\u7684\u9879\u76EE\u4E4B\u95F4\u5171\u4EAB\u4F9D\u8D56",paraId:117,tocIndex:23},{value:"\u3002\u4F8B\u5982 dt-data-api \u9879\u76EE\u4E2D\u4E2D\u5B89\u88C5\u4E86 dt-common/dt-react-component \u7B49\u4F9D\u8D56\uFF0C\u5F53\u6211\u4EEC\u5728 dt-easy-index \u9879\u76EE\u4E2D\u4E5F\u7528\u4E86\u8BE5\u4E24\u4E2A\u4F9D\u8D56\u65F6\uFF0C\u4F1A\u91CD\u590D\u4F7F\u7528 store \u4E0B\u7684\u4F9D\u8D56\u3002\u800C yarn/npm \u6BCF\u6B21\u90FD\u4F1A\u91CD\u65B0\u5B89\u88C5\u4F9D\u8D56",paraId:117,tocIndex:23},{value:"\u{1F914} \u90A3\u4E48\u95EE\u9898\u6765\u4E86\uFF0C\u4E3A\u4EC0\u4E48\u5728\u8FD9\u91CC\u8981\u4F7F\u7528\u786C\u94FE\u63A5\uFF0C\u800C\u4E0D\u662F\u76F4\u63A5\u521B\u5EFA\u5230\u5168\u5C40\u5B58\u50A8\u7684\u7B26\u53F7\u94FE\u63A5",paraId:118,tocIndex:23},{value:`
-\u901A\u8FC7\u4E0A\u6587\u6211\u4EEC\u77E5\u9053 node \u5BF9\u8F6F\u786C\u94FE\u63A5\u67E5\u8BE2\u4F4D\u7F6E\u7684\u5904\u7406\u4E0D\u540C\u3002\u5047\u8BBE\u6211\u4EEC\u6709\u5982\u4E0B\u7684\u4E24\u4E2A\u9879\u76EE\uFF1A`,paraId:118,tocIndex:23},{value:"foo",paraId:119,tocIndex:23},{value:`"react": "16.8.0",
-"dt-react-component": "1.0.0"
-`,paraId:120,tocIndex:23},{value:"bar",paraId:121,tocIndex:23},{value:`"react": "17.0.0",
-"dt-react-component": "1.0.0"
-`,paraId:122,tocIndex:23},{value:"\u5728",paraId:123,tocIndex:23},{value:"dt-react-component",paraId:123,tocIndex:23},{value:"\u91CC\u9762\uFF0C\u4F1A\u4F7F\u7528",paraId:123,tocIndex:23},{value:"import React from 'react'",paraId:123,tocIndex:23},{value:"\uFF0C\u5047\u8BBE",paraId:123,tocIndex:23},{value:"foo/node_modules/dt-react-component",paraId:123,tocIndex:23},{value:"\u548C",paraId:123,tocIndex:23},{value:"bar/node_modules/dt-react-component",paraId:123,tocIndex:23},{value:"\u90FD\u4F7F\u7528\u8F6F\u94FE\u63A5\u5230",paraId:123,tocIndex:23},{value:"./pnpm-store/v3",paraId:123,tocIndex:23},{value:"\uFF0C\u90A3\u4ED6\u4EEC\u90FD\u4F1A\u4F7F\u7528\u540C\u4E00\u4E2A\u7248\u672C\u7684 react\uFF0C\u8FD9\u4E0D\u662F\u6211\u4EEC\u6240\u671F\u671B\u7684\u3002\u6240\u4EE5\u4F7F\u7528\u786C\u94FE\u63A5\uFF0C\u5728",paraId:123,tocIndex:23},{value:"dt-react-component",paraId:123,tocIndex:23},{value:"\u4E2D\u5728\u4F7F\u7528",paraId:123,tocIndex:23},{value:"import React from 'react'",paraId:123,tocIndex:23},{value:"\u65F6\uFF0C\u4F1A\u6839\u636E\u5F53\u524D\u7684\u4F4D\u7F6E\u53BB\u5BFB\u627E\u4F9D\u8D56\uFF0C\u8FD9\u6837\u4F7F\u5F97 foo \u548C bar \u53EF\u4EE5\u4F9D\u8D56\u4E0D\u540C\u7684 react \u7684\u7248\u672C",paraId:123,tocIndex:23},{value:"\u53C2\u8003\u94FE\u63A5",paraId:12},{value:"npm \u4F9D\u8D56\u7BA1\u7406\u4E2D\u88AB\u5FFD\u7565\u7684\u90A3\u4E9B\u7EC6\u8282",paraId:124,tocIndex:24},{value:"\u5256\u6790 npm \u7684\u5305\u7BA1\u7406\u673A\u5236",paraId:124,tocIndex:24},{value:"npm \u5DE5\u4F5C\u673A\u5236",paraId:124,tocIndex:24},{value:"npm -- install \u5B89\u88C5\u6D41\u7A0B",paraId:124,tocIndex:24},{value:"yarn install \u5DE5\u4F5C\u6D41\u7A0B\u89E3\u6790",paraId:124,tocIndex:24},{value:"\u5B9E\u8DF5\uFF1Apnpm \u89E3\u51B3\u4E86\u6211\u7684\u54EA\u4E9B\u75DB\u70B9\uFF1F",paraId:124,tocIndex:24},{value:"\u5173\u4E8E\u73B0\u4EE3\u5305\u7BA1\u7406\u5668\u7684\u6DF1\u5EA6\u601D\u8003\u2014\u2014\u4E3A\u4EC0\u4E48\u73B0\u5728\u6211\u66F4\u63A8\u8350 pnpm \u800C\u4E0D\u662F npm/yarn?",paraId:124,tocIndex:24},{value:"\u8F6F\u94FE\u63A5&\u786C\u94FE\u63A5\u5728\u524D\u7AEF\u4E2D\u7684\u5E94\u7528",paraId:124,tocIndex:24}]},12062:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(49222);const a=[{value:"\u5728",paraId:0,tocIndex:0},{value:"\u524D\u4E00\u7BC7\u6587\u7AE0",paraId:1,tocIndex:0},{value:"\u4E2D\uFF0C\u4E3B\u8981\u8BB2\u89E3\u4E86\u5229\u7528 ",paraId:0,tocIndex:0},{value:"git hooks",paraId:0,tocIndex:0},{value:" \u505A\u4E00\u4E9B ",paraId:0,tocIndex:0},{value:"pre-commit",paraId:0,tocIndex:0},{value:" \u4EE3\u7801\u68C0\u67E5\u7684\u5DE5\u4F5C\uFF0C\u4E3B\u8981\u662F\u4E3A\u4E86\u63D0\u4EA4\u5230\u4ED3\u5E93\u7684\u4EE3\u7801\u4FDD\u6301\u7EDF\u4E00\u7684\u98CE\u683C\uFF0C\u56E0\u6B64\u91C7\u7528 ",paraId:0,tocIndex:0},{value:"git-hooks",paraId:0,tocIndex:0},{value:" \u6765\u505A\u68C0\u67E5\u3002",paraId:0,tocIndex:0},{value:"\u5728\u6211\u4EEC\u63D0\u4EA4 ",paraId:2,tocIndex:0},{value:"commit",paraId:2,tocIndex:0},{value:" \u4FE1\u606F\u7684\u65F6\u5019\uFF0C\u6211\u4EEC\u8FD8\u9700\u8981\u5199 commit msg\uFF0C\u5BF9\u4E8E msg \u6765\u8BF4\uFF0C\u6211\u4EEC\u4E5F\u60F3\u4FDD\u6301\u4E00\u79CD\u683C\u5F0F\uFF0C\u89C4\u5B9A\u597D\u6BCF\u4E00\u4E2A\u53D8\u66F4\u7684\u683C\u5F0F\u4E0E\u5185\u5BB9\u3002",paraId:2,tocIndex:0},{value:"\u90A3\u4E48\u5C31\u9700\u8981\u5F15\u5165 ",paraId:3,tocIndex:0},{value:"commitlint/commitizen",paraId:3,tocIndex:0},{value:" \u7B49\u5DE5\u5177\u6765\u5B8C\u5584\u8BE5\u529F\u80FD\u3002",paraId:3,tocIndex:0},{value:"\u6267\u884C ",paraId:4,tocIndex:2},{value:"git commit -m \u201Dxxxx\u201D",paraId:4,tocIndex:2},{value:" \u7684\u65F6\u5019\uFF0C\u7528\u6765\u68C0\u67E5 xxx \u662F\u5426\u7B26\u5408\u56FA\u5B9A\u683C\u5F0F\u7684",paraId:4,tocIndex:2},{value:"\u57FA\u4E8E Node.js \u7684 ",paraId:5,tocIndex:3},{value:"git commit",paraId:5,tocIndex:3},{value:" \u547D\u4EE4\u884C\u5DE5\u5177\uFF0C\u8F85\u52A9\u751F\u6210\u6807\u51C6\u7684 ",paraId:5,tocIndex:3},{value:"commit message",paraId:5,tocIndex:3},{value:"\uFF0C\u5177\u4F53\u7684\u64CD\u4F5C\u4F1A\u4EA4\u7ED9\u9002\u914D\u5668\u505A",paraId:5,tocIndex:3},{value:"commitizen",paraId:6,tocIndex:4},{value:" \u547D\u4EE4\u884C\u5DE5\u5177\u7684\u4EA4\u4E92\u65B9\u5F0F\u63D2\u4EF6\u3002\u4F8B\u5982 ",paraId:6,tocIndex:4},{value:"cz-emoji",paraId:6,tocIndex:4},{value:"\u3001",paraId:6,tocIndex:4},{value:"cz-emoji-chinese",paraId:6,tocIndex:4},{value:"\u3001",paraId:6,tocIndex:4},{value:"cz-conventional-changelog",paraId:6,tocIndex:4},{value:" \u7B49\u7B49",paraId:6,tocIndex:4},{value:"\u5168\u5C40\u5B89\u88C5 commitizen\uFF0C\u8FD9\u6837\u5B50\u5C31\u80FD\u591F\u5168\u5C40\u4F7F\u7528 ",paraId:7,tocIndex:6},{value:"cz/git-cz/git cz",paraId:7,tocIndex:6},{value:" \u7B49\u547D\u4EE4\u4E86",paraId:7,tocIndex:6},{value:`pnpm install -g commitizen
+`,paraId:45,tocIndex:9},{value:"Intl MessageFormat",paraId:46,tocIndex:10},{value:"\u662F\u4E00\u4E2A\u529F\u80FD\u5F3A\u5927\u4E14\u6210\u719F\u7684\u56FD\u9645\u5316\u5DE5\u5177\u3002\u901A\u8FC7\u7ED3\u5408",paraId:46,tocIndex:10},{value:"ICU",paraId:46,tocIndex:10},{value:"\u4FE1\u606F\u8BED\u6CD5\u548C JS \u7684",paraId:46,tocIndex:10},{value:"Intl API",paraId:46,tocIndex:10},{value:"\uFF0C\u5B83\u80FD\u591F\u4E3A\u591A\u8BED\u8A00\u5E94\u7528\u63D0\u4F9B\u9AD8\u6548\u3001\u7075\u6D3B\u7684\u6D88\u606F\u683C\u5F0F\u5316\u89E3\u51B3\u65B9\u6848",paraId:46,tocIndex:10}]},12062:function(t,n,e){e.r(n),e.d(n,{texts:function(){return a}});var r=e(49222);const a=[{value:"\u5728",paraId:0,tocIndex:0},{value:"\u524D\u4E00\u7BC7\u6587\u7AE0",paraId:1,tocIndex:0},{value:"\u4E2D\uFF0C\u4E3B\u8981\u8BB2\u89E3\u4E86\u5229\u7528 ",paraId:0,tocIndex:0},{value:"git hooks",paraId:0,tocIndex:0},{value:" \u505A\u4E00\u4E9B ",paraId:0,tocIndex:0},{value:"pre-commit",paraId:0,tocIndex:0},{value:" \u4EE3\u7801\u68C0\u67E5\u7684\u5DE5\u4F5C\uFF0C\u4E3B\u8981\u662F\u4E3A\u4E86\u63D0\u4EA4\u5230\u4ED3\u5E93\u7684\u4EE3\u7801\u4FDD\u6301\u7EDF\u4E00\u7684\u98CE\u683C\uFF0C\u56E0\u6B64\u91C7\u7528 ",paraId:0,tocIndex:0},{value:"git-hooks",paraId:0,tocIndex:0},{value:" \u6765\u505A\u68C0\u67E5\u3002",paraId:0,tocIndex:0},{value:"\u5728\u6211\u4EEC\u63D0\u4EA4 ",paraId:2,tocIndex:0},{value:"commit",paraId:2,tocIndex:0},{value:" \u4FE1\u606F\u7684\u65F6\u5019\uFF0C\u6211\u4EEC\u8FD8\u9700\u8981\u5199 commit msg\uFF0C\u5BF9\u4E8E msg \u6765\u8BF4\uFF0C\u6211\u4EEC\u4E5F\u60F3\u4FDD\u6301\u4E00\u79CD\u683C\u5F0F\uFF0C\u89C4\u5B9A\u597D\u6BCF\u4E00\u4E2A\u53D8\u66F4\u7684\u683C\u5F0F\u4E0E\u5185\u5BB9\u3002",paraId:2,tocIndex:0},{value:"\u90A3\u4E48\u5C31\u9700\u8981\u5F15\u5165 ",paraId:3,tocIndex:0},{value:"commitlint/commitizen",paraId:3,tocIndex:0},{value:" \u7B49\u5DE5\u5177\u6765\u5B8C\u5584\u8BE5\u529F\u80FD\u3002",paraId:3,tocIndex:0},{value:"\u6267\u884C ",paraId:4,tocIndex:2},{value:"git commit -m \u201Dxxxx\u201D",paraId:4,tocIndex:2},{value:" \u7684\u65F6\u5019\uFF0C\u7528\u6765\u68C0\u67E5 xxx \u662F\u5426\u7B26\u5408\u56FA\u5B9A\u683C\u5F0F\u7684",paraId:4,tocIndex:2},{value:"\u57FA\u4E8E Node.js \u7684 ",paraId:5,tocIndex:3},{value:"git commit",paraId:5,tocIndex:3},{value:" \u547D\u4EE4\u884C\u5DE5\u5177\uFF0C\u8F85\u52A9\u751F\u6210\u6807\u51C6\u7684 ",paraId:5,tocIndex:3},{value:"commit message",paraId:5,tocIndex:3},{value:"\uFF0C\u5177\u4F53\u7684\u64CD\u4F5C\u4F1A\u4EA4\u7ED9\u9002\u914D\u5668\u505A",paraId:5,tocIndex:3},{value:"commitizen",paraId:6,tocIndex:4},{value:" \u547D\u4EE4\u884C\u5DE5\u5177\u7684\u4EA4\u4E92\u65B9\u5F0F\u63D2\u4EF6\u3002\u4F8B\u5982 ",paraId:6,tocIndex:4},{value:"cz-emoji",paraId:6,tocIndex:4},{value:"\u3001",paraId:6,tocIndex:4},{value:"cz-emoji-chinese",paraId:6,tocIndex:4},{value:"\u3001",paraId:6,tocIndex:4},{value:"cz-conventional-changelog",paraId:6,tocIndex:4},{value:" \u7B49\u7B49",paraId:6,tocIndex:4},{value:"\u5168\u5C40\u5B89\u88C5 commitizen\uFF0C\u8FD9\u6837\u5B50\u5C31\u80FD\u591F\u5168\u5C40\u4F7F\u7528 ",paraId:7,tocIndex:6},{value:"cz/git-cz/git cz",paraId:7,tocIndex:6},{value:" \u7B49\u547D\u4EE4\u4E86",paraId:7,tocIndex:6},{value:`pnpm install -g commitizen
 `,paraId:8,tocIndex:6},{value:"\u5B89\u88C5 ",paraId:9,tocIndex:7},{value:"commitizen",paraId:9,tocIndex:7},{value:" \u5BF9\u5E94\u7684\u9002\u914D\u5668\uFF0C\u76EE\u524D\u6211\u4EEC\u9009\u62E9 ",paraId:9,tocIndex:7},{value:"cz-git",paraId:9,tocIndex:7},{value:`pnpm install -D cz-git
 `,paraId:10,tocIndex:7},{value:"\u5728 ",paraId:11,tocIndex:7},{value:"packsge.json",paraId:11,tocIndex:7},{value:" \u4E2D\u6DFB\u52A0\u5BF9\u4E8E ",paraId:11,tocIndex:7},{value:"commitizen",paraId:11,tocIndex:7},{value:" \u7684\u914D\u7F6E",paraId:11,tocIndex:7},{value:`{
   "config": {
