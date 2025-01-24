@@ -6,6 +6,7 @@
     "start": "npm run dev",
     "dev": "dumi dev",
     "build": "dumi build",
+    "preview": "dumi preview",
     "prepare": "husky install && dumi setup",
     "deploy": "dumi build && gh-pages -d dist"
   },
@@ -25,7 +26,8 @@
     "@commitlint/cli": "^16.2.1",
     "@commitlint/config-conventional": "^16.2.1",
     "@commitlint/cz-commitlint": "^16.2.1",
-    "dumi": "^2.2.0",
+    "dumi": "^2.4.13",
+    "dumi-theme-antd-style": "^0.31.1",
     "gh-pages": "^5.0.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",

@@ -1,4 +1,4 @@
-# FBB◦Blog
+#
 
 A static site base on [dumi](https://d.umijs.org).
 
@@ -13,6 +13,9 @@ $ pnpm start
 
 # build docs
 $ pnpm run build
+
+# Locally preview the production build
+$ pnpm run preview
 ```
 
 ## LICENSE
