@@ -9,6 +9,7 @@ export default defineConfig({
     },
     logo: '/blog/logo.png',
     nav: [
+      { link: '/base', title: '🧸 前端基础' },
       { link: '/react', title: '🤡 React' },
       { link: '/node', title: '🍟 Node' },
       { link: '/engineering', title: '🤺 工程化' },

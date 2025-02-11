@@ -6,7 +6,16 @@ module.exports = {
     'scope-enum': [
       2,
       'always',
-      ['AI', 'React', 'Node', 'Engineering', 'DataStructure', 'Others', 'Base'],
+      [
+        'AI',
+        'Front',
+        'React',
+        'Node',
+        'Engineering',
+        'DataStructure',
+        'Others',
+        'Base',
+      ],
     ],
   },
 };

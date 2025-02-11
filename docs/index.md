@@ -7,6 +7,9 @@ hero:
     - text: 快速开始
       link: /react
 features:
+  - title: 前端基础
+    description: JS/TS相关内容
+    link: /base
   - title: React
     description: React 相关内容
     link: /react

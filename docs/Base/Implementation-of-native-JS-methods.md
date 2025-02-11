@@ -1,8 +1,8 @@
 ---
 title: 原生 JS 方法的实现
 group:
-  title: 基础
-  order: 4
+  title: JS 基础
+  order: 1
 order: 0
 ---
 
