@@ -1,5 +1,5 @@
 ---
-title: pnpm 是如何吊打 npm/yarn 的
+title: pnpm 是为何吊打 npm/yarn 的
 group:
   title: 包管理
   order: 4

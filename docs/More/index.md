@@ -19,7 +19,3 @@ order: 0
 ### 编码
 
 - [Base64 产生的思考](/more/thoughts-from-base64)
-
-### JS 基础
-
-- [原生 JS 方法的实现](/more/implementation-of-native--j-s-methods)

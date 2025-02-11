@@ -26,7 +26,8 @@ order: 0
 
 - [了解 package.json](/engineering/understanding-package)
 - [基于 pnpm 的 monorepo 的工作流](/engineering/workflow-for-pnpm-based-monorepo)
-- [我所知道的 npm/Yarn/pnpm 包管理](/engineering/pnpm-package-management-that--i-know)
+- [npm 如何实现依赖管理](/engineering/pnpm-package-management-that--i-know)
+- [pnpm 是为何吊打 npm/yarn 的](/engineering/pnpm-package-management-that--i-know)
 
 ### 国际化
 
