@@ -33,8 +33,13 @@ order: 0
 
 - [国际化利器 Intl Messageformat](/engineering/intl-messageformat)
 - [如何做国际化文本提取](/engineering/extract-chinese)
+- [国际化工具](/engineering/intl-cli)
 
 ### 代码规范
 
 - [代码检查](/engineering/code-inspection)
 - [规范提交记录](/engineering/regulatory-submission-records)
+
+### 其他
+
+- [通过 Figma 插件实现 Icon 自由](/engineering/icon-freedom-with--figma-plugin)

@@ -1,5 +1,5 @@
 ---
-title: 如何做国际化文本提取
+title: 通过 Figma 插件实现 Icon 自由
 group:
   title: 其他
   order: 7

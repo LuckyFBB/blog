@@ -6,13 +6,13 @@ group:
 order: 1
 ---
 
-### 前言
+## 前言
 
 在之前的文章 [babel 与 SWC](/engineering/base-babel) 中，主要是介绍了一些 babel 的基础配置，babel 的架构图如下:
 
 ![image.png](https://github.com/LuckyFBB/blog/assets/38368040/0142bd87-57c9-46ee-bbe0-3bbc062e2a54)
 
-### 确定中文范围
+## 确定中文范围
 
 先需要明确项目中可能存在中文的情况有哪些?
 
@@ -198,11 +198,11 @@ I18N.get(I18N.K, {
 }
 ```
 
-### 使用 Babel 处理
+## 使用 Babel 处理
 
 ![image.png](https://user-images.githubusercontent.com/38368040/167138103-b604db7f-63d5-4943-bde2-0785153d54b2.png)
 
-#### 使用 @babel/parser 将源代码转译为 AST
+### 使用 @babel/parser 将源代码转译为 AST
 
 ```js | pure
 const plugins: ParserOptions['plugins'] = ['decorators-legacy', 'typescript'];
@@ -215,7 +215,7 @@ const ast = parse(sourceCode, {
 });
 ```
 
-#### @babel/traverse 特殊处理上述的节点，转化 AST
+### @babel/traverse 特殊处理上述的节点，转化 AST
 
 ```js | pure
 babelTraverse(ast, {
@@ -350,7 +350,7 @@ Program: {
 }
 ```
 
-#### 转为代码
+### 转为代码
 
 ```js | pure
 const { code } = generate(ast, {
@@ -375,7 +375,7 @@ const i18nPlugin = () => {
 };
 ```
 
-### 其他处理
+## 其他处理
 
 **动态生成 key**
 
@@ -417,7 +417,7 @@ export const getFileKey = (filePath: string) => {
 };
 ```
 
-### 脚手架命令
+## 脚手架命令
 
 [i18n-extract-cli](https://github.com/LuckyFBB/i18n-extract)
 
