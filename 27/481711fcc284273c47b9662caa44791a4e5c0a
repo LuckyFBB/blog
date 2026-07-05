@@ -1,0 +1,32 @@
+docs/Ai/walk-into-skill-internals.md
+  s_e7e73ac0554fd1::t_02bff05cbf0bb6 105
+  s_e7e73ac0554fd1::t_e94042c88f7221 25,32,64,72,92-99,102,106-217
+  s_e7e73ac0554fd1::t_2bbfcfbeb6651b 103
+  s_e7e73ac0554fd1::t_c778ff8e784616 89-91
+  s_e7e73ac0554fd1::t_f71ecd42789b65 101
+  s_e7e73ac0554fd1::t_e82ad715d5030a 218-220
+  s_e7e73ac0554fd1::t_a91b4463852246 100
+  s_e7e73ac0554fd1::t_20a751a121fd0b 104
+  s_e7e73ac0554fd1::t_be138f5cd50ce7 22-24
+  s_e7e73ac0554fd1::t_c288ae3cda8e07 26-31
+  s_e7e73ac0554fd1::t_db01d1291cdc20 33-35,61-63
+  s_e7e73ac0554fd1::t_c01e5542427b3c 65-67,69-71
+  s_e7e73ac0554fd1::t_9c25b4a4db5d60 73-75,86-88
+  s_e7e73ac0554fd1::t_cc2c53da408e81 221-223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "27481711fcc284273c47b9662caa44791a4e5c0a",
+  "prompts": {},
+  "sessions": {
+    "s_e7e73ac0554fd1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3028-2055-78b1-ab71-175a3280a0a4",
+        "model": "gpt-5.5"
+      },
+      "human_author": "LuckyFBB <976060700@qq.com>"
+    }
+  }
+}
