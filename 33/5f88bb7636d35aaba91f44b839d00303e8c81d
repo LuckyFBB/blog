@@ -1,0 +1,91 @@
+docs/Node/Buffer.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 209
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 21-23,63-65,75-77,131-133,197-199
+docs/React/Hooks-knowledge-you-should-know.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 327
+docs/React/Rediscover-controlled-and-uncontrolled-components.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 349
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 94-96,163-165
+docs/More/SSE.md
+  s_59ca4f6cc277a9::t_0cfb5fe061bd3e 62-63
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 53,55-61
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 321
+docs/React/Redux-toolkit.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 13,19,82-84
+docs/Engineering/Intl-messageformat.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 9-11
+docs/React/Data-flow-management-in-React.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 11-13
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 131
+docs/Engineering/Understanding-package.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 38-40
+docs/Node/Process-and-thread-in-NodeJS.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 591
+.dumi/global.less
+  s_59ca4f6cc277a9::t_cb00895fdd7eff 46
+  s_59ca4f6cc277a9::t_27b57a01ea1959 18-22
+  s_59ca4f6cc277a9::t_a32de4726bdb8c 35-38,52-55,117-120
+  s_59ca4f6cc277a9::t_aa8ce3d71da8bd 1-2,6,8,13-17,28-34,109-110,137-138
+  s_59ca4f6cc277a9::t_a6f98d22db58a5 108
+  s_59ca4f6cc277a9::t_4f56f6ca87716f 40,50-51,62-63,115-116,121
+  s_59ca4f6cc277a9::t_dd0e10739eb9a0 71-73,79-81,83-107,130-132
+  s_59ca4f6cc277a9::t_fa628532efba0f 74-78,82,133-136
+  s_59ca4f6cc277a9::t_cd47917e5c4f84 64-70
+  s_59ca4f6cc277a9::t_c0d4a27284f4b3 3-5,7,9-12,23-27,39,41-45,47-49,56-61,111-114,122-129
+docs/Node/Inter-process-communication-in-nodejs.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 519
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 119-121
+docs/Engineering/Base-swc.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 13,15,21,23,27,29,418,420
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 9
+docs/React/Redux-more.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 89-91
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 250
+docs/Engineering/Comparison-between-babel-plugin-and-eslint-plugin.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 357
+docs/More/Memory-read-note.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 9-11
+docs/React/Mobx-principle-and-version-implementation.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 185-187
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 482
+docs/Engineering/Webpack-hmr.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 212-215
+docs/Engineering/Webpack-splitChunk.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 296-300,302
+docs/React/React-Router6.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 29,31
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 9,287
+docs/Engineering/Pnpm-package-management-that-I-know.md
+  s_59ca4f6cc277a9::t_dd0e10739eb9a0 187-189
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 62-64,82-84,109-111
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 598
+docs/Node/Stream.md
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 316
+docs/Engineering/Webpack-loader.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 78-80,82,111-113,167-171,173
+docs/More/Thoughts-from-base64.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 49-51,197-199
+docs/Node/Multi-process-and-cluster.md
+  s_59ca4f6cc277a9::t_4f56f6ca87716f 492
+docs/React/UseSyncExternalStore.md
+  s_59ca4f6cc277a9::t_e02cdd11476fc1 9,11
+docs/Engineering/Base-babel.md
+  s_59ca4f6cc277a9::t_dd0e10739eb9a0 250-252
+  s_59ca4f6cc277a9::t_fcb39ec87575ac 521
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "335f88bb7636d35aaba91f44b839d00303e8c81d",
+  "prompts": {},
+  "sessions": {
+    "s_59ca4f6cc277a9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f2fdc-b8df-7fa0-8728-f8aa074f9b29",
+        "model": "gpt-5.5"
+      },
+      "human_author": "LuckyFBB <976060700@qq.com>"
+    }
+  }
+}
