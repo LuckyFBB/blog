@@ -5,7 +5,7 @@ module.exports = {
   maxMessageLength: 80,
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject'],
-  scopes: ['React', 'Node', 'Engineering', 'DataStructure', 'Others', 'Base'],
+  scopes: ['AI', 'React', 'Node', 'Engineering', 'DataStructure', 'Others', 'Base'],
   types: {
     feat: {
       description: 'Add a new blog',

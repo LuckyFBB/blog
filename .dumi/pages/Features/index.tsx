@@ -17,6 +17,7 @@ export default function Features() {
       link: '/engineering',
       emoji: '🤺',
     },
+    { title: 'AI', description: 'AI 相关内容', link: '/ai', emoji: '🤖' },
     {
       title: '数据结构',
       description: '数据结构相关内容',

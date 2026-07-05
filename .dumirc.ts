@@ -12,6 +12,7 @@ export default defineConfig({
       { link: '/react', title: '🤡 React' },
       { link: '/node', title: '🍟 Node' },
       { link: '/engineering', title: '🤺 工程化' },
+      { link: '/ai', title: '🤖 AI' },
       { link: '/data-structure', title: '🌳 数据结构' },
       { link: '/more', title: '🧿 其他' },
     ],
