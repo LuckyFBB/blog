@@ -1,0 +1,66 @@
+docs/Engineering/Base-npm.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 62,64,82,84,109,111,187,189
+docs/React/Redux-toolkit.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 13
+docs/Engineering/Webpack-loader.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 78,82-83,112,114,168
+docs/React/UseSyncExternalStore.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 9,11
+docs/More/Memory-read-note.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 9,11
+.dumi/theme/style/global.scss
+  s_59ca4f6cc277a9::t_b72f0279652184 6-7,147-148
+  s_59ca4f6cc277a9::t_a7e9c35be72d4f 1-4,154-157
+  s_59ca4f6cc277a9::t_2ff4deaae9a233 5,8-146,149-153,158-172
+docs/React/Data-flow-management-in-React.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 11,13
+docs/Engineering/Intl-messageformat.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 9,11
+docs/More/Thoughts-from-base64.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 49,51,197,199
+docs/React/React-Router6.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 29,31
+docs/Node/Buffer.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 21,23,63,65,75,77,131,133,197,199
+docs/React/Redux-more.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 89,91
+docs/Engineering/Webpack-hmr.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 212
+docs/Node/Inter-process-communication-in-nodejs.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 119,121
+docs/Engineering/Webpack-splitChunk.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 296,302-303
+docs/Engineering/Base-swc.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 13,15,21,23,27,29,418,420
+docs/More/SSE.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 53
+docs/React/Mobx-principle-and-version-implementation.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 185,187
+.dumi/global.less
+  s_59ca4f6cc277a9::t_b451333f84ae34 71-72,82-84,87-89,92-93,98-99,127-128
+docs/index.md
+  s_59ca4f6cc277a9::t_08d239ba02c59c 2,4-5,9,12-14,16-17,19,21-22,24,26-27,29,31-32,34,39,41,43-44
+  s_59ca4f6cc277a9::t_a6740996ca180b 7-8
+  s_59ca4f6cc277a9::t_bbac9ba91d8c9a 10-11
+  s_59ca4f6cc277a9::t_1ca095d6cc4d55 35-38
+docs/React/Rediscover-controlled-and-uncontrolled-components.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 94,96,163,165
+docs/Engineering/Base-babel.md
+  s_59ca4f6cc277a9::t_20aa9feb2d888e 250,252
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1c14209982684a3cdba690a2bce10dc3a086ad44",
+  "prompts": {},
+  "sessions": {
+    "s_59ca4f6cc277a9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f2fdc-b8df-7fa0-8728-f8aa074f9b29",
+        "model": "gpt-5.5"
+      },
+      "human_author": "LuckyFBB <976060700@qq.com>"
+    }
+  }
+}
