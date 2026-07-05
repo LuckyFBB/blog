@@ -1,21 +1,173 @@
-.link {
-  margin-top: 16px;
-  padding: 4px 12px 4px 10px;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-left: 5px solid #f8cba6;
-  background-color: #fffbeb;
+.site-app > .layoutkit-flexbox {
+  gap: 36px !important;
 }
-.foreword {
-  padding: 12px 12px 12px 16px;
-  background-color: #ecf9ff;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-left: 5px solid #439dd3;
+
+.dumi-antd-style-features {
+  width: calc(100vw - 48px);
+  max-width: 1120px;
+  margin-top: -16px;
+  grid-auto-rows: 22px !important;
+  gap: 18px !important;
 }
-.quote {
-  background-color: #ffe7cc;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: 500;
+
+.dumi-antd-style-features > div {
+  overflow: hidden;
+  padding: 24px !important;
+  border: 1px solid rgba(45, 106, 210, 0.1);
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(52, 145, 255, 0.14), transparent 30%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(246, 248, 252, 0.88)) !important;
+  box-shadow:
+    0 20px 50px rgba(29, 39, 64, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  transform: translateY(0);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease !important;
+}
+
+.dumi-antd-style-features > div:nth-child(1) {
+  background:
+    radial-gradient(circle at 82% 20%, rgba(22, 119, 255, 0.22), transparent 34%),
+    linear-gradient(145deg, rgba(245, 250, 255, 0.96), rgba(255, 255, 255, 0.88)) !important;
+}
+
+.dumi-antd-style-features > div:nth-child(2) {
+  background:
+    radial-gradient(circle at 86% 18%, rgba(95, 91, 255, 0.16), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(247, 247, 255, 0.88)) !important;
+}
+
+.dumi-antd-style-features > div:nth-child(3) {
+  background:
+    radial-gradient(circle at 86% 18%, rgba(34, 197, 94, 0.14), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(245, 251, 247, 0.88)) !important;
+}
+
+.dumi-antd-style-features > div:nth-child(4) {
+  background:
+    radial-gradient(circle at 86% 18%, rgba(245, 158, 11, 0.15), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 243, 0.88)) !important;
+}
+
+.dumi-antd-style-features > div:hover {
+  border-color: rgba(22, 119, 255, 0.22);
+  box-shadow:
+    0 24px 58px rgba(22, 80, 180, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
+  transform: translateY(-4px);
+  scale: 1 !important;
+}
+
+.dumi-antd-style-features-cover {
+  width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border-radius: 14px !important;
+  background: rgba(22, 119, 255, 0.1) !important;
+  opacity: 1 !important;
+}
+
+.dumi-antd-style-features-img {
+  width: 26px !important;
+  height: 26px !important;
+  font-size: 26px !important;
+  line-height: 1 !important;
+}
+
+.dumi-antd-style-features-title {
+  margin: 18px 0 10px !important;
+  color: #202938 !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0;
+}
+
+.dumi-antd-style-features-description {
+  max-width: 420px;
+  margin: 0 !important;
+  color: #697386 !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+}
+
+.dumi-antd-style-features > div a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1677ff !important;
+  font-weight: 600;
+}
+
+.dumi-antd-style-features > div:hover a {
+  color: #0958d9 !important;
+}
+
+html[data-prefers-color='dark'] {
+  .dumi-antd-style-features > div {
+    border-color: rgba(255, 255, 255, 0.09);
+    background:
+      radial-gradient(circle at 88% 18%, rgba(64, 150, 255, 0.14), transparent 32%),
+      linear-gradient(145deg, rgba(27, 33, 45, 0.96), rgba(18, 22, 30, 0.92)) !important;
+    box-shadow:
+      0 20px 50px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .dumi-antd-style-features > div:hover {
+    border-color: rgba(64, 150, 255, 0.24);
+    box-shadow:
+      0 24px 58px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .dumi-antd-style-features-cover {
+    background: rgba(64, 150, 255, 0.14) !important;
+  }
+
+  .dumi-antd-style-features-title {
+    color: #edf3ff !important;
+  }
+
+  .dumi-antd-style-features-description {
+    color: #aab4c4 !important;
+  }
+
+  .dumi-antd-style-features > div a {
+    color: #69b1ff !important;
+  }
+}
+
+@media (max-width: 960px) {
+  .dumi-antd-style-features {
+    width: calc(100vw - 32px);
+    max-width: 720px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-app > .layoutkit-flexbox {
+    gap: 24px !important;
+  }
+
+  .dumi-antd-style-features {
+    display: flex !important;
+    width: calc(100vw - 28px);
+    margin-top: -8px;
+    gap: 14px !important;
+  }
+
+  .dumi-antd-style-features > div {
+    min-height: 178px;
+    padding: 20px !important;
+  }
+
+  .dumi-antd-style-features-title {
+    font-size: 20px !important;
+  }
 }

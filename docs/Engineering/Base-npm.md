@@ -59,9 +59,9 @@ order: 1
 - 在不同层级的依赖中，可能引用了同一个模块，导致大量的模块冗余
 - 在 windows 系统中，文件路径最大长度为 260 字符，嵌套层级过深可能导致不可预知的问题
 
-:::info{title=" "}
+<aside>
 💡 在 npm2 中，按照递归的方式，严格将 package.json 中的依赖安装到对应模块下。并不会处理某几个模块中的相同版本依赖，直接无脑生成对应树结构
-:::
+</aside>
 
 ## 扁平结构(npm3)
 
@@ -79,9 +79,9 @@ order: 1
 
 ![5](https://user-images.githubusercontent.com/38368040/164896705-f9ef865f-f632-425a-beba-1e98b3ffe457.png)
 
-:::info{title=" "}
+<aside>
 💡 如果 package.json 中的依赖的子依赖无相同依赖，那么所有的依赖都会被扁平化到根目录的 node_modules 下
-:::
+</aside>
 
 ### 子依赖项依赖相同/兼容版本
 
@@ -106,9 +106,9 @@ order: 1
 
 ![7](https://user-images.githubusercontent.com/38368040/164896728-d37ab1c2-7d00-41ec-9dc6-1e192bc0e21f.png)
 
-:::info{title=" "}
+<aside>
 💡 如果 package.json 中的依赖的子依赖有相同或者兼容版本依赖，那么所有的依赖都会被扁平化到根目录的 node_modules 下
-:::
+</aside>
 
 ### 子依赖项的依赖不兼容
 
@@ -184,9 +184,9 @@ order: 1
 
     能够发现，这次是`base64-js@ 1.5.1`被提取到了根目录下的 node_modules 下，buffer 的 base64-js 能够和它兼容，所以 buffer 的 node_modules 下不再存在依赖，然而 bops 依赖的 base64-js 不兼容，所以会挂在自身的 node_modules 下
 
-:::info{title=" "}
+<aside>
 💡 子依赖项的依赖不兼容的情况下，底层会通过 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">localeCompare</a> 的方法对依赖进行一个排序，字典序靠前的 npm 包的**底层依赖**会优先被提取出来，放到根目录下的 node_modules 中，之后如果发现不兼容的依赖，则继续采用 npm 2 的处理方式，都会放在自身的 node_modules 下
-:::
+</aside>
 
 ❓ 通过上面这几个例子，能够发现 npm3 在解决了一些问题的同时，也带来新的问题。
 

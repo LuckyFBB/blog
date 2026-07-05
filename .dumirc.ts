@@ -9,11 +9,11 @@ export default defineConfig({
     },
     logo: '/blog/logo.png',
     nav: [
-      { link: '/base', title: '🧸 前端基础' },
+      { link: '/ai', title: '🤖 AI' },
       { link: '/react', title: '🤡 React' },
       { link: '/node', title: '🍟 Node' },
       { link: '/engineering', title: '🤺 工程化' },
-      { link: '/ai', title: '🤖 AI' },
+      { link: '/base', title: '🧸 前端基础' },
       { link: '/data-structure', title: '🌳 数据结构' },
       { link: '/more', title: '🧿 其他' },
     ],

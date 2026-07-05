@@ -10,23 +10,23 @@ order: 0
 
 ## SWC 是什么？
 
-:::info{title=" "}
+<aside>
 💡 SWC(Speedy Web Complier) is a super-fast TypeScript / JavaScript compiler written in Rust.
-:::
+</aside>
 
 SWC 出现的很大部分原因其实是替换掉工程中的 Babel，因此它的功能和 Babel 差不多。
 
 最大的区别可能就是：SWC is father than Babel
 
-:::info{title=" "}
+<aside>
 🏎️ SWC is 20x faster than Babel on a single thread and 70x faster on four cores.
-:::
+</aside>
 
 🤔️ 其实 SWC 快的原因是由于底层语言 Rust 带来的。
 
-:::info{title=" "}
+<aside>
 🧤 JavaScript is single-threaded. The JS thread is not a good place to do heavy computation.
-:::
+</aside>
 
 ## SWC 怎么用？
 
@@ -415,9 +415,9 @@ swc
 
 ## SWC 编译
 
-:::info{title=" "}
+<aside>
 🎗️ 我们使用的上述 API，其实都是从二进制文件里面获取到的。
-:::
+</aside>
 
 例如上述我们调用 transformFile 时，其源码如下
 

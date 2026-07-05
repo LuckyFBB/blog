@@ -6,9 +6,9 @@ group:
 order: 2
 ---
 
-:::info{title=" "}
+<aside>
 💡useSyncExternalStore is a React Hook that lets you subscribe to an external store
-:::
+</aside>
 
 useSyncExternalStore 是一个可以订阅外部 Store 的 React Hook
 

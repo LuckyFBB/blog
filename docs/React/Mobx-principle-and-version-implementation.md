@@ -182,9 +182,9 @@ class TodoList {
 
 包裹 React 组件的高阶组件，在组件的 render 函数中任何使用的`observable`发生变化时，组件都会调用 render 重新渲染，更新 UI
 
-:::info{title=" "}
+<aside>
 ⚠️ 不要放在顶层 Page，如果一个 state 改变，整个 Page 都会 render，所以 observer 尽量取包裹小组件，组件越小重新渲染的变化就越小
-:::
+</aside>
 
 ```js
 @observer

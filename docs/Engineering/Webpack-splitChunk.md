@@ -293,13 +293,14 @@ module.exports = {
 - maxInitialRequests
   入口文件的最大并行请求数，默认为 30
 
-:::info{title=" "}
+<aside>
 💡 何为请求数？
 
 是指加载一个 chunk 的时候需要加载的所有分包数量。
 
 例如对于一个 chunk A 来说，通过分包规则(如模块引用次数、第三方包)分离出来了若干的子 chunk[i]，那么加载 chunk A 的时候就回去加载 chunk[i]，那么等于浏览器需要同时加载 chunk A 和所有的分离 chunk[i]，此时的并行请求数量为主包 A 加上 i 个分包，即 i+1
-:::
+
+</aside>
 
 ![image.png](/blog/imgs/webpackSplitChunk/image%201.png)
 

@@ -116,9 +116,9 @@ Node 中的 IPC 通道具体实现是由 [libuv](https://luohaha.github.io/Chine
 
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/179391106-7ec14866-a7cd-42b8-a9fb-b6ab01692eb9.png">
 
-:::info{title=" "}
+<aside>
 ⚠️  只有在启动的子进程是 Node 进程时，子进程才会根据环境变量去连接对应的 IPC 通道，对于其他类型的子进程则无法实现进程间通信，除非其他进程也按着该约定去连接这个 IPC 通道。
-:::
+</aside>
 
 ### unix domain socket
 

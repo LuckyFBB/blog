@@ -247,9 +247,9 @@ useBuiltIns 的参数:
 - usage: 会根据配置的目标环境的兼容性以及代码中使用的 API 来进行 polyfill，实现按需加载
 - entry: 会根据配置的浏览器兼容，引入浏览器不兼容的  polyfill，需要在入口文件手动添加`import '@babel/polyfill'`。如果指定的`"corejs": "3"`，则需要引入`import 'core-js/stable'; import 'regenerator-runtime/runtime'`
 
-:::info{title=" "}
+<aside>
 💡 <a href="https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fzloirock%2Fcore-js">core-js</a>是 JavaScript 的模块化标准库，包含  `Promise/Symbol/Iterator` 和许多其他的特性，它可以让你仅加载必需的功能。core-js@2.0的版本已经之冻结，所有的新特性只会添加到 3.0 的分支中
-:::
+</aside>
 
 ```json
 {

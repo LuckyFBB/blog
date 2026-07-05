@@ -26,9 +26,9 @@ order: 0
 
 ### Router
 
-:::info{title=" "}
+<aside>
 💡 基于 Context 的全局状态下发。Router 是一个 “Provider-Consumer” 模型
-:::
+</aside>
 
 [Router](https://github.com/remix-run/react-router/blob/react-router%406.11.1/packages/react-router/lib/components.tsx#L327) 做的事情很简单，接收`navigator` 和`location`，使用 context 将数据传递下去，能够让子组件获取到相关的数据
 

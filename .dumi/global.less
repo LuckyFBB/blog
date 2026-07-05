@@ -68,7 +68,8 @@
   display: none;
 }
 
-.dumi-default-container.markdown[data-type='info'] {
+.markdown aside,
+.dumi-default-content aside {
   margin: 18px 0 24px;
   padding: 14px 16px;
   color: #303846;
@@ -78,30 +79,24 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
 }
 
-.dumi-default-container.markdown[data-type='info'] > svg {
-  display: none;
+.markdown aside > :first-child,
+.dumi-default-content aside > :first-child {
+  margin-top: 0;
 }
 
-.dumi-default-container.markdown[data-type='info'] > h4 {
-  display: none;
+.markdown aside > :last-child,
+.dumi-default-content aside > :last-child {
+  margin-bottom: 0;
 }
 
-.dumi-default-container.markdown[data-type='info'] > section {
-  min-width: 0;
-  color: inherit;
+.markdown aside,
+.dumi-default-content aside {
   font-size: 14px;
   line-height: 1.8;
 }
 
-.dumi-default-container.markdown[data-type='info'] > section > :first-child {
-  margin-top: 0;
-}
-
-.dumi-default-container.markdown[data-type='info'] > section > :last-child {
-  margin-bottom: 0;
-}
-
-.dumi-default-container.markdown[data-type='info'] a {
+.markdown aside a,
+.dumi-default-content aside a {
   font-weight: 500;
 }
 
@@ -129,7 +124,8 @@ html[data-prefers-color='dark'] {
     background: #4096ff;
   }
 
-  .dumi-default-container.markdown[data-type='info'] {
+  .markdown aside,
+  .dumi-default-content aside {
     color: #d7dde7;
     background: rgba(255, 255, 255, 0.065);
     border-color: rgba(255, 255, 255, 0.09);

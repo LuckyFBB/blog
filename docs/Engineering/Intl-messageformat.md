@@ -6,9 +6,9 @@ group:
 order: 0
 ---
 
-:::info{title=" "}
+<aside>
 Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.
-:::
+</aside>
 
 ## ICU 信息语法
 

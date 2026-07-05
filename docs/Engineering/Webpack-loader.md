@@ -75,11 +75,12 @@ module.exports = {
 
 ### Normal Loader
 
-:::info{title=" "}
+<aside>
 🤔 什么是  Normal Loader 呢？
 
 上述我们讲到 Loader 的本质是导出函数的 JS 模块，而该模块导出的函数就被称为 Normal Loader。
-:::
+
+</aside>
 
 首先我们先分别定义三个简单的 Normal Loader
 
@@ -108,9 +109,9 @@ module.exports = LoaderA;
 ```
 
 <br/>
-:::info{title=" "}
+<aside>
 🤔 思考为什么 LoaderA 需要把 source 的内容赋值给 module.exports
-:::
+</aside>
 
 在 webpack.config.js 中如下使用这些 loaders
 
@@ -164,7 +165,7 @@ console.log(text);
 
 ### Pitch Loader
 
-:::info{title=" "}
+<aside>
 💡 为什么需要 Pitch Loader？
 
 1. Loader 一旦启动，链式调用会一直执行下去直到结束，无法中断除非显示抛出错误

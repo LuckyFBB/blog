@@ -10,7 +10,7 @@ order: 5
 
 Redux-Toolkit 是 基于 Redux 的二次封装，开箱即用的 Redux 工具，比 Redux 更加简单方便。
 
-:::info{title=" "}
+<aside>
 🚧 Why to use Redux-toolkit?
 
 1. Configuring a Redux store is too complicated
@@ -83,9 +83,9 @@ updateAge(18);
 
 创建 Redux reducer 的函数
 
-  :::info{title=" "}
-  💡 createReducer 使用 Immer 库，可以在 reducer 中直接对状态进行修改，而不需要手动编写不可变性的逻辑
-  :::
+:::info{title=" "}
+💡 createReducer 使用 Immer 库，可以在 reducer 中直接对状态进行修改，而不需要手动编写不可变性的逻辑
+:::
 
 Redux 中 reducer 的创建
 

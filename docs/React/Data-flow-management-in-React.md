@@ -8,9 +8,9 @@ order: 0
 
 ## 前言
 
-:::info{title=" "}
+<aside>
 💡 为什么数据流管理重要？React 的核心思想为：UI=render(data)，data 就是所谓的数据，render 是 React 提供的纯函数，所以 UI 展示完全由数据层决定。
-:::
+</aside>
 
 在本文中，会简单介绍 react 中的数据流管理，从自身的 context 到三方库的 redux 的相关概念，以及 redux 附属内容丐版实现。
 

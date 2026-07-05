@@ -86,9 +86,9 @@ export const connect =
 
 ## Redux Middleware
 
-:::info{title=" "}
+<aside>
 “It provides a third-party extension point between dispatching an action, and the moment it reaches the reducer.” – Dan Abramov
-:::
+</aside>
 
 `middleware`提供分类处理`action`的机会，在`middleware`中可以检查每一个`action`，挑选出特定类型的`action`做对应操作
 

@@ -209,8 +209,7 @@ sendStats(clients, stats, force) {
 
 在`start`函数中，会执行`setupDevMiddleware`方法，该方法主要是执行`webpack-dev-middleware`库的。
 
-:::info{title=" "}
-
+<aside>
 1. webpack-dev-middleware: 该库主要做文件相关的操作，本地文件输出以及监听
 
 2. webpack-dev-server: 该库主要只负责启动服务和前置准备工作
