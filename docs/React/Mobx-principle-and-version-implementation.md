@@ -6,23 +6,6 @@ group:
 order: 4
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 前言
 
 在之前的文章中，我们讲述了 React 的数据流管理，从 props → context → Redux，以及 Redux 相关的三方库 React-Redux。
@@ -199,7 +182,9 @@ class TodoList {
 
 包裹 React 组件的高阶组件，在组件的 render 函数中任何使用的`observable`发生变化时，组件都会调用 render 重新渲染，更新 UI
 
-<div class="quote">⚠️ 不要放在顶层 Page，如果一个 state 改变，整个 Page 都会 render，所以 observer 尽量取包裹小组件，组件越小重新渲染的变化就越小</div>
+:::info{title=" "}
+⚠️ 不要放在顶层 Page，如果一个 state 改变，整个 Page 都会 render，所以 observer 尽量取包裹小组件，组件越小重新渲染的变化就越小
+:::
 
 ```js
 @observer
@@ -494,7 +479,7 @@ export function observer(target: any) {
 
 本文从 Mobx 的简单示例开始，讲述了一下 Mobx 的执行流程，引入了对应的核心概念，然后从零开始实现了一个简版的 Mobx，最后将 Mobx 和 Redux 做了一个简单的对比
 
-<div class="link">参考链接</div>
+## 参考链接
 
 - [从零实现 Mobx：深入理解 Mobx 原理](https://github.com/yinguangyao/blog/issues/54#)
 - [MobX 实现原理揭秘](https://mp.weixin.qq.com/s/KnlRBGr0iS2BBrsVB4oUsw)

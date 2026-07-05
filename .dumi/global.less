@@ -1,0 +1,138 @@
+.markdown blockquote,
+.dumi-default-content blockquote {
+  margin: 18px 0 24px;
+  padding: 12px 16px;
+  color: #2f3a4a;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.8;
+  background: linear-gradient(90deg, rgba(22, 119, 255, 0.08), rgba(22, 119, 255, 0.03));
+  border: 1px solid rgba(22, 119, 255, 0.12);
+  border-left: 4px solid #1677ff;
+  border-radius: 6px;
+}
+
+.markdown blockquote > :first-child,
+.dumi-default-content blockquote > :first-child {
+  margin-top: 0;
+}
+
+.markdown blockquote *,
+.dumi-default-content blockquote * {
+  font-style: normal;
+}
+
+.markdown blockquote a,
+.dumi-default-content blockquote a {
+  font-weight: 500;
+}
+
+.markdown blockquote > :last-child,
+.dumi-default-content blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown h2[id='参考链接'],
+.markdown h2[id='参考资料'],
+.dumi-default-content h2[id='参考链接'],
+.dumi-default-content h2[id='参考资料'] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  color: #202938;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
+  background: transparent;
+}
+
+.markdown h2[id='参考链接']::before,
+.markdown h2[id='参考资料']::before,
+.dumi-default-content h2[id='参考链接']::before,
+.dumi-default-content h2[id='参考资料']::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 4px;
+  height: 20px;
+  background: #1677ff;
+  border-radius: 999px;
+}
+
+.markdown h2[id='参考链接'] > a[aria-hidden]:first-child,
+.markdown h2[id='参考资料'] > a[aria-hidden]:first-child,
+.dumi-default-content h2[id='参考链接'] > a[aria-hidden]:first-child,
+.dumi-default-content h2[id='参考资料'] > a[aria-hidden]:first-child {
+  display: none;
+}
+
+.dumi-default-container.markdown[data-type='info'] {
+  margin: 18px 0 24px;
+  padding: 14px 16px;
+  color: #303846;
+  background: #f7f6f3;
+  border: 1px solid rgba(55, 53, 47, 0.08);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+.dumi-default-container.markdown[data-type='info'] > svg {
+  display: none;
+}
+
+.dumi-default-container.markdown[data-type='info'] > h4 {
+  display: none;
+}
+
+.dumi-default-container.markdown[data-type='info'] > section {
+  min-width: 0;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.dumi-default-container.markdown[data-type='info'] > section > :first-child {
+  margin-top: 0;
+}
+
+.dumi-default-container.markdown[data-type='info'] > section > :last-child {
+  margin-bottom: 0;
+}
+
+.dumi-default-container.markdown[data-type='info'] a {
+  font-weight: 500;
+}
+
+html[data-prefers-color='dark'] {
+  .markdown blockquote,
+  .dumi-default-content blockquote {
+    color: #d6deea;
+    background: rgba(22, 119, 255, 0.1);
+    border-color: rgba(22, 119, 255, 0.18);
+    border-left-color: #4096ff;
+  }
+
+  .markdown h2[id='参考链接'],
+  .markdown h2[id='参考资料'],
+  .dumi-default-content h2[id='参考链接'],
+  .dumi-default-content h2[id='参考资料'] {
+    color: #e5e7eb;
+    border-bottom-color: rgba(229, 231, 235, 0.12);
+  }
+
+  .markdown h2[id='参考链接']::before,
+  .markdown h2[id='参考资料']::before,
+  .dumi-default-content h2[id='参考链接']::before,
+  .dumi-default-content h2[id='参考资料']::before {
+    background: #4096ff;
+  }
+
+  .dumi-default-container.markdown[data-type='info'] {
+    color: #d7dde7;
+    background: rgba(255, 255, 255, 0.065);
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow: none;
+  }
+}

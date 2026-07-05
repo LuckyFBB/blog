@@ -6,34 +6,17 @@ group:
 order: 5
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 背景
 
 Redux-Toolkit 是 基于 Redux 的二次封装，开箱即用的 Redux 工具，比 Redux 更加简单方便。
 
-<div class="quote">
+:::info{title=" "}
 🚧 Why to use Redux-toolkit?
 
 1. Configuring a Redux store is too complicated
 2. I have to add a lot of packages to get Redux to do anything useful
 3. Redux requires too much boilerplate code
-</div>
+   :::
 
 ## Toolkit 使用
 
@@ -96,9 +79,9 @@ const store = configureStore({
 
 - createReducer -- 创建 Redux reducer 的函数
 
-    <div class="quote">
-    💡 createReducer 使用 Immer 库，可以在 reducer 中直接对状态进行修改，而不需要手动编写不可变性的逻辑
-    </div>
+  :::info{title=" "}
+  💡 createReducer 使用 Immer 库，可以在 reducer 中直接对状态进行修改，而不需要手动编写不可变性的逻辑
+  :::
 
   Redux 中 reducer 的创建
 

@@ -6,23 +6,6 @@ group:
 order: 1
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 在前文的文章中，我们讲到了 [React 数据流](/react/data-flow-management-in--react) 相关的知识。在本文中将介绍 redux 的实现原理。
 
 在本文开始之前，有一些内容需要忘记：

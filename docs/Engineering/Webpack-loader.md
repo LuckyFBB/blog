@@ -6,15 +6,6 @@ group:
 order: 1
 ---
 
-<style>
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 前言
 
 webpack 有两种扩展方式。一种是 Loader 主要是负责将其他的资源形态转译成 webpack 可以处理的标准 JavaScript 代码；另一种是 Plugin 主要伴随着 webpack 整个生命周期，做一些重塑逻辑。
@@ -84,9 +75,11 @@ module.exports = {
 
 ### Normal Loader
 
-<div class="quote"> 🤔 什么是 Normal Loader呢？<br/>
+:::info{title=" "}
+🤔 什么是  Normal Loader 呢？
+
 上述我们讲到 Loader 的本质是导出函数的 JS 模块，而该模块导出的函数就被称为 Normal Loader。
-</div>
+:::
 
 首先我们先分别定义三个简单的 Normal Loader
 
@@ -115,8 +108,9 @@ module.exports = LoaderA;
 ```
 
 <br/>
-<div class="quote"> 🤔 思考为什么 LoaderA 需要把 source 的内容赋值给 module.exports
-</div>
+:::info{title=" "}
+🤔 思考为什么 LoaderA 需要把 source 的内容赋值给 module.exports
+:::
 
 在 webpack.config.js 中如下使用这些 loaders
 
@@ -170,11 +164,13 @@ console.log(text);
 
 ### Pitch Loader
 
-<div class="quote">
-💡 为什么需要 Pitch Loader？<br/>
-1. Loader 一旦启动，链式调用会一直执行下去直到结束，无法中断除非显示抛出错误<br/>
+:::info{title=" "}
+💡 为什么需要 Pitch Loader？
+
+1. Loader 一旦启动，链式调用会一直执行下去直到结束，无法中断除非显示抛出错误
+
 2. 在某些情况下，并不需要关心资源的具体内容，到 Normal loader 需要在资源读取出来之后才会执行
-</div>
+   :::
 
 上述我们讲到 Normal Loader 是 Loader 模块导出的函数，而对于导出的函数我们添加 pitch 属性，则导出的为 Pitch Loader
 

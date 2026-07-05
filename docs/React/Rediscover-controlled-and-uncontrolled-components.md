@@ -6,23 +6,6 @@ group:
 order: 1
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 前言
 
 在 HTML 中，表单元素(`<input>`/`<textarea>`/`<select>`)，通常自己会维护 state，并根据用户的输入进行更新
@@ -108,7 +91,9 @@ const handleChange = (event) => {
 
 React 组件控制着用户输入过程中表单发生的操作并且 state 还是唯一数据源，被 React 以这种方式控制取值的表单输入元素叫做受控组件
 
-<div class="quote">📌 对于受控组件来说，输入的值始终由`React`的`state`驱动!!!</div>
+:::info{title=" "}
+📌 对于受控组件来说，输入的值始终由`React`的`state`驱动!!!
+:::
 
 ## 受控和非受控组件边界
 
@@ -175,7 +160,9 @@ function Demo() {
 }
 ```
 
-<div class="quote">📌 受控以及非受控组件的边界划分取决于`当前组件对于子组件值的变更是否拥有控制权`。如果拥有控制权利子组件对于当前组件来说是受控的；反之则是非受控。</div>
+:::info{title=" "}
+📌 受控以及非受控组件的边界划分取决于`当前组件对于子组件值的变更是否拥有控制权`。如果拥有控制权利子组件对于当前组件来说是受控的；反之则是非受控。
+:::
 
 ## 反模式-以非受控组件的方式去调用受控组件
 
@@ -359,7 +346,7 @@ function EmailInput(props) {
 
 最后总结了一下，应当如何选择受控组件还是非受控组件。
 
-<div class="link"> 参考链接 </div>
+## 参考链接
 
 - [React 官网——受控组件](https://zh-hans.reactjs.org/docs/forms.html#controlled-components)
 - [React 官网——非受控组件](https://zh-hans.reactjs.org/docs/uncontrolled-components.html)

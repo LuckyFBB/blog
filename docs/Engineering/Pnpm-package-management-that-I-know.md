@@ -6,30 +6,6 @@ group:
 order: 1
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .foreword{
-        padding: 12px 12px 12px 16px;
-        background-color: #ECF9FF;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #439dd3;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 在依赖包盛行的今天，安装包的方式也是多种多样的，从 npm->yarn->pnpm，每一次的升级都带来着不一样的便利，这篇文章将从 npm2 开始，剖析到现在火热的 pnpm。
 
 <!-- more -->
@@ -83,7 +59,9 @@ order: 1
 - 在不同层级的依赖中，可能引用了同一个模块，导致大量的模块冗余
 - 在 windows 系统中，文件路径最大长度为 260 字符，嵌套层级过深可能导致不可预知的问题
 
-<div class="quote"> 💡 在 npm2 中，按照递归的方式，严格将 package.json 中的依赖安装到对应模块下。并不会处理某几个模块中的相同版本依赖，直接无脑生成对应树结构</div>
+:::info{title=" "}
+💡 在 npm2 中，按照递归的方式，严格将 package.json 中的依赖安装到对应模块下。并不会处理某几个模块中的相同版本依赖，直接无脑生成对应树结构
+:::
 
 ## 扁平结构(npm3)
 
@@ -101,7 +79,9 @@ order: 1
 
 ![5](https://user-images.githubusercontent.com/38368040/164896705-f9ef865f-f632-425a-beba-1e98b3ffe457.png)
 
-<div class="quote"> 💡 如果 package.json 中的依赖的子依赖无相同依赖，那么所有的依赖都会被扁平化到根目录的 node_modules 下</div>
+:::info{title=" "}
+💡 如果 package.json 中的依赖的子依赖无相同依赖，那么所有的依赖都会被扁平化到根目录的 node_modules 下
+:::
 
 ### 子依赖项依赖相同/兼容版本
 
@@ -126,7 +106,9 @@ order: 1
 
 ![7](https://user-images.githubusercontent.com/38368040/164896728-d37ab1c2-7d00-41ec-9dc6-1e192bc0e21f.png)
 
-<div class="quote"> 💡 如果 package.json 中的依赖的子依赖有相同或者兼容版本依赖，那么所有的依赖都会被扁平化到根目录的 node_modules 下</div>
+:::info{title=" "}
+💡 如果 package.json 中的依赖的子依赖有相同或者兼容版本依赖，那么所有的依赖都会被扁平化到根目录的 node_modules 下
+:::
 
 ### 子依赖项的依赖不兼容
 
@@ -202,7 +184,9 @@ order: 1
 
     能够发现，这次是`base64-js@ 1.5.1`被提取到了根目录下的 node_modules 下，buffer 的 base64-js 能够和它兼容，所以 buffer 的 node_modules 下不再存在依赖，然而 bops 依赖的 base64-js 不兼容，所以会挂在自身的 node_modules 下
 
-<div class="quote"> 💡 子依赖项的依赖不兼容的情况下，底层会通过 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">localeCompare</a> 的方法对依赖进行一个排序，字典序靠前的 npm 包的**底层依赖**会优先被提取出来，放到根目录下的 node_modules 中，之后如果发现不兼容的依赖，则继续采用 npm 2 的处理方式，都会放在自身的 node_modules 下</div>
+:::info{title=" "}
+💡 子依赖项的依赖不兼容的情况下，底层会通过 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare">localeCompare</a> 的方法对依赖进行一个排序，字典序靠前的 npm 包的**底层依赖**会优先被提取出来，放到根目录下的 node_modules 中，之后如果发现不兼容的依赖，则继续采用 npm 2 的处理方式，都会放在自身的 node_modules 下
+:::
 
 ❓ 通过上面这几个例子，能够发现 npm3 在解决了一些问题的同时，也带来新的问题。
 
@@ -611,7 +595,7 @@ bar
 
 ![34](https://user-images.githubusercontent.com/38368040/164909110-2ed224d5-91ae-4f9b-b753-b9873af42199.png)
 
-<div class="link">参考链接</div>
+## 参考链接
 
 - [npm 依赖管理中被忽略的那些细节](https://www.zoo.team/article/npm-details)
 - [剖析 npm 的包管理机制](http://www.conardli.top/blog/article/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96-%E5%89%96%E6%9E%90npm%E7%9A%84%E5%8C%85%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6%EF%BC%88%E5%AE%8C%E6%95%B4%E7%89%88%EF%BC%89.html)

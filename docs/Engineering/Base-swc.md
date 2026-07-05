@@ -6,54 +6,27 @@ group:
 order: 0
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .foreword{
-        padding: 12px 12px 12px 16px;
-        background-color: #ECF9FF;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #439dd3;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
-<div class="foreword">随着在编译中越来越卷，SWC 由于速度极快也出现在大众的视野中，本文会简单介绍一下 SWC。<a href="/engineering/base-babel">前文</a>中有对 Babel 做相关介绍，大家可以一起阅读。</div>
+> 随着在编译中越来越卷，SWC 由于速度极快也出现在大众的视野中，本文会简单介绍一下 SWC。[前文](/engineering/base-babel)中有对 Babel 做相关介绍，大家可以一起阅读。
 
 ## SWC 是什么？
 
-<div class="quote">
+:::info{title=" "}
 💡 SWC(Speedy Web Complier) is a super-fast TypeScript / JavaScript compiler written in Rust.
-
-</div>
+:::
 
 SWC 出现的很大部分原因其实是替换掉工程中的 Babel，因此它的功能和 Babel 差不多。
 
 最大的区别可能就是：SWC is father than Babel
 
-<div class="quote">
+:::info{title=" "}
 🏎️ SWC is 20x faster than Babel on a single thread and 70x faster on four cores.
-
-</div>
+:::
 
 🤔️ 其实 SWC 快的原因是由于底层语言 Rust 带来的。
 
-<div class="quote">
+:::info{title=" "}
 🧤 JavaScript is single-threaded. The JS thread is not a good place to do heavy computation.
-
-</div>
+:::
 
 ## SWC 怎么用？
 
@@ -442,10 +415,9 @@ swc
 
 ## SWC 编译
 
-<div class="quote">
+:::info{title=" "}
 🎗️ 我们使用的上述 API，其实都是从二进制文件里面获取到的。
-
-</div>
+:::
 
 例如上述我们调用 transformFile 时，其源码如下
 

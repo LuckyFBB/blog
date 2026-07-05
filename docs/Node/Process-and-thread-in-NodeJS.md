@@ -6,17 +6,6 @@ group:
 order: 0
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-</style>
-
 ## 进程和线程
 
 ### 进程(Process)的概念
@@ -599,6 +588,6 @@ process.on('message', (msg) => {
 
 ![8](https://user-images.githubusercontent.com/38368040/170860070-1b113e51-60aa-4935-8b13-2ba61c639d1d.png)
 
-<div class="link">参考链接</div>
+## 参考链接
 
 - [Node.js 中 spawn 与 exec 的异同比较](https://segmentfault.com/a/1190000002913884)

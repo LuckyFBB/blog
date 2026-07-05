@@ -6,17 +6,6 @@ group:
 order: 2
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-</style>
-
 ## 消息队列
 
 消息队列是在两个不相关进程间传递数据的一种简单、高效的方式，其独立于发送进程 、接收进程存在。

@@ -6,31 +6,7 @@ group:
 order: 0
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .foreword{
-        padding: 12px 12px 12px 16px;
-        background-color: #ECF9FF;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #439dd3;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
-<div class="foreword"><a href="/react/react--router-principle-and-version-implementation">前文</a>讲述了前端路由的实现已经 react-router@4 一些组件的实现。最近笔者公司在升级 react-router@6 因此本文将对 react-router@6 的一些实现做分析。</div>
+> [前文](/react/react--router-principle-and-version-implementation)讲述了前端路由的实现已经 react-router@4 一些组件的实现。最近笔者公司在升级 react-router@6 因此本文将对 react-router@6 的一些实现做分析。
 
 ## React-Router 的架构
 
@@ -50,9 +26,9 @@ order: 0
 
 ### Router
 
-<div class="quote">
+:::info{title=" "}
 💡 基于 Context 的全局状态下发。Router 是一个 “Provider-Consumer” 模型
-</div>
+:::
 
 [Router](https://github.com/remix-run/react-router/blob/react-router%406.11.1/packages/react-router/lib/components.tsx#L327) 做的事情很简单，接收`navigator` 和`location`，使用 context 将数据传递下去，能够让子组件获取到相关的数据
 
@@ -308,7 +284,7 @@ function useNavigate() {
 }
 ```
 
-<div class="link"> 参考链接 </div>
+## 参考链接
 
 - [react router v6 使用详解以及部分源码解析（新老版本对比） - 掘金](https://juejin.cn/post/7133599300919459871)
 - [「React 进阶」react-router v6 通关指南 - 掘金](https://juejin.cn/post/7069555976717729805)

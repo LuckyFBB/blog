@@ -6,30 +6,6 @@ group:
 order: 0
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .foreword{
-        padding: 12px 12px 12px 16px;
-        background-color: #ECF9FF;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #439dd3;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 一篇关于 hooks 的内容分享，主要涉及函数组件、类组件的介绍，以及 useEffect 的生命周期替换方案和是否把函数作为 useEffect 的第二参数在实践中的解决方案。
 
 <!-- more -->
@@ -348,7 +324,7 @@ useCallback(fn,deps)相当于 useMemo(() => fn, deps)
 
 本文介绍了 hooks 产生动机、函数组件和类组件的区别以及 useEffect/useCallback/useMemo 等内容。重点介绍了 useEffect 的生命周期替换方案以及是否把函数作为 useEffect 的第二参数。
 
-<div class="link"> 参考链接 </div>
+## 参考链接
 
 - [When to useMemo and useCallback](https://kentcdodds.com/blog/usememo-and-usecallback)
 - [How to fetch data with React Hooks](https://www.robinwieruch.de/react-hooks-fetch-data)

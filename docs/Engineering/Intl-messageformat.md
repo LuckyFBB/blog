@@ -6,16 +6,9 @@ group:
 order: 0
 ---
 
-<style>
-    .quote {
-        background-color: #f9f1db;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
-<div class="quote">Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.</div>
+:::info{title=" "}
+Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.
+:::
 
 ## ICU 信息语法
 

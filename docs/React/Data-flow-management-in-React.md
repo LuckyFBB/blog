@@ -6,26 +6,11 @@ group:
 order: 0
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 前言
 
-<div class="quote">💡 为什么数据流管理重要？React 的核心思想为：UI=render(data)，data 就是所谓的数据，render 是 React 提供的纯函数，所以 UI 展示完全由数据层决定。</div>
+:::info{title=" "}
+💡 为什么数据流管理重要？React 的核心思想为：UI=render(data)，data 就是所谓的数据，render 是 React 提供的纯函数，所以 UI 展示完全由数据层决定。
+:::
 
 在本文中，会简单介绍 react 中的数据流管理，从自身的 context 到三方库的 redux 的相关概念，以及 redux 附属内容丐版实现。
 
@@ -143,7 +128,7 @@ const cloneObj = { ...obj, info: { name: 'shuangxu' } };
 1.  使用 Context 维护全局状态，介绍了 v16.3 之前/v16.3 之后/hooks，不同版本`context`的使用，以及 v16.3 之前版本的`context`的弊端。
 1.  引入 redux，第三方的状态容器，以及 react-redux API(Provider/connect)分析与丐版实现
 
-<div class="link">参考链接</div>
+## 参考链接
 
 - [对 React 状态管理的理解及方案对比](https://github.com/sunyongjian/blog/issues/36)
 - [聊一聊我对 React Context 的理解以及应用](https://juejin.cn/post/6844903566381940744)

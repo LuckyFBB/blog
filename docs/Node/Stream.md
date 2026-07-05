@@ -6,17 +6,6 @@ group:
 order: 0
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-</style>
-
 ## 流(Stream)
 
 stream 是一个抽象的数据接口，它继承了 EventEmitter，它能够发送/接受数据，本质就是让数据流动起来，如下图：
@@ -150,13 +139,13 @@ fs.createReadStream 创建一个 Readable 对象
     当  data 事件被添加后，可写流中有数据后会将数据推到该事件回调函数中，需要自己去消费数据块，如果不处理则该数据会丢失
   - 调用  stream.pipe  方法将数据发送到 Writeable
   - 调用 stream.resume 方法
-  ![Untitled](/blog/imgs/stream/Untitled%2018.png)
+    ![Untitled](/blog/imgs/stream/Untitled%2018.png)
 - **暂停模式**
   数据会堆积在内部缓冲器中，必须显式调用  stream.read() 读取数据块
   - 监听 readable 事件
     可写流在数据准备好后会触发该事件回调，此时需要在回调函数中使用  stream.read()
     来主动消费数据。readable  事件表明流有新的动态：要么有新的数据，要么流已经读取所有数据
-  ![Untitled](/blog/imgs/stream/Untitled%2019.png)
+    ![Untitled](/blog/imgs/stream/Untitled%2019.png)
 - **两种模式之间如何进行转换呢？**
   - 可读流在创建完成之后处于初始状态 //TODO：和网上的分享不一致
   - 暂停模式切换到流动模式
@@ -324,7 +313,7 @@ source.pipe(pipeline).pipe(dest);
 
 将 lessTransform.pipe(minifyCss) 封装称为 pipeline
 
-<div class="link">参考链接</div>
+## 参考链接
 
 - [Node Guidebook](https://tsejx.github.io/node-guidebook/system/io/stream)
 - [想学 Node.js，stream 先有必要搞清楚](https://juejin.cn/post/6844903891083984910)

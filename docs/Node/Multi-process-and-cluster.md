@@ -5,17 +5,6 @@ group:
 order: 2
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-</style>
-
 在本文中主要会介绍多进程架构以及其问题，cluster 在多进程架构上解决了什么问题，以及其原理。
 
 ## 多进程架构
@@ -500,7 +489,7 @@ function onconnection(err, clientHandle) {
 }
 ```
 
-<div class="link">参考连接</div>
+## 参考链接
 
 - [详解 Node.Js 中实现端口重用原理](https://segmentfault.com/a/1190000014701988)
 - [通过源码解析 Node.js 中 cluster 模块的主要功能实现](https://cnodejs.org/topic/56e84480833b7c8a0492e20c)

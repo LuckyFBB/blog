@@ -6,15 +6,6 @@ group:
 order: 5
 ---
 
-<style>
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 理解 chunk
 
 `Webpack`可以看成一个模块打包机器，我们编写的文件对于`Webpack`来说都是模块(`module`)，我们可以在`Webpack`中配置对应模块的处理方式。
@@ -302,11 +293,13 @@ module.exports = {
 - maxInitialRequests
   入口文件的最大并行请求数，默认为 30
 
-<div class="quote">
-💡 何为请求数？<br/>
-是指加载一个 chunk 的时候需要加载的所有分包数量。<br/>
+:::info{title=" "}
+💡 何为请求数？
+
+是指加载一个 chunk 的时候需要加载的所有分包数量。
+
 例如对于一个 chunk A 来说，通过分包规则(如模块引用次数、第三方包)分离出来了若干的子 chunk[i]，那么加载 chunk A 的时候就回去加载 chunk[i]，那么等于浏览器需要同时加载 chunk A 和所有的分离 chunk[i]，此时的并行请求数量为主包 A 加上 i 个分包，即 i+1
-</div>
+:::
 
 ![image.png](/blog/imgs/webpackSplitChunk/image%201.png)
 

@@ -6,15 +6,6 @@ group:
 order: 0
 ---
 
-<style>
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## npm 中的依赖包
 
 ### 依赖包类型
@@ -44,10 +35,9 @@ order: 0
 
    它要求宿主环境安装`react`/`react-dom`版本都大于 16.0.0
 
-   <div class="quote">
-   📌 在插件import或者require所依赖的包的时候，永远都是引用宿主环境统一安装的npm包，最终解决插件与所依赖包不一致的问题
-
-   </div>
+   :::info{title=" "}
+   📌 在插件 import 或者 require 所依赖的包的时候，永远都是引用宿主环境统一安装的 npm 包，最终解决插件与所依赖包不一致的问题
+   :::
 
 4. optionalDependencies
 

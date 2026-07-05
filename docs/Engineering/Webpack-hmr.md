@@ -6,15 +6,6 @@ group:
 order: 4
 ---
 
-<style>
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## 何为 HMR?
 
 模块热替换(HMR - Hot Module Replacement)功能会在应用程序运行过程中替换、添加或删除模块，而无需重新加载整个页面
@@ -218,10 +209,12 @@ sendStats(clients, stats, force) {
 
 在`start`函数中，会执行`setupDevMiddleware`方法，该方法主要是执行`webpack-dev-middleware`库的。
 
-<div class="quote">
-1. webpack-dev-middleware: 该库主要做文件相关的操作，本地文件输出以及监听<br/>
+:::info{title=" "}
+
+1. webpack-dev-middleware: 该库主要做文件相关的操作，本地文件输出以及监听
+
 2. webpack-dev-server: 该库主要只负责启动服务和前置准备工作
-</div>
+   :::
 
 在`webpack-dev-middleware`中主要实现
 
@@ -345,6 +338,7 @@ if (this.options.hot) {
 上述知道了 module.hot.check 的来源，现在看看该[`check`](https://github.com/webpack/webpack/blob/main/lib/hmr/HotModuleReplacement.runtime.js#L258)函数具体做了什么事情
 
 - 调用`$hmrDownloadManifest$`获取当前的`hash.hot-update.json`
+
   ```js
   // $hmrDownloadManifest$ 都是动态注入的代码
   __webpack_require__.hmrM = () => {
@@ -366,7 +360,9 @@ if (this.options.hot) {
   __webpack_require__.hmrF = () =>
     'main.' + __webpack_require__.h() + '.hot-update.json';
   ```
+
 - 再调用`$hmrDownloadUpdateHandlers$["jsonp"]`请求`js`文件
+
   ```js
   // 执行 loadUpdateChunk
   __webpack_require__.hu = (chunkId) => {

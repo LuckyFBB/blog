@@ -6,18 +6,9 @@ group:
 order: 2
 ---
 
-<style>
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
-<div class="quote">
+:::info{title=" "}
 💡useSyncExternalStore is a React Hook that lets you subscribe to an external store
-</div>
+:::
 
 useSyncExternalStore 是一个可以订阅外部 Store 的 React Hook
 

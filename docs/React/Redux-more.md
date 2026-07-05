@@ -6,23 +6,6 @@ group:
 order: 2
 ---
 
-<style>
-    .link {
-        margin-top: 16px;
-        padding: 4px 12px 4px 10px;
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        border-left: 5px solid #F8CBA6;
-        background-color: #FFFBEB;
-    }
-    .quote {
-        background-color: #FFE7CC;
-        padding: 10px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-</style>
-
 ## React-Redux
 
 react-redux 是 Redux 提供的 react 绑定，辅助在 react 项目中使用 redux
@@ -103,7 +86,9 @@ export const connect =
 
 ## Redux Middleware
 
-<div class="quote">“It provides a third-party extension point between dispatching an action, and the moment it reaches the reducer.” – Dan Abramov</div>
+:::info{title=" "}
+“It provides a third-party extension point between dispatching an action, and the moment it reaches the reducer.” – Dan Abramov
+:::
 
 `middleware`提供分类处理`action`的机会，在`middleware`中可以检查每一个`action`，挑选出特定类型的`action`做对应操作
 
@@ -262,6 +247,6 @@ applyMiddleware 符合洋葱模型
 
 <img width="770" alt="image" src="https://user-images.githubusercontent.com/38368040/156110747-48070fcb-e85a-4d2f-b97a-7aa57a2a523c.png">
 
-<div class="link">参考链接</div>
+## 参考链接
 
 - [手写 react-redux](http://dennisgo.cn/Articles/React/React-Redux.html)
