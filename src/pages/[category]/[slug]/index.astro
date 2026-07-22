@@ -1,0 +1,71 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getArticleSlug, getCategoryForEntry, getPostUrl, isArticle, sortPosts, type PostEntry } from '../../../lib/blog';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).filter(isArticle);
+
+  return posts
+    .map((post) => {
+      const category = getCategoryForEntry(post);
+      if (!category) return undefined;
+
+      return {
+        params: {
+          category: category.slug,
+          slug: getArticleSlug(post),
+        },
+        props: { post },
+      };
+    })
+    .filter(Boolean);
+}
+
+interface Props {
+  post: PostEntry;
+}
+
+const { post } = Astro.props;
+const category = getCategoryForEntry(post);
+const { Content, headings } = await render(post);
+const posts = sortPosts((await getCollection('posts')).filter(isArticle));
+const currentIndex = posts.findIndex((item) => item.id === post.id);
+const previousPost = posts[currentIndex - 1];
+const nextPost = posts[currentIndex + 1];
+---
+
+<BaseLayout title={post.data.title} description={category?.description}>
+  <article class="article-layout">
+    <header class="article-header">
+      <a class="article-category" href={category ? `../` : '/'}>{category?.title}</a>
+      <h1>{post.data.title}</h1>
+    </header>
+
+    <div class="article-grid">
+      <div class="prose">
+        <Content />
+      </div>
+
+      {
+        headings.length > 0 && (
+          <aside class="toc" aria-label="目录">
+            <strong>目录</strong>
+            {headings
+              .filter((heading) => heading.depth <= 3)
+              .map((heading) => (
+                <a class={`depth-${heading.depth}`} href={`#${heading.slug}`}>
+                  {heading.text}
+                </a>
+              ))}
+          </aside>
+        )
+      }
+    </div>
+
+    <nav class="article-pager" aria-label="文章翻页">
+      {previousPost && <a href={getPostUrl(previousPost)}>上一篇：{previousPost.data.title}</a>}
+      {nextPost && <a href={getPostUrl(nextPost)}>下一篇：{nextPost.data.title}</a>}
+    </nav>
+  </article>
+</BaseLayout>

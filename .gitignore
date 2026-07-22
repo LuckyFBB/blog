@@ -1,5 +1,7 @@
 node_modules
 /dist
+.astro
+.pnpm-store
 .dumi/tmp
 .dumi/tmp-production
 .DS_Store

@@ -1,0 +1,99 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  categories,
+  getArticlesByCategory,
+  getCategoryBySlug,
+  getPostUrl,
+  isArticle,
+  type Category,
+  type PostEntry,
+} from '../../lib/blog';
+
+export async function getStaticPaths() {
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+}
+
+interface Props {
+  category: Category;
+}
+
+const { category } = Astro.props;
+const routeCategory = getCategoryBySlug(category.slug) ?? category;
+const allPosts = (await getCollection('posts')).filter(isArticle);
+const posts = getArticlesByCategory(allPosts, routeCategory);
+
+function getGroup(post: PostEntry) {
+  const group = post.data.group;
+
+  if (typeof group === 'string') {
+    return { title: group, order: 999 };
+  }
+
+  if (group && typeof group === 'object' && 'title' in group) {
+    return {
+      title: String(group.title),
+      order: typeof group.order === 'number' ? group.order : 999,
+    };
+  }
+
+  return { title: '其他', order: 999 };
+}
+
+const groupedPosts = Array.from(
+  posts.reduce((groups, post) => {
+    const group = getGroup(post);
+    const current = groups.get(group.title) ?? { ...group, posts: [] as PostEntry[] };
+
+    current.order = Math.min(current.order, group.order);
+    current.posts.push(post);
+    groups.set(group.title, current);
+
+    return groups;
+  }, new Map<string, { title: string; order: number; posts: PostEntry[] }>()),
+  ([, group]) => ({
+    ...group,
+    posts: group.posts.sort((a, b) => {
+      const orderDiff = (a.data.order ?? 999) - (b.data.order ?? 999);
+      if (orderDiff !== 0) return orderDiff;
+
+      return a.data.title.localeCompare(b.data.title, 'zh-CN');
+    }),
+  }),
+).sort((a, b) => {
+  const orderDiff = a.order - b.order;
+  if (orderDiff !== 0) return orderDiff;
+
+  return a.title.localeCompare(b.title, 'zh-CN');
+});
+---
+
+<BaseLayout title={routeCategory.title} description={routeCategory.description}>
+  <section class="page-title">
+    <h1>{routeCategory.title}</h1>
+    <p>{routeCategory.description}</p>
+  </section>
+
+  <section class="content-shell">
+    <div class="category-intro">
+      {
+        groupedPosts.map((group) => (
+          <section class="category-group">
+            <h2>{group.title}</h2>
+            <div class="category-group-list">
+              {group.posts.map((post) => (
+                <a href={getPostUrl(post)}>
+                  <span>{post.data.title}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

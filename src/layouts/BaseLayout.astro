@@ -1,0 +1,57 @@
+---
+import { categories, getCategoryUrl, withBase } from '../lib/blog';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const siteTitle = 'FBB Blog';
+const { title = siteTitle, description = '记录前端工程、React、Node 与一些认真折腾过的技术笔记。' } =
+  Astro.props;
+const pageTitle = title === siteTitle ? siteTitle : `${title} | ${siteTitle}`;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href={withBase('/favicon.ico')} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={withBase('/')}>
+        <img src={withBase('/logo.png')} alt="" />
+        <span>FBB Blog</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        {
+          categories.map((category) => (
+            <a
+              class:list={['nav-link', currentPath.includes(`/${category.slug}/`) && 'is-active']}
+              href={getCategoryUrl(category)}
+            >
+              {category.title}
+            </a>
+          ))
+        }
+      </nav>
+      <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+        GitHub
+      </a>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      Copyright © 2022-{new Date().getFullYear()} Made with care by FBB
+    </footer>
+  </body>
+</html>

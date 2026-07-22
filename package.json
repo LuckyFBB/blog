@@ -2,13 +2,17 @@
   "name": "blog-of-fbb",
   "version": "0.0.1",
   "description": "Welcome to FBB's blog，have something you need",
+  "type": "module",
+  "engines": {
+    "node": ">=18.20.8"
+  },
   "scripts": {
-    "start": "npm run dev",
-    "dev": "dumi dev",
-    "build": "dumi build",
-    "preview": "dumi preview",
-    "prepare": "husky install && dumi setup",
-    "deploy": "dumi build && gh-pages -d dist"
+    "start": "pnpm run dev",
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "prepare": "husky install",
+    "deploy": "astro build && gh-pages -d dist"
   },
   "authors": [],
   "license": "MIT",
@@ -26,12 +30,13 @@
     "@commitlint/cli": "^16.2.1",
     "@commitlint/config-conventional": "^16.2.1",
     "@commitlint/cz-commitlint": "^16.2.1",
-    "dumi": "^2.4.13",
-    "dumi-theme-antd-style": "^0.31.1",
+    "@astrojs/check": "^0.9.4",
+    "astro": "^5.12.0",
     "gh-pages": "^5.0.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1"
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "git-cz": "^4.9.0"
