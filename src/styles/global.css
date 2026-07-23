@@ -6,7 +6,10 @@
   --line: #e5e7eb;
   --line-strong: #d1d5db;
   --code-bg: #f6f8fa;
+  --code-block-bg: #24292f;
+  --code-block-text: #e6edf3;
   --link: #0969da;
+  --page-width: 1180px;
 }
 
 * {
@@ -45,7 +48,7 @@ img {
   gap: 24px;
   align-items: center;
   min-height: 64px;
-  padding: 0 max(24px, calc((100vw - 1040px) / 2));
+  padding: 0 max(24px, calc((100vw - var(--page-width)) / 2));
   border-bottom: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
@@ -101,7 +104,7 @@ img {
 
 main,
 .site-footer {
-  width: min(1040px, calc(100% - 40px));
+  width: min(var(--page-width), calc(100% - 40px));
   margin: 0 auto;
 }
 
@@ -346,7 +349,7 @@ h3 {
 }
 
 .article-header {
-  max-width: 760px;
+  max-width: 900px;
   margin-bottom: 36px;
 }
 
@@ -364,8 +367,8 @@ h3 {
 
 .article-grid {
   display: grid;
-  grid-template-columns: minmax(0, 720px) 220px;
-  gap: 64px;
+  grid-template-columns: minmax(0, 900px) 220px;
+  gap: 56px;
   align-items: start;
 }
 
@@ -430,17 +433,21 @@ h3 {
 
 .prose pre {
   overflow-x: auto;
-  margin: 20px 0;
-  padding: 16px;
-  border: 1px solid var(--line);
+  margin: 24px 0;
+  padding: 22px 24px;
   border-radius: 6px;
-  background: var(--code-bg);
-  line-height: 1.7;
+  background: var(--code-block-bg);
+  color: var(--code-block-text);
+  font-size: 15px;
+  line-height: 1.75;
 }
 
 .prose pre code {
   padding: 0;
   background: transparent;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .prose blockquote {
@@ -552,7 +559,7 @@ h3 {
 @media (max-width: 640px) {
   main,
   .site-footer {
-    width: min(100% - 28px, 1040px);
+    width: min(100% - 28px, var(--page-width));
   }
 
   .home-hero {
