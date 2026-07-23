@@ -1,15 +1,159 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="阅读笔记、系统知识和一些暂时没归类的内容。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>进程间通信之管道 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link is-active" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">其他</a> <h1>进程间通信之管道</h1> </header> <div class="article-grid"> <div class="prose"> <p>在之前我们讲了 <a href="/blog/node/inter-process-communication-in-nodejs">Node 中的进程通信</a>，在 *nix 系统下使用的是 Unix Domain Socket，在 window 系统下使用的的命名管道。</p>
+<p>其实进程间的通信远不止上述两种，该篇文章我们来了解更多吧！</p>
+<h2 id="匿名管道">匿名管道</h2>
+<p>在使用 git 命令批量删除本地分支时，经常使用<code>git branch | grep 'fix_5.2.x' | xargs git branch -d</code>这个命令，那其实 | 就是我们常说的管道，前面的命令的输出作为后一个命令的输入。</p>
+<p>管道是一种<strong>半双工</strong>的通信方式，数据只能有一个流动方向，数据只能从一端写入，从另一端读取。想要实现双方通信，需要实现两个管道。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> _pipe[</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> pipe</span><span style="color:#E1E4E8">(_pipe);</span></span></code></pre>
+<p>在 C++ 中，创建管道用 pipe 函数。调用 pipe 函数，会在内核中开辟出一块缓冲区用来进行进程间通信，这块缓冲区称为<strong>管道</strong>，它有一个读端和一个写端。_pipe[0] 指向管道的读端，_pipe[1] 指向管道的写端。通过 read(_pipe[0]) 读取管道中的内容，write(_pipe[1]) 向管道中写入内容。</p>
+<h3 id="管道通信的步骤"><strong>管道通信的步骤</strong></h3>
+<ol>
+<li>
+<p>父进程创建管道，得到两个文件描述符指向管道的两端</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/8da4618a-68e9-4513-8e17-66ca5cfd9d8a" alt="Untitled"></p>
+</li>
+<li>
+<p>fork 子进程，子进程复制两个文件描述符指向同一管道</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/bf9401d8-6e78-41e6-a958-cb72a7d9f2cd" alt="Untitled 1"></p>
+</li>
+<li>
+<p>父进程关闭写端 _pipe[1]，子进程关闭读端 _pipe[0]，从而实现通信</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/3e286cf7-3cd9-40cd-a770-514a1e2e8eb3" alt="Untitled 2"></p>
+</li>
+</ol>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> _pipe[</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> pipe</span><span style="color:#E1E4E8">(_pipe);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (ret </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        perror</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"pipe</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    pid_t</span><span style="color:#E1E4E8"> id </span><span style="color:#F97583">=</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (id </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        perror</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"fork</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 子进程</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (id </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        close</span><span style="color:#E1E4E8">(_pipe[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#F97583">        char</span><span style="color:#E1E4E8"> msg[</span><span style="color:#79B8FF">1024</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#B392F0">            fgets</span><span style="color:#E1E4E8">(msg, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(msg), stdin);</span></span>
+<span class="line"><span style="color:#B392F0">            printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"send msg </span><span style="color:#79B8FF">%s\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, msg);</span></span>
+<span class="line"><span style="color:#B392F0">            write</span><span style="color:#E1E4E8">(_pipe[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">], msg, </span><span style="color:#B392F0">strlen</span><span style="color:#E1E4E8">(msg));</span></span>
+<span class="line"><span style="color:#B392F0">            sleep</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 父进程</span></span>
+<span class="line"><span style="color:#F97583">    else</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        close</span><span style="color:#E1E4E8">(_pipe[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#F97583">        char</span><span style="color:#E1E4E8"> msg[</span><span style="color:#79B8FF">1024</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#B392F0">            memset</span><span style="color:#E1E4E8">(msg, </span><span style="color:#9ECBFF">'</span><span style="color:#79B8FF">\0</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(msg));</span></span>
+<span class="line"><span style="color:#B392F0">            read</span><span style="color:#E1E4E8">(_pipe[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">], msg, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(msg));</span></span>
+<span class="line"><span style="color:#B392F0">            printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"recv msg </span><span style="color:#79B8FF">%s\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, msg);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="匿名管道的特点">匿名管道的特点</h3>
+<ol>
+<li>只能单向通信，且只能为存在血缘关系的进程</li>
+<li>依赖于文件系统</li>
+<li>生命周期跟随进程，在内存中，进程结束后被释放</li>
+</ol>
+<p>⭕️ 如果想利用匿名管道实现双向通信，则需要创建两个管道，且需要继承两个管道的文件描述符。</p>
+<h2 id="命名管道">命名管道</h2>
+<p>匿名管道中，只有血缘关系的进程才可以进程通信，命名管道(FIFO)解决了这个问题。</p>
+<p>它提供<strong>一个路径名</strong>与之关联，以文件的形式存储在文件系统。即使进程与创建 FIFO 的进程不存在亲缘关系，只要可以访问该路径，就能够通过 FIFO 相互通信。</p>
+<p>FIFO 表明是先进先出(First-In-First-Out)，Unix 中的 FIFO 类似管道，是一个半双工的数据流。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/types.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/stat.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583"> int</span><span style="color:#E1E4E8"> ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mkfifo</span><span style="color:#E1E4E8">(pathname, mode);</span></span></code></pre>
+<p>第一个参数是 Unix 的路径名，又为 FIFO 的名字。</p>
+<p>mode 参数为文件的权限位，创建 FIFO 后，需要使用 open 函数打开文件来进行读或者写操作。FIFO 不能打开来既可以读又可以写。write 总是从尾部添加数据，read 总是从开头添加数据。</p>
+<h3 id="命名管道的实现">命名管道的实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;stdio.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/types.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/stat.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;unistd.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;fcntl.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;string.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> _PATH_NAME_</span><span style="color:#9ECBFF"> "./myfifo"</span></span>
+<span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> _SIZE_</span><span style="color:#79B8FF"> 100</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#6A737D">		// 创建管道时需要在 mode 参数位置传 S_IFIFO,表明创建的是命名管道</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mkfifo</span><span style="color:#E1E4E8">(_PATH_NAME_, S_IFIFO </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (ret </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"make file error</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> buf[_SIZE_];</span></span>
+<span class="line"><span style="color:#B392F0">    memset</span><span style="color:#E1E4E8">(buf, </span><span style="color:#9ECBFF">'</span><span style="color:#79B8FF">\0</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(buf));</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> fd </span><span style="color:#F97583">=</span><span style="color:#B392F0"> open</span><span style="color:#E1E4E8">(_PATH_NAME_, O_WRONLY);</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        fgets</span><span style="color:#E1E4E8">(buf, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(buf) </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, stdin);</span></span>
+<span class="line"><span style="color:#F97583">        int</span><span style="color:#E1E4E8"> ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> write</span><span style="color:#E1E4E8">(fd, buf, </span><span style="color:#B392F0">strlen</span><span style="color:#E1E4E8">(buf) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (ret </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#B392F0">            printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"write error</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">            break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#B392F0">    close</span><span style="color:#E1E4E8">(fd);</span></span>
+<span class="line"><span style="color:#B392F0">		unlink</span><span style="color:#E1E4E8">(_PATH_NAME_);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF">&#x3C;stdio.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF">&#x3C;sys/types.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF">&#x3C;sys/stat.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF">&#x3C;unistd.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF">&#x3C;fcntl.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF">&#x3C;string.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> _PATH_NAME_</span><span style="color:#9ECBFF"> "./myfifo"</span></span>
+<span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> _SIZE_</span><span style="color:#79B8FF">  100</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> fd </span><span style="color:#F97583">=</span><span style="color:#B392F0"> open</span><span style="color:#E1E4E8">(_PATH_NAME_, O_RDONLY);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8">(fd </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"open file error</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> buf[_SIZE_];</span></span>
+<span class="line"><span style="color:#B392F0">    memset</span><span style="color:#E1E4E8">(buf, </span><span style="color:#9ECBFF">'</span><span style="color:#79B8FF">\0</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(buf));</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#F97583">        int</span><span style="color:#E1E4E8"> ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> read</span><span style="color:#E1E4E8">(fd, buf, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(buf));</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8">(ret </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#B392F0">            printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"read error</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">            break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#B392F0">        printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%s\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, buf);</span></span>
+<span class="line"><span style="color:#F97583">        int</span><span style="color:#E1E4E8"> ret1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> write</span><span style="color:#E1E4E8">(fd, buf, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(buf));</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#B392F0">    close</span><span style="color:#E1E4E8">(fd);</span></span>
+<span class="line"><span style="color:#B392F0">		unlink</span><span style="color:#E1E4E8">(_PATH_NAME_);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="命名管道和匿名管道的区别">命名管道和匿名管道的区别</h2>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/d2c97d01-de05-4dcc-902b-51aeb5f27edb" alt="Untitled 3"></p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#匿名管道"> 匿名管道 </a><a class="depth-3" href="#管道通信的步骤"> 管道通信的步骤 </a><a class="depth-3" href="#匿名管道的特点"> 匿名管道的特点 </a><a class="depth-2" href="#命名管道"> 命名管道 </a><a class="depth-3" href="#命名管道的实现"> 命名管道的实现 </a><a class="depth-2" href="#命名管道和匿名管道的区别"> 命名管道和匿名管道的区别 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/more/thoughts-from-base64/">上一篇：Base64 产生的思考</a> <a href="/blog/more/msg-share-and-memory/">下一篇：进程间通信之消息队列和内存共享</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,83 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>规范提交记录 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>规范提交记录</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>在<a href="/blog/engineering/code-inspection">前一篇文章</a>中，主要讲解了利用 <code>git hooks</code> 做一些 <code>pre-commit</code> 代码检查的工作，主要是为了提交到仓库的代码保持统一的风格，因此采用 <code>git-hooks</code> 来做检查。</p>
+<p>在我们提交 <code>commit</code> 信息的时候，我们还需要写 commit msg，对于 msg 来说，我们也想保持一种格式，规定好每一个变更的格式与内容。</p>
+<p>那么就需要引入 <code>commitlint/commitizen</code> 等工具来完善该功能。</p>
+<h2 id="概念">概念</h2>
+<h3 id="commitlint">commitlint</h3>
+<p>执行 <code>git commit -m ”xxxx”</code> 的时候，用来检查 xxx 是否符合固定格式的</p>
+<h3 id="commitizen">commitizen</h3>
+<p>基于 Node.js 的 <code>git commit</code> 命令行工具，辅助生成标准的 <code>commit message</code>，具体的操作会交给适配器做</p>
+<h3 id="adapter">adapter</h3>
+<p><code>commitizen</code> 命令行工具的交互方式插件。例如 <code>cz-emoji</code>、<code>cz-emoji-chinese</code>、<code>cz-conventional-changelog</code> 等等</p>
+<h2 id="使用">使用</h2>
+<h3 id="安装-commitizen">安装 commitizen</h3>
+<p>全局安装 commitizen，这样子就能够全局使用 <code>cz/git-cz/git cz</code> 等命令了</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> install</span><span style="color:#79B8FF"> -g</span><span style="color:#9ECBFF"> commitizen</span></span></code></pre>
+<h3 id="安装-cz-git">安装 cz-git</h3>
+<p>安装 <code>commitizen</code> 对应的适配器，目前我们选择 <code>cz-git</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> install</span><span style="color:#79B8FF"> -D</span><span style="color:#9ECBFF"> cz-git</span></span></code></pre>
+<p>在 <code>packsge.json</code> 中添加对于 <code>commitizen</code> 的配置</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "config"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">    "commitizen"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">      "path"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "node_modules/cz-git"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>当我们再次运行 <code>git-cz</code> 的时候，就会出现</p>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled.png" alt="Untitled"></p>
+<h3 id="安装-commitlint">安装 commitlint</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> install</span><span style="color:#79B8FF"> -D</span><span style="color:#9ECBFF"> @commitlint/config-conventional</span><span style="color:#9ECBFF"> @commitlint/cli</span></span></code></pre>
+<p><code>@commitlint/cli</code>  是 <code>commitlint</code> 提供的命令行工具</p>
+<p><code>@commitlint/config-conventional</code> 是社区中一些共享的配置，是根据 Angular 提交规范预定义的规则包</p>
+<p>定义 <code>commitlint.config.js</code> 配置 <code>lint</code> 规则，<a href="https://cz-git.qbb.sh/zh/config/">cz-git 配置</a>，选择 emoji 模版后运行 <code>git-cz</code></p>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled%201.png" alt="Untitled"></p>
+<p>能够看到我们的提交信息都是有一定格式的</p>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled%202.png" alt="Untitled"></p>
+<h2 id="standard-version">standard-version</h2>
+<p>在我们需要发版本时，往往需要生成对应的 CHANGELOG.md，如果还是一条一条的写，未必也有点太蠢了。当 commit 信息规范之后，有对应的工具来帮我们完成这个事情。</p>
+<p>上述用到的 <code>conventional-changelog</code> 其实一个完整的<a href="https://github.com/conventional-changelog">生态</a>，能够 <code>lint message/generate changelogs/automate versioning</code></p>
+<h3 id="安装"><strong>安装</strong></h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> add</span><span style="color:#9ECBFF"> standard-version</span><span style="color:#79B8FF"> -D</span></span></code></pre>
+<p>添加脚本，执行 <code>pnpm release</code> 之后能够自动生成 changeLog 和 package version</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "scripts"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">    "release"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "standard-version"</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled%203.png" alt="Untitled"></p>
+<h3 id="原理">原理</h3>
+<ol>
+<li>
+<p>解析 Git 提交历史，查找符合标准格式的提交信息。<code>Standard-version</code> 期望的提交信息格式是符合 <code>Conventional Commits</code> 规范的。</p>
+</li>
+<li>
+<p>根据提交信息的类型(feat、fix、docs 等)和关键字(BREAKING CHANGE、MAJOR、MINOR 等)，确定新版本号的增量。例如，如果提交信息中包含 <code>BREAKING CHANGE</code> Standard-version 将增加主版本号(Major)；如果提交信息中包含  <code>feat</code>  类型的提交，Standard-version 将增加次版本号(Minor)；如果包含  <code>fix</code>  类型的提交，将增加修订版本号(Patch)。</p>
+</li>
+<li>
+<p>更新项目的  <code>package.json</code>  文件中的版本号，并生成一个新的 Git 标签。新版本号将根据增量自动计算。</p>
+</li>
+<li>
+<p>通过 <code>conventional-changelog</code> 根据提交信息生成 <code>CHANGELOG</code> 文件，其中包含了自上一个版本以来的所有变更。</p>
+</li>
+</ol>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled%204.png" alt="Untitled"></p>
+<h3 id="changelog">changelog</h3>
+<p><code>standard-version</code> 会根据 <code>commit</code> 信息生成对应的 <code>CHANGELOG</code>，如果我们在 <code>commit</code> 信息中使用了 <code>#number</code> 这个形式，<code>#number</code> 会自动的变成对应仓库的 <code>issue</code> 信息</p>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled%205.png" alt="Untitled"></p>
+<p>如果我们添加 <code>repository.url</code> 信息，提交对应的 <code>commit</code>，能够发现 <code>#number</code> 会自动关联上 <code>repository</code>，<code>commit</code> 信息也是如此</p>
+<p><img src="/blog/imgs/regulatory-submission-records/Untitled%206.png" alt="Untitled"></p>
+<p>在我们的业务迭代中，我们往往会使用其他的 bug 管理系统，不是放在 issue 上，希望能够替换 changelog 上的地址</p>
+<p><code>standard-version</code> 提供了对应的 <a href="https://github.com/conventional-changelog/standard-version?tab=readme-ov-file#lifecycle-scripts">hook</a> 做生命周期上其他的处理，我们希望更改 <code>changelog</code> 需要在 <code>postchangelog</code> 上做处理</p>
+<p>在 <code>package.json</code> 中新增如下的代码即可</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "standard-version"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">    "scripts"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {</span></span>
+<span class="line"><span style="color:#B392F0">      "postchangelog"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "handle changelog"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#概念"> 概念 </a><a class="depth-3" href="#commitlint"> commitlint </a><a class="depth-3" href="#commitizen"> commitizen </a><a class="depth-3" href="#adapter"> adapter </a><a class="depth-2" href="#使用"> 使用 </a><a class="depth-3" href="#安装-commitizen"> 安装 commitizen </a><a class="depth-3" href="#安装-cz-git"> 安装 cz-git </a><a class="depth-3" href="#安装-commitlint"> 安装 commitlint </a><a class="depth-2" href="#standard-version"> standard-version </a><a class="depth-3" href="#安装"> 安装 </a><a class="depth-3" href="#原理"> 原理 </a><a class="depth-3" href="#changelog"> changelog </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/webpack-core-process/">上一篇：webpack 核心流程</a> <a href="/blog/engineering/workflow-for-pnpm-based-monorepo/">下一篇：基于 pnpm 的 monorepo 的工作流</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

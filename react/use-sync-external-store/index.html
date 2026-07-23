@@ -1,15 +1,178 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>useSyncExternalStore | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>useSyncExternalStore</h1> </header> <div class="article-grid"> <div class="prose"> <aside>
+💡useSyncExternalStore is a React Hook that lets you subscribe to an external store
+</aside>
+<p>useSyncExternalStore 是一个可以订阅外部 Store 的 React Hook</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> snapshot</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> useSyncExternalStore</span><span style="color:#E1E4E8">(subscribe, getSnapshot, getServerSnapshot</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<h3 id="单个监听">单个监听</h3>
+<p>该 hook 可以基于外部的 store 创建一个 state。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> store </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { x: window.innerWidth, y: window.innerHeight };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> subscribe</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">callback</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'resize'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    store </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { x: window.innerWidth, y: window.innerHeight };</span></span>
+<span class="line"><span style="color:#B392F0">    callback</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    window.</span><span style="color:#B392F0">removeEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'resize'</span><span style="color:#E1E4E8">, callback);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> getSnapshot</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> store;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>getSnapshot 是用来获取当前的数据，需要注意这里返回的 store 需要是新对象的引用，把 store 当成不可变数据来使用</p>
+<p>subscribe 接受一个 callback 方法，这个 callback 方法是由 react 内部传递而来，主要是做当 store 发生改变的时候，callback 方法需要被执行，其内部主要是执行 forceUpdate 方法</p>
+<p>其核心逻辑为 store 改变 ⇒ 调用 callback ⇒ forceUpdate(fiber) 执行刷新</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> App</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> size</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> useSyncExternalStore</span><span style="color:#E1E4E8">(subscribe, getSnapshot);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#B392F0">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#B392F0">div</span><span style="color:#E1E4E8">></span><span style="color:#FFAB70">X</span><span style="color:#F97583">:</span><span style="color:#E1E4E8">{</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">.</span><span style="color:#FFAB70">x</span><span style="color:#E1E4E8">}&#x3C;/</span><span style="color:#B392F0">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#B392F0">div</span><span style="color:#E1E4E8">></span><span style="color:#FFAB70">Y</span><span style="color:#F97583">:</span><span style="color:#E1E4E8">{</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">.</span><span style="color:#FFAB70">y</span><span style="color:#E1E4E8">}&#x3C;/</span><span style="color:#B392F0">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#F97583">    &#x3C;/</span><span style="color:#E1E4E8">div</span><span style="color:#F97583">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><img src="/blog/imgs/useSyncExternalStore/chatgpt.gif" alt="chatgpt.gif"></p>
+<h3 id="多个监听">多个监听</h3>
+<p>官网的一个 todoList 的示例</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> TodoStore</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  private</span><span style="color:#FFAB70"> _todoList</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">id</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">status</span><span style="color:#F97583">:</span><span style="color:#B392F0"> TodoStatus</span><span style="color:#E1E4E8"> }[] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  private</span><span style="color:#FFAB70"> _listeners</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> (() </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">)[] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  addTodo</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> name</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> nanoid</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">._todoList </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#F97583">      ...</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">._todoList,</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#E1E4E8">        id: name,</span></span>
+<span class="line"><span style="color:#E1E4E8">        name: </span><span style="color:#9ECBFF">`TODO_${</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        status: TodoStatus.Todo,</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    ];</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">emitChange</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  completeTodo</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">id</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">._todoList </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">._todoList.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">todo</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (todo.id </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> id) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        todo.status </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> TodoStatus.Complete;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> todo;</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">emitChange</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  emitChange</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">._listeners.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">l</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> l</span><span style="color:#E1E4E8">?.());</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  subscribe</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">listener</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">._listeners.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(listener);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">._listeners.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">l</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> l </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> listener);</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  getSnapShot</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">._todoList;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TodoStore</span><span style="color:#E1E4E8">();</span></span></code></pre>
+<p>代码逻辑和单个示例的差不多，但是值得注意的是 subscribe 中不在直接调用 react 返回的 callback 方法，而是将其存储到一个数组中，当 store 发生改变的时候去掉用 emitChange 方法，让每一个 callback 方法执行。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> UnToList</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> store</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> useSyncExternalStore</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    todoStore.subscribe,</span></span>
+<span class="line"><span style="color:#E1E4E8">    todoStore.getSnapShot,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> CompleteList</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> store</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> useSyncExternalStore</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    todoStore.subscribe,</span></span>
+<span class="line"><span style="color:#E1E4E8">    todoStore.getSnapShot,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>例如上述代码，我们会在两个组件中使用 useSyncExternalStore 方法，其中 todoStore.subscribe 的接受不同的 callback 方法，其中包含了组件组件的 fiber，那么在 store 发生改变的时候，两个 callback 都需要被执行，这样不同的组件才能够获取到正确的数据。</p>
+<h3 id="usesyncexternalstore">useSyncExternalStore</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> useSyncExternalStore</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>(</span></span>
+<span class="line"><span style="color:#FFAB70">    subscribe</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> (() </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">    getSnapshot</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">    getServerSnapshot</span><span style="color:#F97583">?:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#B392F0"> T</span></span>
+<span class="line"><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> value</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getSnapshot</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> [{ </span><span style="color:#79B8FF">inst</span><span style="color:#E1E4E8"> }, </span><span style="color:#79B8FF">forceUpdate</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">({ inst: { value, getSnapshot } });</span></span>
+<span class="line"><span style="color:#B392F0">    useLayoutEffect</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        inst.value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#E1E4E8">        inst.getSnapshot </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> getSnapshot;</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">checkIfSnapshotChanged</span><span style="color:#E1E4E8">(inst)) {</span></span>
+<span class="line"><span style="color:#B392F0">            forceUpdate</span><span style="color:#E1E4E8">({ inst });</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, [subscribe, value, getSnapshot]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">    useEffect</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">checkIfSnapshotChanged</span><span style="color:#E1E4E8">(inst)) {</span></span>
+<span class="line"><span style="color:#B392F0">            forceUpdate</span><span style="color:#E1E4E8">({ inst });</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#B392F0"> handleStoreChange</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">checkIfSnapshotChanged</span><span style="color:#E1E4E8">(inst)) {</span></span>
+<span class="line"><span style="color:#B392F0">                forceUpdate</span><span style="color:#E1E4E8">({ inst });</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#E1E4E8">        };</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#B392F0"> subscribe</span><span style="color:#E1E4E8">(handleStoreChange);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, [subscribe]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> checkIfSnapshotChanged</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>(</span><span style="color:#FFAB70">inst</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">value</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">; </span><span style="color:#B392F0">getSnapshot</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8"> })</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> latestGetSnapshot</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> inst.getSnapshot;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> prevValue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> inst.value;</span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> nextValue</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> latestGetSnapshot</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> !</span><span style="color:#B392F0">is</span><span style="color:#E1E4E8">(prevValue, nextValue);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<ul>
+<li>初始化
+<ul>
+<li>调用<code>getSnapshot</code>获取当前快照值</li>
+<li>使用<code>useState</code>创建一个状态对象，包含一个<code>inst</code>属性：
+<ul>
+<li><code>inst.value</code>: 当前快照值</li>
+<li><code>inst.getSnapshot</code>: 当前快照的获取函数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>同步逻辑
+<ul>
+<li>在 DOM 更新前运行</li>
+<li>每次<code>value</code>或<code>getSnapshot</code>变化时更新<code>inst</code></li>
+<li>如果快照值发生变化（通过<code>checkIfSnapshotChanged</code>检测），触发强制更新 <code>forceUpdate</code></li>
+</ul>
+</li>
+<li>订阅变化
+<ul>
+<li>在组件挂载时订阅外部存储</li>
+<li>每次存储变化时调用<code>handleStoreChange</code>检查快照值是否变化，如果变化则更新组件
+<ul>
+<li>此时<code>subscribe</code>执行，将<code>handleStoreChange</code>作为<code>callback</code>传递给<code>subscribe</code>，然后在我们执行<code>callback</code>的时候就会检查数据是否发生变化，则触发组件重新渲染</li>
+</ul>
+</li>
+<li>返回值是<code>subscribe</code>的清理函数，用于取消订阅</li>
+</ul>
+</li>
+<li>checkIfSnapshotChanged
+<ul>
+<li>调用<code>inst.getSnapshot</code>获取最新值。</li>
+<li>使用<code>is</code>方法比较旧值<code>prevValue</code>和新值<code>nextValue</code></li>
+</ul>
+</li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-3" href="#单个监听"> 单个监听 </a><a class="depth-3" href="#多个监听"> 多个监听 </a><a class="depth-3" href="#usesyncexternalstore"> useSyncExternalStore </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/redux-more/">上一篇：关于 Redux 的更多</a> <a href="/blog/react/talk-about-connect-design-again/">下一篇：再谈 Connect 设计</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

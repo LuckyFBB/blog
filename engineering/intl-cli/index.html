@@ -1,15 +1,228 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>国际化工具 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>国际化工具</h1> </header> <div class="article-grid"> <div class="prose"> <p>在做国际化相关内容的时候，需要提供一些工具类，目前基于现状一共做了三个工具类，分别涉及提取文案/获取文案/提示文案等，会依次介绍。</p>
+<h2 id="i18n-extract">i18n-extract</h2>
+<p><a href="https://www.npmjs.com/package/i18n-extract-cli">npm i18n-extract-cli</a></p>
+<p>主要做配置文件初始化/提取中文文本/检测中文文本/清除中文文本，暴露 i18n 作为命令行。</p>
+<p>提供如下命令行</p>
+<h3 id="init">init</h3>
+<p>用于初始化配置化文件，会根据配置创建对应的 <code>i18n.config.json</code></p>
+<p><img src="/blog/imgs/intl/1.gif" alt="1.gif"></p>
+<p>需要配置当前提取中文的目标文件夹，提取出来的中文存放的 locales 文件夹，默认文本文件类型(仅仅支持 ts/js/json 三种文件类型)</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "localeDir"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"./locales"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "extractDir"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"./"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "importStatement"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"import I18N from @/utils/i18n"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "excludeFile"</span><span style="color:#E1E4E8">: [],</span></span>
+<span class="line"><span style="color:#79B8FF">  "excludeDir"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"node_modules"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"locales"</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#79B8FF">  "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ts"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "sourceLocale"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"zh-CN"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>生成的 config.json 中，除了上述可以在 prompt 中的配置项之外，还有其他的几个配置</p>
+<ul>
+<li>importStatement: 引入 I18N 语句，用于提取到中文的文件中引入</li>
+<li>excludeFile: 排除的文件，不做提取的文件</li>
+<li>excludeDir: 排除的文件夹，不做提取的文件夹</li>
+</ul>
+<h3 id="extract">extract</h3>
+<p>根据配置文件提取 extractDir 的中文写入到对应的 <code>{localeDir}/{sourceLocale/index.{type}</code> 中</p>
+<p>在<a href="https://luckyfbb.github.io/blog/engineering/extract-chinese">这篇文章</a>中详细的介绍了如何做国际化文本的提取，主要是使用 babel 获取 AST 来获取中文，<code>extract</code> 命令是可以多次执行的。</p>
+<blockquote>
+<p>每一个文件中的中文，都会对应一个 key，该 key 是由当前的文件路径+ sortKey 组成。
+再次执行命令时，需要将当然文件中的中文写入到当前的文件路径的对象中。</p>
+</blockquote>
+<p>再次执行 <code>extract</code> 命令时，需要将读取 <code>{sourceLocale/index.{type}</code> 中的内容。</p>
+<p>对于 json 文件来说，相当好处理，fs.readFile 读取到对应的内容之后，即可获取到对象</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#E1E4E8">exportData </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">parse</span><span style="color:#E1E4E8">(content);</span></span></code></pre>
+<blockquote>
+<p>如果 type 对应的为 ts/js 文件，需要当前文件中的对象为默认导出(export default xxx)。</p>
+</blockquote>
+<p>虽然为 export default，但也有两种方式</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#6A737D">// 直接导出</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 变量导出</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> obj</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#E1E4E8"> obj;</span></span></code></pre>
+<p>这时对于 <code>{sourceLocale/index.{type}</code> 文件来说，也需要来判断是什么导出方式，这里采取的手段依旧是使用 babel，在 <a href="https://github.com/LuckyFBB/i18n-extract/blob/main/src/utils.ts#L286">parseLocaleModule</a> 方法中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#B392F0">traverse</span><span style="color:#E1E4E8">(ast, {</span></span>
+<span class="line"><span style="color:#B392F0">  ExportDefaultDeclaration</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> declaration</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.node.declaration;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (babelTypes.</span><span style="color:#B392F0">isIdentifier</span><span style="color:#E1E4E8">(declaration)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      exportIdentifier </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> declaration.name;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (babelTypes.</span><span style="color:#B392F0">isObjectExpression</span><span style="color:#E1E4E8">(declaration)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      exportData </span><span style="color:#F97583">=</span><span style="color:#B392F0"> eval</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">        `(${</span><span style="color:#E1E4E8">code</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">slice</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">declaration</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">start</span><span style="color:#F97583"> ??</span><span style="color:#79B8FF"> 0</span><span style="color:#9ECBFF">, </span><span style="color:#E1E4E8">declaration</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">end</span><span style="color:#F97583"> ??</span><span style="color:#79B8FF"> 0</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">})`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      );</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>如果是直接导出，<code>eval</code> 获取到对应导出的对象；否则记录下导出变量的名字 <code>exportIdentifier</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#B392F0">traverse</span><span style="color:#E1E4E8">(ast, {</span></span>
+<span class="line"><span style="color:#B392F0">  VariableDeclarator</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      path.node.id.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Identifier'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">      path.node.id.name </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> exportIdentifier</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (path.node.init </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> path.node.init.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'ObjectExpression'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        exportData </span><span style="color:#F97583">=</span><span style="color:#B392F0"> eval</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">          `(${</span><span style="color:#E1E4E8">code</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">slice</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">path</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">node</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">init</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">start</span><span style="color:#F97583"> ??</span><span style="color:#79B8FF"> 0</span><span style="color:#9ECBFF">, </span><span style="color:#E1E4E8">path</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">node</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">init</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">end</span><span style="color:#F97583"> ??</span><span style="color:#79B8FF"> 0</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">})`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        );</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>再次遍历 ast 通过 <code>exportIdentifier</code> 获取到对应的对象</p>
+<p>拿到对象之后，<code>extract</code> 时还存在的中文，写入到对应当前的文件路径的对象中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#6A737D">// 文件路径</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fileKey</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> generateLocaleKey</span><span style="color:#E1E4E8">(fileName);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> obj</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> {} </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> _.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(extractMap, fileKey) </span><span style="color:#F97583">??</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 文在文件中的唯一 key</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getSortKey</span><span style="color:#E1E4E8">(count, obj);</span></span>
+<span class="line"><span style="color:#B392F0">setLocaleValue</span><span style="color:#E1E4E8">(obj, key, value);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">_.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(extractMap, fileKey, obj);</span></span></code></pre>
+<p>写入到 <code>{sourceLocale/index.{type}</code> 中也需要注意 <code>index.{type}</code> 的导出方式，和上述获取的方式大同小异，只是变为更改 ast 之后再 <code>generate</code></p>
+<h3 id="extractcheck">extract:check</h3>
+<p>检查 extractDir 文件夹中的中文是否提取完全</p>
+<p>结合目前的业务，在提取完文案之后，需要检测是否完全提取完中文</p>
+<p>由于上述采用的 babel 的手段来提取中文，那么这里需要用不一样的手段，使用正则匹配来检测，需要去除掉注释</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> zhRegex</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> /</span><span style="color:#79B8FF">[\u4e00-\u9fa5]</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// 匹配单行注释、块注释</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> commentAndStringRegex</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> /</span><span style="color:#DBEDFF">(</span><span style="color:#85E89D;font-weight:bold">\/\/</span><span style="color:#79B8FF">[</span><span style="color:#F97583">^</span><span style="color:#79B8FF">\n]</span><span style="color:#F97583">*|</span><span style="color:#85E89D;font-weight:bold">\/\*</span><span style="color:#79B8FF">[\s\S]</span><span style="color:#F97583">*?</span><span style="color:#85E89D;font-weight:bold">\*\/</span><span style="color:#DBEDFF">)</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<h3 id="extractclear">extract:clear</h3>
+<p>清理 extractDir 尚未使用的国际化文案</p>
+<blockquote>
+<p>值得注意，是按着每个文件路径作为 key 来判断当前文件中的 sortKey 是否使用，因此必须保证每个文件中使用的 key 为 fileKey + sortKey，否则会导致当前脚本失效</p>
+</blockquote>
+<p>通过 <a href="https://github.com/LuckyFBB/i18n-extract/blob/main/src/utils.ts#L286">parseLocaleModule</a> 获取到对应的对象，我们最后代码中使用的都是 I18N.xxx.xxx.A 等对象，对应的 AST 如下</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"MemberExpression"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "object"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"MemberExpression"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "object"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"MemberExpression"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "object"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Identifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"I18N"</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#79B8FF">      "property"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"xxx"</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#79B8FF">    "property"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Identifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"xxx"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "property"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Identifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"A"</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>我们需要确定 <code>MemberExpression</code> 是由 I18N 开头，并且不是 I18N.get(特殊处理模版字符串)，获取到最外层的 <code>MemberExpression</code> 的 <code>property.name</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">MemberExpression</span><span style="color:#E1E4E8">(path) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> node </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> path.node;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> identifiers</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (babelTypes.</span><span style="color:#B392F0">isMemberExpression</span><span style="color:#E1E4E8">(node)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        identifiers.</span><span style="color:#B392F0">unshift</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">            (node.property </span><span style="color:#F97583">as</span><span style="color:#B392F0"> babelTypes</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Identifier</span><span style="color:#E1E4E8">).name,</span></span>
+<span class="line"><span style="color:#E1E4E8">        );</span></span>
+<span class="line"><span style="color:#E1E4E8">        node </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> node.object </span><span style="color:#F97583">as</span><span style="color:#B392F0"> babelTypes</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">MemberExpression</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (babelTypes.</span><span style="color:#B392F0">isIdentifier</span><span style="color:#E1E4E8">(node)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        identifiers.</span><span style="color:#B392F0">unshift</span><span style="color:#E1E4E8">((node </span><span style="color:#F97583">as</span><span style="color:#B392F0"> babelTypes</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Identifier</span><span style="color:#E1E4E8">).name);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        identifiers.</span><span style="color:#B392F0">at</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> importVariable </span><span style="color:#F97583">&#x26;&#x26;</span></span>
+<span class="line"><span style="color:#F97583">        !</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">            identifiers.</span><span style="color:#B392F0">at</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'get'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">            babelTypes.</span><span style="color:#B392F0">isCallExpression</span><span style="color:#E1E4E8">(path.parentPath.node)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        keySet.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(identifiers[identifiers.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#E1E4E8">        path.</span><span style="color:#B392F0">skip</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>获取到当前文件所有的数据存储的 obj，如果 keySet 不存在的话，即删除 obj 中的值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#E1E4E8">Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(currObj).</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">keySet.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(key)) {</span></span>
+<span class="line"><span style="color:#F97583">    delete</span><span style="color:#E1E4E8"> currObj[key];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>如果 currObj 为空的时候，需要从文件中删除，保证最后的 locales 文件中不存在空对象</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (_.</span><span style="color:#B392F0">isEmpty</span><span style="color:#E1E4E8">(currObj)) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> currKey </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fileKey;</span></span>
+<span class="line"><span style="color:#F97583">  do</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    _.</span><span style="color:#B392F0">unset</span><span style="color:#E1E4E8">(extractMap, currKey);</span></span>
+<span class="line"><span style="color:#E1E4E8">    currKey </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> currKey.</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (currKey </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> _.</span><span style="color:#B392F0">isEmpty</span><span style="color:#E1E4E8">(_.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(extractMap, currKey)));</span></span>
+<span class="line"><span style="color:#E1E4E8">} </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  _.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(extractMap, fileKey, currObj);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>以上就是 i18n-extract-cli 包做的事情，围绕文案提取/校验/删除为主，提供国际化基本功能</p>
+<h2 id="i18n-intl">i18n-intl</h2>
+<p><a href="https://www.npmjs.com/package/dt-intl">npm dt-intl</a>，fork 自 <a href="https://github.com/alibaba/kiwi/tree/master/kiwi-intl">kiwi-intl</a>，更改对应的打包方式，以及 <code>intl-messageformat</code> 版本</p>
+<p><code>i18n-intl</code> 默认导出一个方法，仅支持 init 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> dtIntl </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'dt-intl'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> I18N</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> dtIntl.</span><span style="color:#B392F0">init</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">I18NType</span><span style="color:#E1E4E8">>(currentLang, langs, LangEnum.zhCN);</span></span></code></pre>
+<p>返回的 <code>I18N</code> 是一个响应式对象，通过 <code>Object.defineProperty/Proxy</code> 实现属性的响应式变化</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> defineReactive</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">defaultKey</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> childObj </span><span style="color:#F97583">=</span><span style="color:#B392F0"> observe</span><span style="color:#E1E4E8">(obj[key]);</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object.</span><span style="color:#B392F0">defineProperty</span><span style="color:#E1E4E8">(obj, key, {</span></span>
+<span class="line"><span style="color:#B392F0">    get</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (obj.__data__[key]) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#B392F0"> getProxyObj</span><span style="color:#E1E4E8">(obj.__data__[key]);</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (obj.__metas__[defaultKey][key]) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#B392F0"> getProxyObj</span><span style="color:#E1E4E8">(obj.__metas__[defaultKey][key]);</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#B392F0"> getDefaultProxyString</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#B392F0">    set</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">newVal</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (obj[key] </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> newVal) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#6A737D">      // 如果值有变化的话，做一些操作</span></span>
+<span class="line"><span style="color:#E1E4E8">      obj[key] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> newVal;</span></span>
+<span class="line"><span style="color:#6A737D">      // 执行回调</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> cb</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> obj.callback[key];</span></span>
+<span class="line"><span style="color:#E1E4E8">      cb.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(obj);</span></span>
+<span class="line"><span style="color:#6A737D">      // 如果set进来的值为复杂类型，再递归它，加上set/get</span></span>
+<span class="line"><span style="color:#E1E4E8">      childObj </span><span style="color:#F97583">=</span><span style="color:#B392F0"> observe</span><span style="color:#E1E4E8">(newVal);</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>可以直接通过 <code>I18N.xxx</code> 获取到对应的文本</p>
+<p>还提供 template/get 的方式处理带有参数的文案，template 处理简单的模版字符串，get 支持 <code>IntlMessageFormat</code> 处理复杂的模版字符串</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#B392F0">template</span><span style="color:#E1E4E8">(str, args) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">str) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> str.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#85E89D;font-weight:bold">\{</span><span style="color:#DBEDFF">(</span><span style="color:#79B8FF">.</span><span style="color:#F97583">+?</span><span style="color:#DBEDFF">)</span><span style="color:#85E89D;font-weight:bold">\}</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">match</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">p1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getProp</span><span style="color:#E1E4E8">({ </span><span style="color:#F97583">...</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.__data__, </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args }, p1);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(str, args</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    let msg </span><span style="color:#F97583">=</span><span style="color:#B392F0"> lodashGet</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.__data__, str);</span></span>
+<span class="line"><span style="color:#B392F0">    if</span><span style="color:#E1E4E8"> (!</span><span style="color:#FFAB70">msg</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg </span><span style="color:#F97583">=</span><span style="color:#B392F0"> lodashGet</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.__metas__[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.__defaultKey__ </span><span style="color:#F97583">||</span><span style="color:#9ECBFF"> 'zh-CN'</span><span style="color:#E1E4E8">], str, str);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#B392F0">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(msg, </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.__lang__);</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> msg.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">(args);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> msg;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } else {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> msg;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="i18n-helper">i18n-helper</h2>
+<p>vscode 插件，集成在 dtsatck-devops 中。在该 vscode 插件中，目前主要完成 hover 展示对应的中文英文</p>
+<p><img src="/blog/imgs/intl/image.png" alt="image.png"></p>
+<p>通过 <a href="https://github.com/LuckyFBB/i18n-extract/blob/main/src/utils.ts#L286">parseLocaleModule</a> 类似的方法读取到对应的数据，通过 <code>vscode.languages.registerHoverProvider</code> 注册 hover 展示</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#i18n-extract"> i18n-extract </a><a class="depth-3" href="#init"> init </a><a class="depth-3" href="#extract"> extract </a><a class="depth-3" href="#extractcheck"> extract:check </a><a class="depth-3" href="#extractclear"> extract:clear </a><a class="depth-2" href="#i18n-intl"> i18n-intl </a><a class="depth-2" href="#i18n-helper"> i18n-helper </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/webpack-loader/">上一篇：webpack loader</a> <a href="/blog/engineering/webpack-tapable/">下一篇：webpack tapable</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,340 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>React-Router4 原理及丐版实现 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>React-Router4 原理及丐版实现</h1> </header> <div class="article-grid"> <div class="prose"> <p>react-router 版本更新非常快，但是它的底层实现原理确是万变不离其中，在本文中会从前端路由出发到 react-router 原理整体总结与分享。</p>
+<!-- more -->
+<h2 id="前端路由">前端路由</h2>
+<p>在 Web 前端单页面应用 SPA(Single Page Application)中，路由是描述 URL 和 UI 之间的映射关系，这种映射是单向的，即 URL 的改变会引起 UI 更新，无需刷新页面</p>
+<h3 id="如何实现前端路由">如何实现前端路由</h3>
+<p>实现前端路由，需要解决两个核心问题</p>
+<ol>
+<li>如何改变 URL 却不引起页面刷新？</li>
+<li>如何监测 URL 变化？</li>
+</ol>
+<p>在前端路由的实现模式有两种模式，hash 和 history 模式，分别回答上述两个问题</p>
+<h4 id="hash-模式">hash 模式</h4>
+<ol>
+<li>hash 是 url 中 hash(#) 及后面的部分，常用锚点在页面内做导航，改变 url 中的 hash 部分不会引起页面的刷新</li>
+<li>通过 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event">hashchange</a> 事件监听 URL 的改变。改变 URL 的方式只有以下几种：通过浏览器导航栏的前进后退、通过<code>&#x3C;a></code>标签、通过<code>window.location</code>，这几种方式都会触发<code>hashchange</code>事件</li>
+</ol>
+<h4 id="history-模式">history 模式</h4>
+<ol>
+<li>history 提供了 <code>pushState</code> 和 <code>replaceState</code> 两个方法，这两个方法改变 URL 的 path 部分不会引起页面刷新</li>
+<li>通过 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event">popchange</a> 事件监听 URL 的改变。需要注意只在通过浏览器导航栏的前进后退改变 URL 时会触发<code>popstate</code>事件，通过<code>&#x3C;a></code>标签和<code>pushState</code>/<code>replaceState</code>不会触发<code>popstate</code>方法。但我们可以拦截<code>&#x3C;a></code>标签的点击事件和<code>pushState</code>/<code>replaceState</code>的调用来检测 URL 变化，也是可以达到监听 URL 的变化，相对<code>hashchange</code>显得略微复杂</li>
+</ol>
+<h3 id="js-实现前端路由">JS 实现前端路由</h3>
+<h4 id="基于-hash-实现">基于 hash 实现</h4>
+<p>由于三种改变 hash 的方式都会触发<code>hashchange</code>方法，所以只需要监听<code>hashchange</code>方法。<code>需要在DOMContentLoaded</code>后，处理一下默认的 hash 值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 页面加载完不会触发 hashchange，这里主动触发一次 hashchange 事件，处理默认hash</span></span>
+<span class="line"><span style="color:#E1E4E8">window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'DOMContentLoaded'</span><span style="color:#E1E4E8">, onLoad);</span></span>
+<span class="line"><span style="color:#6A737D">// 监听路由变化</span></span>
+<span class="line"><span style="color:#E1E4E8">window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'hashchange'</span><span style="color:#E1E4E8">, onHashChange);</span></span>
+<span class="line"><span style="color:#6A737D">// 路由变化时，根据路由渲染对应 UI</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onHashChange</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  switch</span><span style="color:#E1E4E8"> (location.hash) {</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> '#/home'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'This is Home'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> '#/about'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'This is About'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> '#/list'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'This is List'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    default</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'Not Found'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://codesandbox.io/s/vanilla-hash-vpfcbq?file=/index.html">hash 实现 demo</a></p>
+<h4 id="基于-history-实现">基于 history 实现</h4>
+<p>因为 history 模式下，<code>&#x3C;a></code>标签和<code>pushState</code>/<code>replaceState</code>不会触发<code>popstate</code>方法，我们需要对<code>&#x3C;a></code>的跳转和<code>pushState</code>/<code>replaceState</code>做特殊处理。</p>
+<ul>
+<li>对<code>&#x3C;a></code>作点击事件，禁用默认行为，调用<code>pushState</code>方法并手动触发<code>popstate</code>的监听事件</li>
+<li>对<code>pushState</code>/<code>replaceState</code>可以重写 history 的方法并通过派发事件能够监听对应事件</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> _wr</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">type</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> orig </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> history[type];</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> e </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Event</span><span style="color:#E1E4E8">(type);</span></span>
+<span class="line"><span style="color:#E1E4E8">    e.arguments </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> arguments</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> rv </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> orig.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    window.</span><span style="color:#B392F0">dispatchEvent</span><span style="color:#E1E4E8">(e);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> rv;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">// 重写pushstate事件</span></span>
+<span class="line"><span style="color:#E1E4E8">history.pushState </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _wr</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'pushstate'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onLoad</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">  routerView </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> document.</span><span style="color:#B392F0">querySelector</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'#routeView'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">  onPopState</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#6A737D">  // 拦截 &#x3C;a> 标签点击事件默认行为</span></span>
+<span class="line"><span style="color:#6A737D">  // 点击时使用 pushState 修改 URL并更新手动 UI，从而实现点击链接更新 URL 和 UI 的效果。</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> linkList </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> document.</span><span style="color:#B392F0">querySelectorAll</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'a[href]'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  linkList.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">el</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#E1E4E8">    el.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'click'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      e.</span><span style="color:#B392F0">preventDefault</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      history.</span><span style="color:#B392F0">pushState</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">, el.</span><span style="color:#B392F0">getAttribute</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'href'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#B392F0">      onPopState</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }),</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D">// 监听pushstate方法</span></span>
+<span class="line"><span style="color:#E1E4E8">window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'pushstate'</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">onPopState</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#6A737D">// 页面加载完不会触发 hashchange，这里主动触发一次 popstate 事件，处理默认pathname</span></span>
+<span class="line"><span style="color:#E1E4E8">window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'DOMContentLoaded'</span><span style="color:#E1E4E8">, onLoad);</span></span>
+<span class="line"><span style="color:#6A737D">// 监听路由变化</span></span>
+<span class="line"><span style="color:#E1E4E8">window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'popstate'</span><span style="color:#E1E4E8">, onPopState);</span></span>
+<span class="line"><span style="color:#6A737D">// 路由变化时，根据路由渲染对应 UI</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onPopState</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  switch</span><span style="color:#E1E4E8"> (location.pathname) {</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> '/home'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'This is Home'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> '/about'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'This is About'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> '/list'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'This is List'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    default</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      routerView.innerHTML </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'Not Found'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://codesandbox.io/s/vanilla-history-o88eo7?file=/index.html">history 实现 demo</a></p>
+<h2 id="react-router-的理解">react-router 的理解</h2>
+<p><img src="https://user-images.githubusercontent.com/38368040/155311375-9942ba4d-91c5-4320-a84d-1e6715ab1b43.png" alt="image"></p>
+<p>在 v4 之后，我们在 View 层直接从<code>react-router-dom</code>中引入<code>BrowserRouter</code>/<code>HashRouter</code> 。<code>BrowserRouter</code>/<code>HashRouter</code>又分别使用了<code>react-router</code>提供的 Router 组件和 history 提供的<code>createBrowserHistory</code>/<code>createHashHistory</code>方法。</p>
+<h2 id="react-router-v3v4v6-的应用">react-router v3/v4/v6 的应用</h2>
+<p><a href="https://codesandbox.io/s/router-demo-v3-wqhjd">v3</a>、<a href="https://codesandbox.io/s/router-demo-v4-7xj3f">v4</a>、<a href="https://codesandbox.io/s/router-demo-v6-dpv1m">v6</a></p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/eedd5ac6-d94d-4e15-b7ce-5444838dae07" alt=""></p>
+<h2 id="history">history</h2>
+<p>在上文中说到，<code>BrowserRouter</code>使用 history 库提供的<code>createBrowserHistory</code>创建的<code>history</code>对象改变路由状态和监听路由变化。</p>
+<p>❓ 那么 history 对象需要提供哪些功能讷？</p>
+<ul>
+<li>监听路由变化的<code>listen</code>方法以及对应的清理监听<code>unlisten</code>方法</li>
+<li>改变路由的<code>push</code>方法</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 创建和管理listeners的方法</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> EventEmitter</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> events</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    subscribe</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">fn</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      events.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(fn);</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">        events </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> events.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">handler</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> handler </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> fn);</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#B392F0">    emit</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arg</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      events.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">fn</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> fn </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> fn</span><span style="color:#E1E4E8">(arg));</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="browserhistory">BrowserHistory</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> createBrowserHistory</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> EventBus</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> EventEmitter</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#6A737D">  // 初始化location</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> location </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    pathname: </span><span style="color:#9ECBFF">'/'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#6A737D">  // 路由变化时的回调</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> handlePop</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> currentLocation</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      pathname: window.location.pathname,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">    EventBus.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(currentLocation); </span><span style="color:#6A737D">// 路由变化时执行回调</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#6A737D">  // 定义history.push方法</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> push</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> history</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> window.history;</span></span>
+<span class="line"><span style="color:#6A737D">    // 为了保持state栈的一致性</span></span>
+<span class="line"><span style="color:#E1E4E8">    history.</span><span style="color:#B392F0">pushState</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">, path);</span></span>
+<span class="line"><span style="color:#6A737D">    // 由于push并不触发popstate，我们需要手动调用回调函数</span></span>
+<span class="line"><span style="color:#E1E4E8">    location </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { pathname: path };</span></span>
+<span class="line"><span style="color:#E1E4E8">    EventBus.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(location);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> listen</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">listener</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> EventBus.</span><span style="color:#B392F0">subscribe</span><span style="color:#E1E4E8">(listener);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // 处理浏览器的前进后退</span></span>
+<span class="line"><span style="color:#E1E4E8">  window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'popstate'</span><span style="color:#E1E4E8">, handlePop);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // 返回history</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> history</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    location,</span></span>
+<span class="line"><span style="color:#E1E4E8">    listen,</span></span>
+<span class="line"><span style="color:#E1E4E8">    push,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> history;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>上述代码实现简单版本的 history，只有监听路由变化的<code>listen</code>/<code>unlisten</code>方法以及改变路由的<code>push</code>方法，详细的<a href="https://github.com/remix-run/history/blob/v4.9.0/modules/createBrowserHistory.js#L38">BrowserHistory 源码</a></p>
+<h3 id="hashhistory">HashHistory</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> createHashHistory</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> EventBus</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> EventEmitter</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> location </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    pathname: </span><span style="color:#9ECBFF">'/'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#6A737D">  // 路由变化时的回调</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> handlePop</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> currentLocation</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      pathname: window.location.hash.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">    EventBus.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(currentLocation); </span><span style="color:#6A737D">// 路由变化时执行回调</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#6A737D">  // 不用手动执行回调，因为hash改变会触发hashchange事件</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> push</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (window.location.hash </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> path);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> listen</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">listener</span><span style="color:#F97583">:</span><span style="color:#B392F0"> Function</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> EventBus.</span><span style="color:#B392F0">subscribe</span><span style="color:#E1E4E8">(listener);</span></span>
+<span class="line"><span style="color:#6A737D">  // 监听hashchange事件</span></span>
+<span class="line"><span style="color:#E1E4E8">  window.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'hashchange'</span><span style="color:#E1E4E8">, handlePop);</span></span>
+<span class="line"><span style="color:#6A737D">  // 返回的history上有个listen方法</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> history</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    location,</span></span>
+<span class="line"><span style="color:#E1E4E8">    listen,</span></span>
+<span class="line"><span style="color:#E1E4E8">    push,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> history;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>和<code>BrowserHistory</code>一样，<code>hashHistory</code>也是极简版，详细的<a href="https://github.com/remix-run/history/blob/v4.9.0/modules/createHashHistory.js#L57">hashHistory 源码</a></p>
+<h2 id="react-router-丐版">react-router 丐版</h2>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/3380494c-323c-45f1-8143-9796f1e4d48c" alt=""></p>
+<h3 id="router">Router</h3>
+<p>Router 接受一个 history 属性，用<code>history.listen</code>创建监听者，使用 context 传递 history 和 location 数据</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Router</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    super</span><span style="color:#E1E4E8">(props);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.state </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      location: props.history.location, </span><span style="color:#6A737D">// 将history的location挂载到state上</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.unlisten </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> props.history.</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">location</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({ location });</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  componentDidMount</span><span style="color:#E1E4E8">() {}</span></span>
+<span class="line"><span style="color:#B392F0">  componentWillUnmount</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">unlisten</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">history</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">children</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">location</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.state;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">RouterContext.Provider</span></span>
+<span class="line"><span style="color:#B392F0">        value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{{</span></span>
+<span class="line"><span style="color:#E1E4E8">          history,</span></span>
+<span class="line"><span style="color:#E1E4E8">          location,</span></span>
+<span class="line"><span style="color:#E1E4E8">        }}</span></span>
+<span class="line"><span style="color:#E1E4E8">      ></span></span>
+<span class="line"><span style="color:#E1E4E8">        {children}</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#79B8FF">RouterContext.Provider</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://github.com/remix-run/react-router/blob/v5/packages/react-router/modules/Router.js">Router 源码</a></p>
+<h3 id="browserrouterhashrouter">BrowserRouter/HashRouter</h3>
+<p>只是给 Router 组件传递 history 属性</p>
+<p><strong>BrowserRouter</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> BrowserRouter</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  history</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createBrowserHistory</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Router</span><span style="color:#B392F0"> history</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.history} </span><span style="color:#B392F0">children</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.children} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>HashRouter</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> HashRouter</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  history</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createHashHistory</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Router</span><span style="color:#B392F0"> history</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.history} </span><span style="color:#B392F0">children</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.children} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://github.com/remix-run/react-router/blob/v5/packages/react-router-dom/modules/BrowserRouter.js">BrowserRouter 源码</a>/<a href="https://github.com/remix-run/react-router/blob/v5/packages/react-router-dom/modules/HashRouter.js">HashRouter 源码</a></p>
+<h3 id="route">Route</h3>
+<p>Route 可以接收<code>component</code>/<code>render</code>/<code>children</code>，但是它们渲染的优先级是不一样的。</p>
+<p>v4/v5 三个优先级不同</p>
+<p>直接使用<code>Route</code>组件时，每个<code>Route</code>组件都会被渲染，会根据路由规则进行判断是否需要把组件渲染出来，目前代码中使用的正则来做匹配</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Route</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">IProps</span><span style="color:#E1E4E8">> {</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">RouterContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        {(</span><span style="color:#FFAB70">context</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> pathname</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> context.location.pathname;</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">            path</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">            component</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">Component</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">            exact</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">            render</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">            children</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props;</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> props</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">context };</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> reg</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> pathToRegExp</span><span style="color:#E1E4E8">(path, [], { end: exact });</span></span>
+<span class="line"><span style="color:#6A737D">          // 判断url是否匹配</span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">reg.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(pathname)) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#E1E4E8"> (Component) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Component</span><span style="color:#E1E4E8"> {</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">props} />;</span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#E1E4E8"> (render) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> render</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#E1E4E8"> (children) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> children;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }}</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#79B8FF">RouterContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://github.com/remix-run/react-router/blob/v5/packages/react-router/modules/Route.js">Route 源码</a></p>
+<h3 id="link">Link</h3>
+<p>在 Link 中，我们使用<code>&#x3C;a></code>标签来做跳转，但是 a 标签会使页面重新刷新，所以需要阻止 a 标签的默认行为，使用 context 中 history 的 push 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Link</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">IProps</span><span style="color:#E1E4E8">> {</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">to</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">children</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">RouterContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        {(</span><span style="color:#FFAB70">context</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">          return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">            &#x3C;</span><span style="color:#85E89D">a</span></span>
+<span class="line"><span style="color:#B392F0">              href</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{to}</span></span>
+<span class="line"><span style="color:#B392F0">              onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">event</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">                // 阻止a标签的默认行为</span></span>
+<span class="line"><span style="color:#E1E4E8">                event.</span><span style="color:#B392F0">preventDefault</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">                context.history.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(to);</span></span>
+<span class="line"><span style="color:#E1E4E8">              }}</span></span>
+<span class="line"><span style="color:#E1E4E8">            ></span></span>
+<span class="line"><span style="color:#E1E4E8">              {children}</span></span>
+<span class="line"><span style="color:#E1E4E8">            &#x3C;/</span><span style="color:#85E89D">a</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">          );</span></span>
+<span class="line"><span style="color:#E1E4E8">        }}</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#79B8FF">RouterContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://github.com/remix-run/react-router/blob/v5/packages/react-router-dom/modules/Link.js#L75">Link 源码</a></p>
+<h3 id="switch">Switch</h3>
+<p>Route 组件的功能是只要 path 匹配上当前路由就渲染组件，也就意味着如果多个 Route 的 path 都匹配上了当前路由，这几个组件都会渲染，例如<code>/home/1</code>能够匹配上<code>/home/1</code>和<code>/home</code>，所以需要一个组件来控制匹配上一个 Route 就返回，所以 Switch 组件诞生了。</p>
+<p>它的功能就是即使多个 Route 的 path 都匹配上了当前路由，也只渲染第一个匹配上的组件。</p>
+<p>要实现该功能，把 Switch 的 children 拿出来循环，找出第一个匹配的 child，记录下当前的 child ，把其他的 child 全部干掉</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Switch</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">RouterContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        {(</span><span style="color:#FFAB70">context</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> location</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> context.location;</span></span>
+<span class="line"><span style="color:#F97583">          let</span><span style="color:#E1E4E8"> element, match; </span><span style="color:#6A737D">// 两个变量记录第一次匹配上的子元素和match属性</span></span>
+<span class="line"><span style="color:#E1E4E8">          React.Children.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.children, (</span><span style="color:#FFAB70">child</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 先检测下match是否已经匹配到了, 如果已经匹配过了，直接跳过</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">match </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">isValidElement</span><span style="color:#E1E4E8">(child)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">              element </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> child;</span></span>
+<span class="line"><span style="color:#F97583">              const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">path</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">exact</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> child.props;</span></span>
+<span class="line"><span style="color:#F97583">              const</span><span style="color:#79B8FF"> reg</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> pathToRegExp</span><span style="color:#E1E4E8">(path, [], { end: exact });</span></span>
+<span class="line"><span style="color:#F97583">              if</span><span style="color:#E1E4E8"> (reg.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(location.pathname)) match </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">            }</span></span>
+<span class="line"><span style="color:#E1E4E8">          });</span></span>
+<span class="line"><span style="color:#6A737D">          // &#x3C;Switch>组件的返回值只是匹配上元素的拷贝，其他元素被忽略了</span></span>
+<span class="line"><span style="color:#6A737D">          // 如果一个都没匹配上，返回null</span></span>
+<span class="line"><span style="color:#F97583">          return</span><span style="color:#E1E4E8"> match </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">cloneElement</span><span style="color:#E1E4E8">(element, { location }) </span><span style="color:#F97583">:</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }}</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#79B8FF">RouterContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://github.com/remix-run/react-router/blob/v5/packages/react-router/modules/Switch.js#L12">Switch 源码</a></p>
+<p>到现在 react-router 的核心组件以及 API 都实现完成，<a href="https://codesandbox.io/s/mini-react-router-0mukx7">线上 demo</a></p>
+<h2 id="总结">总结</h2>
+<p>在本文中，从前端路由入手，分析了原生的 hash/history 的路由实现，react-router 底层依赖和上层使用，实现了简版的 react-router</p>
+<p>需要注意的是，hash 模式下三种改变 url 的方法都会触发 <code>hashchange</code> 时间，而 history 模式下只有浏览器前进后退会触发<code>popstate</code>，<code>pushState</code>/<code>replaceState</code>以及<code>&#x3C;a></code>标签都不会。<code>&#x3C;a></code>标签的默认行为会触发页面刷新，所以在实现路由时需要用<code>e.preventDefault</code>阻止默认行为。</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前端路由"> 前端路由 </a><a class="depth-3" href="#如何实现前端路由"> 如何实现前端路由 </a><a class="depth-3" href="#js-实现前端路由"> JS 实现前端路由 </a><a class="depth-2" href="#react-router-的理解"> react-router 的理解 </a><a class="depth-2" href="#react-router-v3v4v6-的应用"> react-router v3/v4/v6 的应用 </a><a class="depth-2" href="#history"> history </a><a class="depth-3" href="#browserhistory"> BrowserHistory </a><a class="depth-3" href="#hashhistory"> HashHistory </a><a class="depth-2" href="#react-router-丐版"> react-router 丐版 </a><a class="depth-3" href="#router"> Router </a><a class="depth-3" href="#browserrouterhashrouter"> BrowserRouter/HashRouter </a><a class="depth-3" href="#route"> Route </a><a class="depth-3" href="#link"> Link </a><a class="depth-3" href="#switch"> Switch </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/data-flow-management-in--react/">上一篇：React 中的数据流管理</a> <a href="/blog/react/react--router6/">下一篇：React-Router6 简单分析实现</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

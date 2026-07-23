@@ -1,15 +1,327 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Node 运行时、Buffer、进程通信与服务端基础能力。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Node 中的文件模块 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link is-active" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">Node</a> <h1>Node 中的文件模块</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>在聊 Stream/Buffer 的时候，我们已经开始使用<code>require("fs")</code>引入文件模块做一些操作了</p>
+<p>文件模块是对底层文件操作的封装，例如文件读写/打开关闭/删除添加等等</p>
+<p>文件模块最大的特点就是所有的方法都提供的<strong>同步</strong>和<strong>异步</strong>两个版本，具有 sync 后缀的方法都是同步方法，没有的都是异步方法</p>
+<h2 id="文件常识">文件常识</h2>
+<h3 id="文件权限">文件权限</h3>
+<p>因为需要对文件进行操作，所以需要设置对应的权限</p>
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/38368040/232820773-7c0b3281-5a23-4470-b95d-fce2618046a8.png">
+<p>主要分为三种角色，文件所有者、文件所属组、其他用户</p>
+<p>文件权限分为读、写、执行，分别于数字表示为 4/2/1，没有权限的时候表示为 0</p>
+<p>如果取消了执行权限指，文件夹内任何文件都无法访问，也无法 cd 到文件夹</p>
+<p>使用 Linux 命令<code>ll</code>能够查看目录中文件/文件夹的权限</p>
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/38368040/232820672-b4bcf6ce-8774-4e36-9852-6278ea3c2208.png">
+<p>第一位 d 代表文件夹，- 表示文件，后面就是文件的权限</p>
+<p>@ 符号出现在文件权限字符串的末尾，标识文件具有扩展属性。可以通过<code>ls -l@</code>来查看该目录的扩展属性，用于为文件或者目录添加的额外的元数据信息。</p>
+<img width="800" alt="image" src="https://github.com/LuckyFBB/Front-End-Examples/assets/38368040/7bbc00de-738e-4c98-80a4-c03369e17cc9">
+<h3 id="文件标识">文件标识</h3>
+<p>在 Node 中，标识位代表着对文件的操作方式，可读/可写/即可读又可写等等，可以进行排列组合</p>
+<img width="800" alt="image" src="https://github.com/LuckyFBB/Front-End-Examples/assets/38368040/f9f888d9-a7e5-49db-8153-080cda390f5f">
+<p>标识位可以进行排列组合，以实现不同的文件操作行为。</p>
+<p>例如，‘w+’ 表示以可读可写模式打开文件，如果文件不存在则创建文件，如果文件已存在则清空文件内容。</p>
+<p>‘a+’ 表示以可读可写模式打开文件，如果文件不存在则创建文件，如果文件已存在则在文件末尾追加内容。</p>
+<h3 id="文件描述符">文件描述符</h3>
+<p>在之前的内容中讲过，操作系统会为每个打开的文件分配一个叫做文件描述符的数值标识，使用这些数值来追踪特定的文件。</p>
+<p>文件描述符一般从 3 开始，0/1/2 分别代表标准输入/标准输出/错误输出</p>
+<h2 id="常用-api">常用 API</h2>
+<p><img src="https://user-images.githubusercontent.com/38368040/232820936-5a580710-b4eb-414d-a31f-22f415411abc.png" alt="Untitled 3"></p>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821053-c079f89b-c5d5-4852-bb28-f17059ac13a4.png" alt="Untitled 4"></p>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821065-1cf9af48-b027-4241-a292-635b1f80368f.png" alt="Untitled 5"></p>
+<h2 id="过滤项目中适当的文件">过滤项目中适当的文件</h2>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821159-8d0bd0a8-58c5-403c-a31a-6494a82256c0.png" alt="Untitled 6"></p>
+<h2 id="文件拷贝">文件拷贝</h2>
+<p>问题：需要将文件 1 中的内容拷贝到文件 2 中</p>
+<p><strong>文件 API</strong></p>
+<p>可以使用 fs.readFile 把文件内容读取完成，再采用 fs.writeFile 写入新的文件</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821168-2e732b28-2ad4-40fb-8b27-36b86992c5da.png" alt="Untitled 7"></p>
+<p>🤔 这样是否存在问题，我们在 Stream 讲过，需要一点一点来，否则在大文件时内存吃不消。</p>
+<p><strong>Buffer 使用</strong></p>
+<p>使用 fs.open 方法打开文件，获得文件描述符，再调用 fs.read/fs.write 方法往特定的位置读写一定量的数据
+<img src="https://user-images.githubusercontent.com/38368040/232821177-63d55aa4-e626-4f1c-84a7-c1ddcc2a4049.png" alt="Untitled 8"></p>
+<p><strong>Stream 使用</strong></p>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821353-8bd4a708-7ed4-460f-93e4-0920762b4128.png" alt="Untitled 9"></p>
+<h2 id="文件上传">文件上传</h2>
+<h3 id="小文件上传">小文件上传</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 上传后资源的URL地址</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> RESOURCE_URL</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `http://localhost:${</span><span style="color:#79B8FF">PORT</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// 存储上传文件的目录</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> UPLOAD_DIR</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'../public'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> storage</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> multer.</span><span style="color:#B392F0">diskStorage</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#B392F0">  destination</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">file</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">cb</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 设置文件的存储目录</span></span>
+<span class="line"><span style="color:#B392F0">    cb</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">UPLOAD_DIR</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#B392F0">  filename</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">file</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">cb</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 设置文件名</span></span>
+<span class="line"><span style="color:#B392F0">    cb</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">file</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">originalname</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> multerUpload</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> multer</span><span style="color:#E1E4E8">({ storage });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">router.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  '/uploadSingle'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">ctx</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">next</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      await</span><span style="color:#B392F0"> next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        code: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg: </span><span style="color:#9ECBFF">'文件上传成功'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        url: </span><span style="color:#9ECBFF">`${</span><span style="color:#79B8FF">RESOURCE_URL</span><span style="color:#9ECBFF">}/${</span><span style="color:#E1E4E8">ctx</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">file</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">originalname</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(error);</span></span>
+<span class="line"><span style="color:#E1E4E8">      ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        code: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg: </span><span style="color:#9ECBFF">'文件上传失败'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  multerUpload.</span><span style="color:#B392F0">single</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'file'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<h3 id="大文件上传">大文件上传</h3>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821366-d03fa5b7-93d7-45c3-884f-8e5698a96c4c.png" alt="Untitled 10"></p>
+<p><strong>主要步骤</strong></p>
+<ol>
+<li>前端接收大文件，并进行切片处理</li>
+<li>将每份切片进行上传处理</li>
+<li>后端接收到所有的切片，存储所有切片到一个文件夹中</li>
+<li>将文件夹中的切片做合并，并对切片做删除</li>
+<li>再次上传统一文件时，能够快速上传</li>
+</ol>
+<h4 id="具体实现">具体实现</h4>
+<p><strong>前端切片</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> BIG_FILE_SIZE</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 25</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1024</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1024</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> SLICE_FILE_SIZE</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 5</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1024</span><span style="color:#F97583"> *</span><span style="color:#79B8FF"> 1024</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> uploadFile</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">fileList?.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> alert</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'请选择文件'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> file</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> fileList[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> shouldUpload</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> verifyUpload</span><span style="color:#E1E4E8">(file.name);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">shouldUpload) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> message.</span><span style="color:#B392F0">success</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'文件已存在，上传成功'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (file.size </span><span style="color:#F97583">></span><span style="color:#79B8FF"> BIG_FILE_SIZE</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // big handle</span></span>
+<span class="line"><span style="color:#B392F0">    getSliceList</span><span style="color:#E1E4E8">(file);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // // normal handle</span></span>
+<span class="line"><span style="color:#6A737D">  // upload("/uploadSingle", file);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> getSliceList</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">file</span><span style="color:#F97583">:</span><span style="color:#B392F0"> RcFile</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> sliceList</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ISlice</span><span style="color:#E1E4E8">[] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curSize </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (curSize </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> file.size) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    sliceList.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">      id: shortid.</span><span style="color:#B392F0">generate</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">      slice: </span><span style="color:#F97583">new</span><span style="color:#B392F0"> File</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">        [file.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(curSize, (curSize </span><span style="color:#F97583">+=</span><span style="color:#79B8FF"> SLICE_FILE_SIZE</span><span style="color:#E1E4E8">))],</span></span>
+<span class="line"><span style="color:#9ECBFF">        `${</span><span style="color:#E1E4E8">file</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}-${</span><span style="color:#E1E4E8">index</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      ),</span></span>
+<span class="line"><span style="color:#E1E4E8">      name: file.name,</span></span>
+<span class="line"><span style="color:#E1E4E8">      sliceName: </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">file</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}-${</span><span style="color:#E1E4E8">index</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      progress: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">    index</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  uploadSlice</span><span style="color:#E1E4E8">(sliceList);</span></span>
+<span class="line"><span style="color:#B392F0">  setSliceList</span><span style="color:#E1E4E8">(sliceList);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>file 是一种特殊的 <a href="https://zhuanlan.zhihu.com/p/161000123">Blob 对象</a>，可以使用 slice 进行大文件分割</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/232821371-1a679343-4ea6-4b83-9e05-4482b5a05f41.png" alt="Untitled 11"></p>
+<p><strong>上传切片</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> uploadSlice</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">sliceList</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ISlice</span><span style="color:#E1E4E8">[]) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> requestList</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> sliceList</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(({ </span><span style="color:#FFAB70">slice</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sliceName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">name</span><span style="color:#E1E4E8"> }</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ISlice</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">index</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> formData</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> FormData</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      formData.</span><span style="color:#B392F0">append</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'slice'</span><span style="color:#E1E4E8">, slice);</span></span>
+<span class="line"><span style="color:#E1E4E8">      formData.</span><span style="color:#B392F0">append</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'sliceName'</span><span style="color:#E1E4E8">, sliceName);</span></span>
+<span class="line"><span style="color:#E1E4E8">      formData.</span><span style="color:#B392F0">append</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'name'</span><span style="color:#E1E4E8">, name);</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> { formData, index, sliceName };</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(({ </span><span style="color:#FFAB70">formData</span><span style="color:#E1E4E8"> }</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">formData</span><span style="color:#F97583">:</span><span style="color:#B392F0"> FormData</span><span style="color:#E1E4E8"> }, </span><span style="color:#FFAB70">index</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#E1E4E8">      request.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/uploadBig'</span><span style="color:#E1E4E8">, formData, {</span></span>
+<span class="line"><span style="color:#B392F0">        onUploadProgress</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">progressEvent</span><span style="color:#F97583">:</span><span style="color:#B392F0"> AxiosProgressEvent</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#B392F0">          sliceUploadProgress</span><span style="color:#E1E4E8">(progressEvent, index),</span></span>
+<span class="line"><span style="color:#E1E4E8">      }),</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#F97583">  await</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">all</span><span style="color:#E1E4E8">(requestList);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>根据切片构建每个切片的 formData，将二进制数据放在 slice 参数中，分别发送请求。</p>
+<p>onUploadProgress 来处理每个切片的上传进度</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// Client</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> storage</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> multer.</span><span style="color:#B392F0">diskStorage</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#B392F0">  destination</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">file</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">cb</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> name</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> file?.originalname.</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">)?.[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> SLICE_DIR</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">UPLOAD_DIR</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}-slice`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">fs.</span><span style="color:#B392F0">existsSync</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">SLICE_DIR</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">      await</span><span style="color:#E1E4E8"> fs.</span><span style="color:#B392F0">mkdirSync</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">SLICE_DIR</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 设置文件的存储目录</span></span>
+<span class="line"><span style="color:#B392F0">    cb</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">SLICE_DIR</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#B392F0">  filename</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">file</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">cb</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 设置文件名</span></span>
+<span class="line"><span style="color:#B392F0">    cb</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">file</span><span style="color:#9ECBFF">?.</span><span style="color:#E1E4E8">originalname</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Server</span></span>
+<span class="line"><span style="color:#E1E4E8">router.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  '/uploadBig'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">ctx</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">next</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      await</span><span style="color:#B392F0"> next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> slice</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> ctx.files.slice[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]; </span><span style="color:#6A737D">// 切片文件</span></span>
+<span class="line"><span style="color:#E1E4E8">      ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        code: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg: </span><span style="color:#9ECBFF">'文件上传成功'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        url: </span><span style="color:#9ECBFF">`${</span><span style="color:#79B8FF">RESOURCE_URL</span><span style="color:#9ECBFF">}/${</span><span style="color:#E1E4E8">slice</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">originalname</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        code: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        msg: </span><span style="color:#9ECBFF">'文件上传失败'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  multerUpload.</span><span style="color:#B392F0">fields</span><span style="color:#E1E4E8">([{ name: </span><span style="color:#9ECBFF">'slice'</span><span style="color:#E1E4E8"> }]),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><strong>切片合并</strong></p>
+<p>当我们所有的切片上传成功之后，我们依旧希望是按着原始文件作为保存的，所以需要对切片进行合并操作</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// Client</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> uploadSlice</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">sliceList</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ISlice</span><span style="color:#E1E4E8">[]) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  // ...和上述 uploadSlice 一致</span></span>
+<span class="line"><span style="color:#B392F0">  mergeSlice</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> mergeSlice</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  request.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/mergeSlice'</span><span style="color:#E1E4E8">, {</span></span>
+<span class="line"><span style="color:#E1E4E8">    size: </span><span style="color:#79B8FF">SLICE_FILE_SIZE</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    name: fileList[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">].name,</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Server</span></span>
+<span class="line"><span style="color:#E1E4E8">router.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/mergeSlice'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">ctx</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">next</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    await</span><span style="color:#B392F0"> next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">size</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">name</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ctx.request.body </span><span style="color:#F97583">??</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> sliceName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> name.</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">)?.[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> filePath</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">UPLOAD_DIR</span><span style="color:#E1E4E8">, name);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> slice_dir</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">UPLOAD_DIR</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">sliceName</span><span style="color:#9ECBFF">}-slice`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    await</span><span style="color:#B392F0"> mergeSlice</span><span style="color:#E1E4E8">(filePath, slice_dir, size);</span></span>
+<span class="line"><span style="color:#E1E4E8">    ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      code: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      msg: </span><span style="color:#9ECBFF">'文件合并成功'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      code: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      msg: </span><span style="color:#9ECBFF">'文件合并失败'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 通过 stream 来读写数据，将 slice 中数据读取到文件中</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> pipeStream</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">writeStream</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> readStream</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> fs.</span><span style="color:#B392F0">createReadStream</span><span style="color:#E1E4E8">(path);</span></span>
+<span class="line"><span style="color:#E1E4E8">    readStream.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'end'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      fs.</span><span style="color:#B392F0">unlinkSync</span><span style="color:#E1E4E8">(path); </span><span style="color:#6A737D">// 读取完成之后，删除切片文件</span></span>
+<span class="line"><span style="color:#B392F0">      resolve</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">    readStream.</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(writeStream);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> mergeSlice</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">filePath</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sliceDir</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">size</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">fs.</span><span style="color:#B392F0">existsSync</span><span style="color:#E1E4E8">(sliceDir)) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'当前文件不存在'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> slices</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#E1E4E8"> fs.</span><span style="color:#B392F0">readdirSync</span><span style="color:#E1E4E8">(sliceDir);</span></span>
+<span class="line"><span style="color:#E1E4E8">  slices.</span><span style="color:#B392F0">sort</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">a</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">b</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> a.</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'-'</span><span style="color:#E1E4E8">)[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> b.</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'-'</span><span style="color:#E1E4E8">)[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#F97583">  try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> slicesPipe</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> slices.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">sliceName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#B392F0"> pipeStream</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">        path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(sliceDir, sliceName),</span></span>
+<span class="line"><span style="color:#E1E4E8">        fs.</span><span style="color:#B392F0">createWriteStream</span><span style="color:#E1E4E8">(filePath, { start: index </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> size }),</span></span>
+<span class="line"><span style="color:#E1E4E8">      );</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    await</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">all</span><span style="color:#E1E4E8">(slicesPipe);</span></span>
+<span class="line"><span style="color:#F97583">    await</span><span style="color:#E1E4E8"> fs.</span><span style="color:#B392F0">rmdirSync</span><span style="color:#E1E4E8">(sliceDir); </span><span style="color:#6A737D">// 读取完成之后，删除切片文件夹</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(error);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><strong>上传文件校验</strong></p>
+<p>当我们上传一个文件的时候，先去判断在服务器上是否存在该文件，如果存在则直接不做上传操作，否则按上述逻辑进行上传</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// Client</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> verifyUpload</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> res</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#E1E4E8"> request.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/verify'</span><span style="color:#E1E4E8">, { name });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res?.data?.data;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> uploadFile</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">fileList?.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> alert</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'请选择文件'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> file</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> fileList[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> shouldUpload</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> verifyUpload</span><span style="color:#E1E4E8">(file.name);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">shouldUpload) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> message.</span><span style="color:#B392F0">success</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'文件已存在，上传成功'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (file.size </span><span style="color:#F97583">></span><span style="color:#79B8FF"> BIG_FILE_SIZE</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // big handle</span></span>
+<span class="line"><span style="color:#B392F0">    getSliceList</span><span style="color:#E1E4E8">(file);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // // normal handle</span></span>
+<span class="line"><span style="color:#6A737D">  // upload("/uploadSingle", file);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Server</span></span>
+<span class="line"><span style="color:#E1E4E8">router.</span><span style="color:#B392F0">post</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/verify'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">ctx</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">next</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    await</span><span style="color:#B392F0"> next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">name</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ctx.request.body </span><span style="color:#F97583">??</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> filePath</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">UPLOAD_DIR</span><span style="color:#E1E4E8">, name);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (fs.</span><span style="color:#B392F0">existsSync</span><span style="color:#E1E4E8">(filePath)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        code: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        data: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        code: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        data: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    ctx.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      code: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      msg: </span><span style="color:#9ECBFF">'检测失败'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>上述直接使用文件名来做判断，过于绝对，对文件做了相关修改并不更改名字，就会出现问题。更应该采用的方案是根据文件相关的元数据计算出它的 hash 值来做判断。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> calculateMD5</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">file</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#F97583">  new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> chunkSize</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> SLICE_FILE_SIZE</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> fileReader</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> FileReader</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> spark</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> SparkMD5.</span><span style="color:#B392F0">ArrayBuffer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> cursor </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    fileReader.</span><span style="color:#B392F0">onerror</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">      reject</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Error reading file'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">    fileReader.</span><span style="color:#B392F0">onload</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">e</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      spark.</span><span style="color:#B392F0">append</span><span style="color:#E1E4E8">(e.target.result);</span></span>
+<span class="line"><span style="color:#E1E4E8">      cursor </span><span style="color:#F97583">+=</span><span style="color:#E1E4E8"> e.target.result.byteLength;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (cursor </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> file.size) </span><span style="color:#B392F0">loadNext</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      else</span><span style="color:#B392F0"> resolve</span><span style="color:#E1E4E8">(spark.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#B392F0"> loadNext</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> fileSlice</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> file.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(cursor, cursor </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> chunkSize);</span></span>
+<span class="line"><span style="color:#E1E4E8">      fileReader.</span><span style="color:#B392F0">readAsArrayBuffer</span><span style="color:#E1E4E8">(fileSlice);</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#B392F0">    loadNext</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#文件常识"> 文件常识 </a><a class="depth-3" href="#文件权限"> 文件权限 </a><a class="depth-3" href="#文件标识"> 文件标识 </a><a class="depth-3" href="#文件描述符"> 文件描述符 </a><a class="depth-2" href="#常用-api"> 常用 API </a><a class="depth-2" href="#过滤项目中适当的文件"> 过滤项目中适当的文件 </a><a class="depth-2" href="#文件拷贝"> 文件拷贝 </a><a class="depth-2" href="#文件上传"> 文件上传 </a><a class="depth-3" href="#小文件上传"> 小文件上传 </a><a class="depth-3" href="#大文件上传"> 大文件上传 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/node/multi-process-and-cluster/">上一篇：多进程架构和 Cluster</a> <a href="/blog/node/inter-process-communication-in-nodejs/">下一篇：Nodejs 中的进程间通信</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

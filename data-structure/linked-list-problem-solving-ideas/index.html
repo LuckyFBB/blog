@@ -1,15 +1,650 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="常见数据结构、算法思路和刷题复盘。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>链表的解题思路 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link is-active" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">数据结构</a> <h1>链表的解题思路</h1> </header> <div class="article-grid"> <div class="prose"> <p>之前一直有断断续续在学习一些数据结构的知识，在前文中也有过一些总结，一直以来刷 leetcode 也是属于瞎刷，不能够很好的总结题型与解决方案。在此之后，准备按着数据结构类型和算法刷题。
+在刷完二叉树之后，着手开始链表的刷题，也会在此篇博文中进行记录。</p>
+<!-- more -->
+<p>在<a href="/blog/data-structure/linked-list">前文</a>中介绍了链表的相关知识，可以进行查看阅读。</p>
+<h2 id="解题思路">解题思路</h2>
+<h3 id="删除节点">删除节点</h3>
+<p>对于删除节点类的题型，无外乎是获得当前需要删除的节点 curr，然后改变前序节点 prev 的指向，<strong>prev.next = curr.next</strong>，从而达到删除 curr 的效果。</p>
+<h3 id="利用哨兵简化难度">利用哨兵简化难度</h3>
+<p>引入一个哨兵节点 pivot，使得 pivot.next = head。哨兵结点是不存储数据的。因为哨兵结点一直存在，所以插入第一个结点和插入其他结点，删除最后一个结点和删除其他结点，都可以统一为相同的代码实现逻辑了。</p>
+<h3 id="快慢指针">快慢指针</h3>
+<p>快慢指针一般分为两种，一种是快指针速度为慢指针两倍，一种是快指针比慢指针快 N 步。使用快慢指针还能解决链表是否有环的问题。</p>
+<h3 id="边界问题">边界问题</h3>
+<ul>
+<li>如果链表为空时，代码是否能正常工作？</li>
+<li>如果链表只包含一个结点时，代码是否能正常工作？</li>
+<li>如果链表只包含两个结点时，代码是否能正常工作？</li>
+<li>代码逻辑在处理头结点和尾结点的时候，是否能正常工作？</li>
+</ul>
+<h2 id="删除节点-1">删除节点</h2>
+<h3 id="移除链表元素">移除链表元素</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>删除链表中等于给定值 val 的所有节点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->2->6->3->4->5->6, val = 6</span></span>
+<span class="line"><span>输出: 1->2->3->4->5</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/remove-lvinked-list-elements/">leetcode</a></p>
+<p>分析：遍历链表，找到当前的需要删除的节点 curr，并且使用 prev 记录为需删除节点的前序节点，然后使用 prev.next = curr.next，改变 prev 后续指针的指向，从而达到删除的目的。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> removeElements</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">val</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (head </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (head </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> head.val </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    head </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> pre </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (pre </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> pre.next </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> cur </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pre.next;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (cur.val </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      pre </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> cur;</span></span>
+<span class="line"><span style="color:#F97583">      continue</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    pre.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> cur.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 96 ms, faster than 65.34% of JavaScript</span></span></code></pre>
+<h3 id="删除排序链表中的重复元素">删除排序链表中的重复元素</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个排序链表，删除所有重复的元素，使得每个元素只出现一次。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->1->2</span></span>
+<span class="line"><span>输出: 1->2</span></span>
+<span class="line"><span>示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->1->2->3->3</span></span>
+<span class="line"><span>输出: 1->2->3</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list">leetcode</a>
+分析：如果两个元素相同，则将 curr.next 指向 curr.next.next</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> deleteDuplicates</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (curr </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> curr.next) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (curr.val </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> curr.next.val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#F97583">      continue</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 88 ms, faster than 74.09% of JavaScript</span></span></code></pre>
+<h3 id="删除排序链表中的重复元素-ii">删除排序链表中的重复元素 II</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个排序链表，删除所有含有重复数字的节点，只保留原始链表中 没有重复出现 的数字。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->2->3->3->4->4->5</span></span>
+<span class="line"><span>输出: 1->2->5</span></span>
+<span class="line"><span>示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->1->1->2->3</span></span>
+<span class="line"><span>输出: 2->3</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii">leetcode</a></p>
+<p>分析：此题为上一题的加强版，我们采用双指针的方式来解决这个问题。首先设置一个哨兵节点 pivot 指向整个 head。设置 prev 指向哨兵节点，设置 curr 指向 head 节点。然后遍历整个 head 节点，如果 curr 和 curr.next 的值相同，需要跳过所有相同节点的操作，所以有了第二个 while 循环，拿到最后一个相同节点后，prev.next 指向 curr；如果两者不相等，prev 和 curr 都分别指向自身下一个节点。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> deleteDuplicates</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">Infinity</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  pivot.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (curr </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> curr.next) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (curr.val </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> curr.next.val) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> val </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.val;</span></span>
+<span class="line"><span style="color:#F97583">      while</span><span style="color:#E1E4E8"> (curr </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> curr.val </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">      prev.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> prev.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 80 ms, faster than 87.14% of JavaScript</span></span></code></pre>
+<h3 id="删除链表的倒数第-n-个节点">删除链表的倒数第 n 个节点</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>给定一个链表: 1->2->3->4->5, 和 n = 2.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>当删除了倒数第二个节点后，链表变为 1->2->3->5.</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list">leetcode</a></p>
+<ul>
+<li>分析 1：转换为删除正数第(<strong>length-n+1</strong>)个节点。先获取到 length，然后转换 length 为正数节点。一直找到需删除节点的前序节点，然后采用固定公式。</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> removeNthFromEnd</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">n</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  pivot.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> length </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (temp) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    length</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  length </span><span style="color:#F97583">-=</span><span style="color:#E1E4E8"> n;</span></span>
+<span class="line"><span style="color:#E1E4E8">  temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (length </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    length</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  temp.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp.next.next;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 92 ms, faster than 26.06% of JavaScript</span></span></code></pre>
+<ul>
+<li>分析 2：采用快慢指针。使得 fast 在 slow 前的 n 个位置，当 fast 到达链表尾节点时，slow.next 指向当前需删除的节点。</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> removeNthFromEnd</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">n</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  pivot.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    n</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fast.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (fast.next </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fast.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> slow.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  slow.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> slow.next.next;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 88 ms, faster than 36.59% of JavaScript</span></span></code></pre>
+<h2 id="翻转链表">翻转链表</h2>
+<h3 id="反转链表">反转链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>反转一个单链表。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->2->3->4->5->NULL</span></span>
+<span class="line"><span>输出: 5->4->3->2->1->NULL</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/reverse-linked-list/">leetcode</a>
+分析：设置哨兵节点 null，将当前节点的指针指向上一个节点，然后更新当前节点和下一个节点的值即顺移，重复以上动作直到当前节点为尾节点的节点 null</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> reverseList</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (curr) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> next</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> prev;</span></span>
+<span class="line"><span style="color:#E1E4E8">    prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> prev;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="反转链表-ii">反转链表 II</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>反转从位置 m 到 n 的链表。请使用一趟扫描完成反转。</span></span>
+<span class="line"><span>说明:</span></span>
+<span class="line"><span>1 ≤ m ≤ n ≤ 链表长度。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例:</span></span>
+<span class="line"><span>输入: 1->2->3->4->5->NULL, m = 2, n = 4</span></span>
+<span class="line"><span>输出: 1->4->3->2->5->NULL</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/reverse-linked-list-ii">leetcode</a>
+分析：只需要对 m 到 n 之间的元素进行翻转。翻转的思路和上一题一样，但是需要取到 m-n 之间的元素。所以调用了两次 while 循环，获取到 m-n 之间的元素</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> reverseBetween</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">m</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">n</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  pivot.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> length </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> n </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> m;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> m </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp.next;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (length </span><span style="color:#F97583">>=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> next</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> prev;</span></span>
+<span class="line"><span style="color:#E1E4E8">    prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    length</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  temp.next.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr;</span></span>
+<span class="line"><span style="color:#E1E4E8">  temp.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> prev;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 72 ms, faster than 86.55% of JavaScript</span></span></code></pre>
+<h3 id="两两交换链表中的节点">两两交换链表中的节点</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例:</span></span>
+<span class="line"><span>给定 1->2->3->4, 你应该返回 2->1->4->3.</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/swap-nodes-in-pairs">leetcode</a>
+分析：加入哨兵节点，惯用的思路。分别设置 start 和 end 两个节点为要交换的节点，start 为当前遍历节点的后续节点，end 为 start 的后续节点。当前节点的后续节点和后后续两者中有一个为空时则终止循环。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> swapPairs</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  pivot.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (temp.next </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> temp.next.next) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> start</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> temp.next;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> end</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> start.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    temp.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> end;</span></span>
+<span class="line"><span style="color:#E1E4E8">    start.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> end.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    end.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> start;</span></span>
+<span class="line"><span style="color:#E1E4E8">    temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> start;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 68 ms, faster than 94.77% of JavaScript</span></span></code></pre>
+<h2 id="合并链表">合并链表</h2>
+<h3 id="合并两个有序链表">合并两个有序链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 </span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：1->2->4, 1->3->4</span></span>
+<span class="line"><span>输出：1->1->2->3->4->4</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/merge-two-sorted-lists">leetcode</a>
+分析 1：如果 l1 或者 l2 一开始就是空链表 ，那么没有任何操作需要合并，所以我们只需要返回非空链表。否则，我们要判断 l1 和 l2 哪一个链表的头节点的值更小，然后递归地决定下一个添加到结果里的节点。如果两个链表有一个为空，递归结束。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">l1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">l2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (l1 </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> l2;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (l2 </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> l1;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (l1.val </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> l2.val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    l1.next </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#E1E4E8">(l1.next, l2);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> l1;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    l2.next </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#E1E4E8">(l1, l2.next);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> l2;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 88 ms, faster than 72.02% of JavaScript</span></span></code></pre>
+<p>分析 2：
+当 l1 和 l2 都不是空链表时，判断 l1 和 l2 哪一个链表的头节点的值更小，将较小值的节点添加到结果里，当一个节点被添加到结果里之后，将对应链表中的节点向后移一位。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">l1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">l2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (l1 </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> l2) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (l1.val </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> l2.val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      prev.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l2;</span></span>
+<span class="line"><span style="color:#E1E4E8">      l2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l2.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      prev.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l1;</span></span>
+<span class="line"><span style="color:#E1E4E8">      l1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l1.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> prev.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  prev.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l1 </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> l1 </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> l2;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 86.76% of JavaScript</span></span></code></pre>
+<h3 id="合并-k-个升序链表">合并 K 个升序链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给你一个链表数组，每个链表都已经按升序排列。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>请你将所有链表合并到一个升序链表中，返回合并后的链表。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：lists = [[1,4,5],[1,3,4],[2,6]]</span></span>
+<span class="line"><span>输出：[1,1,2,3,4,4,5,6]</span></span>
+<span class="line"><span>解释：链表数组如下：</span></span>
+<span class="line"><span>[</span></span>
+<span class="line"><span>  1->4->5,</span></span>
+<span class="line"><span>  1->3->4,</span></span>
+<span class="line"><span>  2->6</span></span>
+<span class="line"><span>]</span></span>
+<span class="line"><span>将它们合并到一个有序链表中得到。</span></span>
+<span class="line"><span>1->1->2->3->4->4->5->6</span></span>
+<span class="line"><span>示例 2：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：lists = []</span></span>
+<span class="line"><span>输出：[]</span></span>
+<span class="line"><span>示例 3：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：lists = [[]]</span></span>
+<span class="line"><span>输出：[]</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/merge-k-sorted-lists">leetcode</a></p>
+<p>分析：作为上一题的衍生题，可以把多个链表都转换为两个链表的计算，当 lists 中只有一个链表时就返回结果，否则就把两个链表进行合并。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> mergeKLists</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">lists</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (lists.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (lists.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> lists.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> lists.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    lists.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">mergeTwoLists</span><span style="color:#E1E4E8">(a, b));</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> lists[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">l1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">l2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (l1 </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> l2;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (l2 </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> l1;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (l1.val </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> l2.val) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    l1.next </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#E1E4E8">(l1.next, l2);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> l1;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    l2.next </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mergeTwoLists</span><span style="color:#E1E4E8">(l1, l2.next);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> l2;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 108 ms, faster than 79.26% of JavaScript</span></span></code></pre>
+<h3 id="两数相加">两数相加</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>您可以假设除了数字 0 之外，这两个数都不会以 0 开头。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)</span></span>
+<span class="line"><span>输出：7 -> 0 -> 8</span></span>
+<span class="line"><span>原因：342 + 465 = 807</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/add-two-numbers">leetcode</a></p>
+<p>分析：位于链表同一位置的两数相加，需要注意进位的情况。如果所有节点遍历遍历完毕，存在进位情况，需要新增节点。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> addTwoNumbers</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">l1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">l2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> carry </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (l1 </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> l2) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> num1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> l1 </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> l1.val </span><span style="color:#F97583">:</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> num2</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> l2 </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> l2.val </span><span style="color:#F97583">:</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> sum</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> num1 </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> num2 </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> carry;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">pivot) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      pivot </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(sum </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.next </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(sum </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    carry </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">floor</span><span style="color:#E1E4E8">(sum </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    l1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l1 </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> l1.next </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    l2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l2 </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> l2.next </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  carry </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> (curr.next </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(carry)) </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 132 ms, faster than 73.04% of JavaScript</span></span></code></pre>
+<h3 id="两数相加-ii">两数相加 II</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给你两个 非空 链表来代表两个非负整数。数字最高位位于链表开始位置。它们的每个节点只存储一位数字。将这两数相加会返回一个新的链表。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>你可以假设除了数字 0 之外，这两个数字都不会以零开头。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>进阶：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>如果输入链表不能修改该如何处理？换句话说，你不能对列表中的节点进行翻转。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：(7 -> 2 -> 4 -> 3) + (5 -> 6 -> 4)</span></span>
+<span class="line"><span>输出：7 -> 8 -> 0 -> 7</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/add-two-numbers-ii/">leetcode</a>
+分析：该题是上一题的衍生题型，是从尾部开始计算然后向前进位。先分别用栈把两个链表存储起来，然后对于链表的顶部数据进行计算，如果需要进位就 carry 加入下一位运算。循环截至，遍历 stack，输出链表。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> addTwoNumbers</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">l1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">l2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack2</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> carry </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (l1) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack1.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(l1.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">    l1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l1.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (l2) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack2.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(l2.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">    l2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> l2.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (stack1.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> stack2.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> num1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stack1.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> stack1.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">:</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> num2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stack2.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> stack2.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">:</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> sum </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> num1 </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> num2 </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> carry;</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(sum </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    carry </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">floor</span><span style="color:#E1E4E8">(sum </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  carry </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(carry) </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pivot </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pivot;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.next </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pivot.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 140 ms, faster than 53.90% of JavaScript</span></span></code></pre>
+<h2 id="拆分链表">拆分链表</h2>
+<h3 id="奇偶链表">奇偶链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个单链表，把所有的奇数节点和偶数节点分别排在一起。请注意，这里的奇数节点和偶数节点指的是节点编号的奇偶性，而不是节点的值的奇偶性。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>请尝试使用原地算法完成。你的算法的空间复杂度应为 O(1)，时间复杂度应为 O(nodes)，nodes 为节点总数。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->2->3->4->5->NULL</span></span>
+<span class="line"><span>输出: 1->3->5->2->4->NULL</span></span>
+<span class="line"><span>示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 2->1->3->5->6->4->7->NULL</span></span>
+<span class="line"><span>输出: 2->3->6->7->1->5->4->NULL</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/odd-even-linked-list">leetcode</a></p>
+<p>分析：对于奇偶数来说都是指向下下一个节点，node.next = node.next.next，得到一条奇数节点和偶数节点，奇数节点.next = 偶数链头</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> oddEvenList</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">head) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> odd </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> even </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head.next;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> headEven </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> even;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (even </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> even.next) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    odd.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> odd.next.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    even.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> even.next.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    odd </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> odd.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    even </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> even.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  odd.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> headEven;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 89.51% of JavaScript</span></span></code></pre>
+<h3 id="分隔链表">分隔链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个链表和一个特定值 x，对链表进行分隔，使得所有小于 x 的节点都在大于或等于 x 的节点之前。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>你应当保留两个分区中每个节点的初始相对位置。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: head = 1->4->3->2->5->2, x = 3</span></span>
+<span class="line"><span>输出: 1->2->2->4->3->5</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/partition-list">leetcode</a>
+分析: 思维与上一题大同小异，分别采用两条链表来存储小于 x 和大于等于 x 的值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> partition</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">x</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">head) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> smallerHead </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> biggerHead </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> smaller </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> smallerHead;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> bigger </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> biggerHead;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (head) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (head.val </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> x) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      smaller.next </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(head.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">      smaller </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> smaller.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">      smaller.next </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      bigger.next </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ListNode</span><span style="color:#E1E4E8">(head.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">      bigger </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> bigger.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">      bigger.next </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    head </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  smaller.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> biggerHead.next;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> smallerHead.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 72.32% of JavaScript</span></span></code></pre>
+<h2 id="环">环</h2>
+<h3 id="环形链表">环形链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。 为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。注意：pos 不作为参数进行传递，仅仅是为了标识链表的实际情况。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>如果链表中存在环，则返回 true 。 否则，返回 false 。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/linked-list-cycle">leetcode</a>
+分析 1：快慢指针法。从链表头开始，快指针每次走两步，慢指针每次走一步，如果节点值相同，说明有环。如果不同，继续循环。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> hasCycle</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (fast </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> fast.next </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> fast.next.next) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fast.next.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> slow.next;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (fast </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> slow) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 74.06% of JavaScript</span></span></code></pre>
+<p>分析 2：借助哈希表。哈希表存储曾经遍历过的节点，遍历每一个节点，都查看哈希表是否存在当前节点，如果存在，则说明链表有环；如果不存在，则存入哈希表，并继续遍历下一节点。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> hasCycle</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> map </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (head) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(head)) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(head, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    head </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms, faster than 96.70% of JavaScript</span></span></code></pre>
+<h3 id="环形链表-ii">环形链表 II</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/linked-list-cycle-ii/">leetcode</a></p>
+<p>分析 1：快慢指针法。和上一题的方法一样，从链表头开始，快指针每次走两步，慢指针每次走一步。
+<img src="/blog/imgs/algorithm/linked_list_sycle.png" alt="">
+D：头节点到入环点的距离
+S1：从入环点到首次相遇点的距离
+S2：从首次相遇点到入环点的距离
+相遇时，慢指针走的 D+S1，快指针走的距离 D+n(S1+S2)+S1。快指针是慢指针的两倍。并且假设 n 为 1 时，会得到 D=S2。
+所以当在第一次相遇之后，从链表头部和相遇点继续以步速相同前进，两者相遇时就是入环点。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> detectCycle</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (fast </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> fast.next </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> fast.next.next) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fast.next.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> slow.next;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (slow </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> fast) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">      while</span><span style="color:#E1E4E8"> (slow </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> fast) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        slow </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> slow.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">        fast </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fast.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> slow;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 87.83% of JavaScript</span></span></code></pre>
+<p>分析 2：借助哈希表。思路同上一题。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> detectCycle</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> map </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (head) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(head)) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#E1E4E8">    map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(head, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    head </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 80 ms, faster than 95.47% of JavaScript</span></span></code></pre>
+<h2 id="其他">其他</h2>
+<h3 id="回文链表">回文链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>请判断一个链表是否为回文链表。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:                          示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: 1->2                       输入: 1->2->2->1</span></span>
+<span class="line"><span>输出: false                      输出: true</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/palindrome-linked-list/">leetcode</a>
+分析 1：先获得链表长度，然后把前面部分链表翻转，最后对前后两段链表进行比较。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> isPalindrome</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">head) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> length</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getLength</span><span style="color:#E1E4E8">(head);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> [left, right] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> reseveHalf</span><span style="color:#E1E4E8">(head, length);</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> right) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (left.val </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> right.val) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    left </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    right </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> right.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">right;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> reseveHalf</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">length</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> half </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">floor</span><span style="color:#E1E4E8">(length </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (half</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> next</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> prev;</span></span>
+<span class="line"><span style="color:#E1E4E8">    prev </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> length </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> [prev, curr] </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> [prev, curr.next];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> getLength</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> length </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (curr) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    length</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> length;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 92 ms, faster than 35.24% of JavaScript</span></span></code></pre>
+<p>分析 2: 遍历链表放入数组，然后通过数组判断。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> isPalindrome</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">head</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (head </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> ll </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> head;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [ll.val];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (ll.next </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    ll </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ll.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">    arr.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(ll.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> low </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> high </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (low </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> high) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (arr[low] </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> arr[high]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      low</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      high</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms, faster than 93.50% of JavaScript</span></span></code></pre>
+<h3 id="相交链表">相交链表</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>编写一个程序，找到两个单链表相交的起始节点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3</span></span>
+<span class="line"><span>输出：Reference of the node with value = 8</span></span>
+<span class="line"><span>输入解释：相交节点的值为 8 （注意，如果两个链表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1</span></span>
+<span class="line"><span>输出：Reference of the node with value = 2</span></span>
+<span class="line"><span>输入解释：相交节点的值为 2 （注意，如果两个链表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists">leetcode</a>
+分析 1：先遍历 headA 并打上标记，再遍历 headB 寻找标记。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> getIntersectionNode</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">headA</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">headB</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (headA) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    headA.flag </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    headA </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> headA.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (headB) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (headB.flag) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> headB;</span></span>
+<span class="line"><span style="color:#E1E4E8">    z;</span></span>
+<span class="line"><span style="color:#E1E4E8">    headB </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> headB.next;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 96 ms, faster than 94.80% of JavaScript</span></span></code></pre>
+<p>分析 2：双指针法。初始化两个指针 pA 和 pB 分别指向 headA 和 headB，每次 pA 和 pB 各走一步，当 pA 触底后变轨到 headB，同理，当 pB 触底后变轨到 headA。这样就只需遍历(A 的非公共部分+B 的非公共部分+AB 的公共部分)</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> getIntersectionNode</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">headA</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">headB</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> pA </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> headA;</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> pB </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> headB;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (pA </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> pB) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    pB </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pB </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> pB.next </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> headA;</span></span>
+<span class="line"><span style="color:#E1E4E8">    pA </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> pA </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> pA.next </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> headB;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pA;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#解题思路"> 解题思路 </a><a class="depth-3" href="#删除节点"> 删除节点 </a><a class="depth-3" href="#利用哨兵简化难度"> 利用哨兵简化难度 </a><a class="depth-3" href="#快慢指针"> 快慢指针 </a><a class="depth-3" href="#边界问题"> 边界问题 </a><a class="depth-2" href="#删除节点-1"> 删除节点 </a><a class="depth-3" href="#移除链表元素"> 移除链表元素 </a><a class="depth-3" href="#删除排序链表中的重复元素"> 删除排序链表中的重复元素 </a><a class="depth-3" href="#删除排序链表中的重复元素-ii"> 删除排序链表中的重复元素 II </a><a class="depth-3" href="#删除链表的倒数第-n-个节点"> 删除链表的倒数第 n 个节点 </a><a class="depth-2" href="#翻转链表"> 翻转链表 </a><a class="depth-3" href="#反转链表"> 反转链表 </a><a class="depth-3" href="#反转链表-ii"> 反转链表 II </a><a class="depth-3" href="#两两交换链表中的节点"> 两两交换链表中的节点 </a><a class="depth-2" href="#合并链表"> 合并链表 </a><a class="depth-3" href="#合并两个有序链表"> 合并两个有序链表 </a><a class="depth-3" href="#合并-k-个升序链表"> 合并 K 个升序链表 </a><a class="depth-3" href="#两数相加"> 两数相加 </a><a class="depth-3" href="#两数相加-ii"> 两数相加 II </a><a class="depth-2" href="#拆分链表"> 拆分链表 </a><a class="depth-3" href="#奇偶链表"> 奇偶链表 </a><a class="depth-3" href="#分隔链表"> 分隔链表 </a><a class="depth-2" href="#环"> 环 </a><a class="depth-3" href="#环形链表"> 环形链表 </a><a class="depth-3" href="#环形链表-ii"> 环形链表 II </a><a class="depth-2" href="#其他"> 其他 </a><a class="depth-3" href="#回文链表"> 回文链表 </a><a class="depth-3" href="#相交链表"> 相交链表 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/data-structure/array/">上一篇：数组</a> <a href="/blog/data-structure/stack-and-queue/">下一篇：栈、队列</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

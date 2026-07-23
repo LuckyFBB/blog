@@ -1,15 +1,672 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="JS / TS、浏览器、语言机制与日常开发基础。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>原生 JS 方法的实现 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link is-active" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">前端基础</a> <h1>原生 JS 方法的实现</h1> </header> <div class="article-grid"> <div class="prose"> <p>总结一下一些操作符或者方法的原生实现。持续更新</p>
+<h2 id="new-操作符">new-操作符</h2>
+<p>创建某个实例，必须使用 new 操作符。这种方式调用构造函数会经历以下 4 个步骤:</p>
+<ul>
+<li>创造一个新的对象</li>
+<li>将构造函数的作用域赋值给新对象(this 指向该对象)</li>
+<li>执行构造函数中的代码(为新对象添加属性)</li>
+<li>返回新对象</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> myNew</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">fun</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">fun</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#6A737D">  //var obj = {}</span></span>
+<span class="line"><span style="color:#6A737D">  //obj.__proto__ = fun.prototype  与上述方法实现效果相同</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> args </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">].</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fun.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(obj, </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> obj;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="instanceof-操作符">instanceof 操作符</h2>
+<p>instanceof 可以正确的判断对象的类型，因为内部的机制是通过判断对象的原型链中是不是能够找到类型的 prototype。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> myInstanceof</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#F97583"> ||</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> prototype </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> right</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  left </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left.</span><span style="color:#79B8FF">__proto__</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (left </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (prototype </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> left) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    left </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left.</span><span style="color:#79B8FF">__proto__</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="call--apply--bind-的实现">call / apply / bind 的实现</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">call  func.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(obj, args1, args2); </span><span style="color:#6A737D">//传入的是参数列表</span></span>
+<span class="line"><span style="color:#E1E4E8">apply func.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(obj, [args1, args2]); </span><span style="color:#6A737D">//传入的是数组参数    记法：apply是a开头为array</span></span>
+<span class="line"><span style="color:#E1E4E8">bind  func.</span><span style="color:#B392F0">bind</span><span style="color:#E1E4E8">(obj, args1, args2); </span><span style="color:#6A737D">//返回的是函数，前两者为立即执行</span></span></code></pre>
+<h3 id="中心思想">中心思想</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 改变this的指向，让bar()函数的this指向foo对象</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> foo </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  value: </span><span style="color:#79B8FF">100</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> bar</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.value);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">bar.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(foo);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//等同与将bar函数作为foo对象属性进行调用，即为下列方式</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> foo </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  value: </span><span style="color:#79B8FF">100</span></span>
+<span class="line"><span style="color:#E1E4E8">  bar: </span><span style="color:#F97583">function</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.value);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/*</span></span>
+<span class="line"><span style="color:#6A737D"> * 因此我们总结模拟思路如下：</span></span>
+<span class="line"><span style="color:#6A737D"> * 1.将执行的函数作为对象属性</span></span>
+<span class="line"><span style="color:#6A737D"> * 2.执行函数</span></span>
+<span class="line"><span style="color:#6A737D"> * 3.将函数从对象中删除</span></span>
+<span class="line"><span style="color:#6A737D">*/</span></span></code></pre>
+<h3 id="call">call</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">Function</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">myCall</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">context</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  //使用该方式在原型链上拓展方法，以便所有的函数都能够使用.方式调用</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#79B8FF"> this</span><span style="color:#F97583"> !==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //判断调用是否为函数</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Error'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> ctx</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> context </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> window; </span><span style="color:#6A737D">//取到传入的对象(执行上下文)，如果不传参数默认指向window</span></span>
+<span class="line"><span style="color:#E1E4E8">  ctx.func </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//给obj对象添加一个func方法，this也就是调用myCall的函数</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> args</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">].</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">); </span><span style="color:#6A737D">//取得传入除了obj的参数</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> result</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> ctx.</span><span style="color:#B392F0">func</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args); </span><span style="color:#6A737D">//执行函数</span></span>
+<span class="line"><span style="color:#F97583">  delete</span><span style="color:#E1E4E8"> ctx.func; </span><span style="color:#6A737D">//删除函数</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="apply">apply</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">Function</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">myApply</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">context</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#79B8FF"> this</span><span style="color:#F97583"> !==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Error'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> ctx</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> context </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> window;</span></span>
+<span class="line"><span style="color:#E1E4E8">  ctx.func </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#6A737D">    //判断是否传入数组参数,如果传入就要展开数组</span></span>
+<span class="line"><span style="color:#E1E4E8">    result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ctx.</span><span style="color:#B392F0">func</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> ctx.</span><span style="color:#B392F0">func</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  delete</span><span style="color:#E1E4E8"> ctx.func;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="bind">bind</h3>
+<p>相对于前两个，这个函数返回的函数，并不是立即执行。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">Function</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">myBind</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">context</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#79B8FF"> this</span><span style="color:#F97583"> !==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Error'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  context </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> context </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> window;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> _this</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> args</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">].</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> F</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> _this.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(context, args.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="flat-的实现">flat 的实现</h2>
+<h3 id="递归">递归</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 判断当前数据是否为数组，是则递归</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> flatten</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">  nums.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(item)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> result.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">flatten</span><span style="color:#E1E4E8">(item));</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="tostring--map">toString + map</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 这种方式比较局限，只有数组中元素为数字或者数字字符时，如果有‘a’这类字符串就会出错</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> flatten</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> nums</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">toString</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">','</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#F97583"> +</span><span style="color:#E1E4E8">item);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="reduce">reduce</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 思路与递归相似，判断当前是否为数组</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> flatten</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> nums.</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">pre</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> pre.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(curr) </span><span style="color:#F97583">?</span><span style="color:#B392F0"> flatten</span><span style="color:#E1E4E8">(curr) </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }, []);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="some--扩展运算符">some + 扩展运算符</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 扩展运算符可以平铺开一层数组，如果一直存在数组的话，一直采用...平铺数组，直至没有数组</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> flatten</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (nums.</span><span style="color:#B392F0">some</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(item))) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    nums </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [].</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">nums);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> nums;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="层数控制">层数控制</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> isArray</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> flatten</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> deep </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> arguments</span><span style="color:#E1E4E8">[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//判断是否传入展平  层级</span></span>
+<span class="line"><span style="color:#E1E4E8">  arr.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">element</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(element) </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> deep </span><span style="color:#F97583">>=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> result.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">flatten</span><span style="color:#E1E4E8">(element, deep </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(element);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="防抖节流">防抖节流</h2>
+<p>在 resize/scroll/keypress/mousemove 等事件触发时，会不断调用回调函数。</p>
+<p>在我们实现搜索的时候，输入搜索内容进行模糊搜索的时候，也会不断调用回调函数，这样子性能就被降低了。</p>
+<p>对于这类事件的处理方式就是使用事件节流和事件防抖。它们通过对事件对应的回调函数进行包裹，以自由变量的形式缓存时间信息。</p>
+<h3 id="防抖debounce">防抖(debounce)</h3>
+<p>假设设置时间为 2000ms，如果触发事件的 2000ms 之内，你再次触发该事件，就会给新的事件添加新的计时器，之前的事件统统作废。只执行最后一次触发的事件。</p>
+<p>在某段时间内，不管你触发了多少次事件，我都只认最后一次。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> debounce</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">fn</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">delay</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> timer </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> _this </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> args </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> arguments</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    clearTimeout</span><span style="color:#E1E4E8">(timer);</span></span>
+<span class="line"><span style="color:#E1E4E8">    timer </span><span style="color:#F97583">=</span><span style="color:#B392F0"> setTimeout</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">      fn.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(_this, args);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, delay);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="节流throttle">节流(throttle)</h3>
+<p>在某段时间内，不管你触发了多少次事件，我都只认第一次，并在计时结束时给予响应。
+假设设置的时间为 2000ms，再触发了事件的 2000ms 之内，你在多少触发该事件，都不会有任何作用，它只为第一个事件等待 2000ms。时间一到，它就会执行了。</p>
+<h4 id="时间戳">时间戳</h4>
+<p>设置触发事件时的时间戳，然后减去之前的时间戳，如果大于时间周期，则执行函数，更新时间戳。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> throttle</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">fn</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">delay</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  //点击第一下就会立即执行</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pre </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> _this </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> args </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> arguments</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> now </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Date</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (now </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> pre </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> delay) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      fn.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(_this, args);</span></span>
+<span class="line"><span style="color:#E1E4E8">      pre </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> now;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="定时器">定时器</h4>
+<p>设置一个定时器，再次触发时，如果存在定时器就不会执行函数，知道定时器执行之后，清空定时器，才能够设置下一个定时器。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> throttle</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">fn</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">delay</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> timer;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> _this</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> args</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">timer) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      timer </span><span style="color:#F97583">=</span><span style="color:#B392F0"> setTimeout</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">        timer </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        fn.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(_this, args);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }, delay);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="两者比较">两者比较</h4>
+<ul>
+<li>时间戳方式，会立即执行第一个事件；定时器方式，会隔 n 秒后执行第一个事件。</li>
+<li>时间戳方式，停止触发后不会再执行事件；定时器方式，停止触发后会再一次执行事件。</li>
+</ul>
+<h2 id="jsonp-的实现">jsonp 的实现</h2>
+<p>jsonp 的作用是解决跨域问题。
+因为 script 标签不受同源策略限制，所以可以动态插入 script 实现跨域。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> jsonp</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">url</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  data </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> data </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resovle</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> cbFn</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `jsonp_${</span><span style="color:#E1E4E8">Date</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">now</span><span style="color:#9ECBFF">()</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    data.callback </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> cbFn;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> head</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> document.</span><span style="color:#B392F0">querySelector</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'head'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> script</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> document.</span><span style="color:#B392F0">createElement</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'script'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> src</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">url</span><span style="color:#9ECBFF">}?${</span><span style="color:#B392F0">dataToUrl</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    script.src </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> src;</span></span>
+<span class="line"><span style="color:#E1E4E8">    head.</span><span style="color:#B392F0">append</span><span style="color:#E1E4E8">(script);</span></span>
+<span class="line"><span style="color:#E1E4E8">    window[ncbFn] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">      resovle</span><span style="color:#E1E4E8">(res);</span></span>
+<span class="line"><span style="color:#E1E4E8">      head.</span><span style="color:#B392F0">removeChild</span><span style="color:#E1E4E8">(script);</span></span>
+<span class="line"><span style="color:#E1E4E8">      window[cbFn] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> dataToUrl</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(data)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">pre</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      pre.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">curr</span><span style="color:#9ECBFF">}=${</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">[</span><span style="color:#E1E4E8">curr</span><span style="color:#9ECBFF">]</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> pre;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, [])</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'&#x26;'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">jsonp</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http://jsonplaceholder.typicode.com/comments'</span><span style="color:#E1E4E8">, {</span></span>
+<span class="line"><span style="color:#E1E4E8">  postId: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">}).</span><span style="color:#B392F0">then</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(res);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<h2 id="函数柯里化">函数柯里化</h2>
+<p>当某个函数一次需要接受多个参数时，可以使用柯里化来使得当前函数一次性接受少一点的参数。</p>
+<p>百科：把接受多个参数的函数变换成接受一个单一参数(最初函数的第一个参数)的函数，并且返回接受余下的参数且返回结果的新函数的技术。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> carry</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">fn</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> args</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">].</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (fn.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x3C;=</span><span style="color:#E1E4E8"> args.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //当传入参数的数量>=函数参数数量时，执行函数</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> fn</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#6A737D">    //返回一个函数，等待传入其他参数</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> args1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">arguments</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> carry</span><span style="color:#E1E4E8">(fn, </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args, </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args1);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> add</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">a</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">b</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">c</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> b </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> c;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> carryAdd</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> carry</span><span style="color:#E1E4E8">(add);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">carryAdd</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">carryAdd</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">carryAdd</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)(</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">carryAdd</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)()(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)()(</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<h2 id="lazyman链式调用">LazyMan(链式调用)</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> LazyMan</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">name</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> _LazyMan</span><span style="color:#E1E4E8">(name);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _LazyMan</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">name</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.name </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> name;</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> []; </span><span style="color:#6A737D">//初始化队列</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Hi, '</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> name);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#B392F0">  setTimeout</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">_LazyMan</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">next</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> fn</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  fn </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> fn</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">_LazyMan</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">eat</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">food</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.name </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> ' eat '</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> food);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">_LazyMan</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">sleep</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">time</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    setTimeout</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.name </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> ' sleep '</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> time </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> 's'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, time </span><span style="color:#F97583">*</span><span style="color:#79B8FF"> 1000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="数组去重">数组去重</h2>
+<h3 id="双重循环兼容性好">双重循环(兼容性好)</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> unique</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> nums.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; j </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> result.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (nums[i] </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> result[j]) {</span></span>
+<span class="line"><span style="color:#F97583">        break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (j </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> result.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(nums[i]);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="indexof简化上一个方法的内部操作">indexOf(简化上一个方法的内部操作)</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> unique</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> nums.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (result.</span><span style="color:#B392F0">indexOf</span><span style="color:#E1E4E8">(nums[i]) </span><span style="color:#F97583">===</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(nums[i]);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="reduce--sort-实现先排序在去重">reduce + sort 实现(先排序在去重)</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">Array</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">unique</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">sort</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">a</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">b</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> b)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">pre</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (pre.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> pre[pre.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> curr) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        pre.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> pre;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, []);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="对象实现">对象实现</h3>
+<p>可以使用普通对象，或者使用 ES6 Map</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">Array</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">unique</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> map</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">//只能存在一个key</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">map.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(item) </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">Array</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">unique</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> obj</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> obj.</span><span style="color:#B392F0">hasOwnProperty</span><span style="color:#E1E4E8">(item) </span><span style="color:#F97583">?</span><span style="color:#79B8FF"> false</span><span style="color:#F97583"> :</span><span style="color:#E1E4E8"> (obj[item] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="类型判断">类型判断</h2>
+<h3 id="typeof能够判断基本类型">typeof(能够判断基本类型)</h3>
+<p>基本类型：number / string / null / undefined / boolean / symbol(ES6)
+无法区分是哪种类型的对象</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">typeof</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//"object"</span></span>
+<span class="line"><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> {}; </span><span style="color:#6A737D">//"object"</span></span>
+<span class="line"><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> []; </span><span style="color:#6A737D">//"object"</span></span>
+<span class="line"><span style="color:#F97583">typeof</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> foo</span><span style="color:#E1E4E8">() {}; </span><span style="color:#6A737D">//"function"</span></span></code></pre>
+<h3 id="objectprototypetostring">Object.prototype.toString()</h3>
+<p>Object.prototype.toString 会返回一个由 “[object “ 和 class 和 “]” 组成的字符串</p>
+<ul>
+<li>如果 this 值是 undefined，就返回 [object Undefined]</li>
+<li>如果 this 的值是 null，就返回 [object Null]</li>
+<li>让 O 成为 ToObject(this) 的结果</li>
+<li>让 class 成为 O 的内部属性 [[Class]] 的值</li>
+<li>最后返回由 “[object “ 和 class 和 “]” 三个部分组成的字符串</li>
+</ul>
+<p>常规 11 种数据类型：Boolean / Number / String / Function / Array / Date / RegExp / Object / Error / Null / Undefined</p>
+<h3 id="类型判断函数">类型判断函数</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> type</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> classTypeMap</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#9ECBFF">  'Boolean Number String Function Array Date RegExp Object Error'</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">' '</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      classTypeMap[</span><span style="color:#9ECBFF">'[object '</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> item </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> ']'</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> item.</span><span style="color:#B392F0">toLowerCase</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (obj </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#F97583"> ||</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span></span>
+<span class="line"><span style="color:#F97583">    ?</span><span style="color:#E1E4E8"> classTypeMap[</span><span style="color:#79B8FF">Object</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.toString.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(obj)]</span></span>
+<span class="line"><span style="color:#F97583">    :</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> obj;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="深浅拷贝">深浅拷贝</h2>
+<p>JS 有两种数据类型</p>
+<p>基本数据类型 string/number/boolean/undefined/null/symbol(ES6)
+引用数据类型 object/array/function</p>
+<h3 id="浅拷贝">浅拷贝</h3>
+<p>对于基本数据类型来说，拷贝一份互不影响；而对于数组和对象来说，只会拷贝数组或者对象的引用，对新旧数组进行修改，两个数组都会发生变化。</p>
+<p>基础的数组方法能够实现浅拷贝，例如 concat()、slice()；对象能够使用 Object.assign()实现浅拷贝；两者同是都可以使用扩展运算符实现浅拷贝。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 如果是嵌套数组和对象，上述方法不可行</span></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">  arr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, [</span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8">]];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> copyarr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">  copyarr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr1.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">arr[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 5</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//arr[1, 5, 3, 4], copyarr[1, 2, 3, 4]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">arr1[</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">][</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 7</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//arr1[1, 2, 3, [4, 7, 6]], copyarr1[1, 2, 3, [4, 7, 6]]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { a: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, b: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, c: </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">  obj1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { a: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, b: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, c: { d: </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, e: </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8"> } };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> copyobj </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">({}, obj),</span></span>
+<span class="line"><span style="color:#E1E4E8">  copyobj1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">({}, obj1);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">obj.b </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 4</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//obj{ a: 1, b: 4, c: 3 }, copyobj{ a: 1, b: 2, c: 3 }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">obj1.c.d </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 6</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//obj1{ a: 1, b: 2, c: { d: 6, e: 4 } }, copyobj1{ a: 1, b: 2, c: { d: 6, e: 4 } }</span></span></code></pre>
+<h3 id="深拷贝">深拷贝</h3>
+<p>指完全的拷贝一个对象，即使嵌套了对象，两者也相互分离，修改一个对象的属性，也不会影响另一个。</p>
+<h4 id="可以使用-json-的两个函数方法实现深拷贝">可以使用 JSON 的两个函数方法实现深拷贝</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">'old'</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">, [</span><span style="color:#9ECBFF">'old1'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'old2'</span><span style="color:#E1E4E8">], { old: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8"> }];</span></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> new_arr </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">parse</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">stringify</span><span style="color:#E1E4E8">(arr));</span></span>
+<span class="line"><span style="color:#E1E4E8">arr[</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">][</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'old4'</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//new_arr['old', 1, true, ['old1',  'old2'], {old: 1}]</span></span></code></pre>
+<p>但是缺点就是不能拷贝函数和 undefined</p>
+<h4 id="深拷贝函数">深拷贝函数</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> deepClone</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> isObject</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //判断是不是对象</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#F97583">      typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#B392F0">isObject</span><span style="color:#E1E4E8">(obj)) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> newObj </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(obj) </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> [] </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> {}; </span><span style="color:#6A737D">//判断对象类型</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(obj).</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    newObj[key] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> isObject</span><span style="color:#E1E4E8">(obj[key]) </span><span style="color:#F97583">?</span><span style="color:#B392F0"> deepClone</span><span style="color:#E1E4E8">(obj[key]) </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> obj[key]; </span><span style="color:#6A737D">//判断当前值是不是对象</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> newObj;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="进阶版深拷贝函数">进阶版深拷贝函数</h4>
+<p>上面实现的 deepClone 有一个问题，当我们对这样一个对象进行深拷贝时，会报错。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> target</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  filed1: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  filed2: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  filed: [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#E1E4E8">target.target </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> target;</span></span></code></pre>
+<p>在对 target 对象进行深拷贝，报错调用栈溢出 Maximum call stack size exceeded。导致这个的原因是对象的属性间接或直接的引用了自身的情况。
+为了解决这个问题，我们可以开辟一个新的空间来存储当前对象和拷贝对象的关系，当需要拷贝当前对象时，先去存储空间找是否拷贝过；如果有直接返回，如果没有就继续拷贝。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> deepClone</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">map</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> isObject</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //判断是不是对象</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#F97583">      typeof</span><span style="color:#E1E4E8"> obj </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">isObject</span><span style="color:#E1E4E8">(obj)) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> newObj </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(obj) </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> [] </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> {}; </span><span style="color:#6A737D">//判断对象类型</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(obj)) {</span></span>
+<span class="line"><span style="color:#6A737D">      //如果已经克隆过了，直接返回</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(obj);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(obj, newObj); </span><span style="color:#6A737D">//否则将当前对象作为key，克隆对象作为value存储</span></span>
+<span class="line"><span style="color:#E1E4E8">    Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(obj).</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      newObj[key] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> isObject</span><span style="color:#E1E4E8">(obj[key]) </span><span style="color:#F97583">?</span><span style="color:#B392F0"> deepClone</span><span style="color:#E1E4E8">(obj[key], map) </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> obj[key]; </span><span style="color:#6A737D">//判断当前值是不是对象</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> newObj;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> obj;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>可以把 map 改为 weakMap，采用弱引用。</p>
+<h2 id="jsonstringfy">JSON.stringfy</h2>
+<p>JSON.stringfy 是常用到的 JSON 对象中的一个方法。
+JSON 对象包含的两个方法:</p>
+<ul>
+<li>JSON.parse(): 解析成 JSON 对象
+将对象解析成为 JSON 字符串</li>
+<li>JSON.stringify 方法是将一个 JavaScript 对象或值转换为 JSON 字符串，默认该方法其实有三个参数：第一个参数是必选，后面两个是可选参数非必选。第一个参数传入的是要转换的对象；第二个是一个 replacer 函数，比如指定的 replacer 是数组，则可选择性地仅处理包含数组指定的属性；第三个参数用来控制结果字符串里面的间距，后面两个参数整体用得比较少。
+该方法的语法为：JSON.stringify(value[, replacer [, space]])</li>
+</ul>
+<p>针对于 JSON.stringfy 来说，内部处理数据时有以下特点</p>
+<ul>
+<li>转换值有 toJSON 方法直接调用</li>
+<li>在基本数据类型中，undefined/symbol/function 处理为 undefined，null/Infinity 处理为 “null”</li>
+<li>在 Array 中，undefined/symbol/function 处理为 “null”；在非数组对象中，undefined/symbol/function 会被忽略</li>
+<li>所有以 symbol 为属性键的属性都会被完全忽略掉</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> jsonStringify</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> type </span><span style="color:#F97583">=</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> data;</span></span>
+<span class="line"><span style="color:#6A737D">  //基础类型或者function</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (type </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> data;</span></span>
+<span class="line"><span style="color:#6A737D">    //处理NaN和Infinity</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (Number.</span><span style="color:#B392F0">isNaN</span><span style="color:#E1E4E8">(data) </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> data </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> Infinity</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> data </span><span style="color:#F97583">===</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">Infinity</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#9ECBFF"> 'null'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    //处理function/undefined/symbol</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'undefined'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'symbol'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    //处理string</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> `"${</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">}"`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> String</span><span style="color:#E1E4E8">(result);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //引用类型或者null</span></span>
+<span class="line"><span style="color:#F97583">  else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    //处理null</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (data </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#9ECBFF"> 'null'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    //如果自带toJSON()方法，直接调用</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (data.toJSON </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> data.toJSON </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#B392F0"> jsonStringify</span><span style="color:#E1E4E8">(data.</span><span style="color:#B392F0">toJSON</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    //处理Array</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(data)) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">      data.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'undefined'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'symbol'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">          result[index] </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'null'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">          result[index] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> jsonStringify</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">      result </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> `[${</span><span style="color:#E1E4E8">result</span><span style="color:#9ECBFF">}]`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> result.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#DBEDFF">'</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'"'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    //处理普通对象</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">      Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(data).</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">        //key 如果是 symbol，忽略</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> item </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'symbol'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">          //键值如果是 undefined、function、symbol 为属性值，忽略</span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">            data[item] </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> undefined</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#F97583">            typeof</span><span style="color:#E1E4E8"> data[item] </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#F97583">            typeof</span><span style="color:#E1E4E8"> data[item] </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'symbol'</span></span>
+<span class="line"><span style="color:#E1E4E8">          ) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`"${</span><span style="color:#E1E4E8">item</span><span style="color:#9ECBFF">}":${</span><span style="color:#B392F0">jsonStringify</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">[</span><span style="color:#E1E4E8">item</span><span style="color:#9ECBFF">])</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">          }</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#9ECBFF"> `{${</span><span style="color:#E1E4E8">result</span><span style="color:#9ECBFF">}}`</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#DBEDFF">'</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'"'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="eventemit-发布订阅模式">EventEmit 发布订阅模式</h2>
+<p>实现自定义事件的订阅与发布，主要包含 on、off、emit、once、alloff 方法</p>
+<ul>
+<li>on 指定事件添加的监听器可以持续不断地监听相应的事件</li>
+<li>once 添加的监听器，监听一次后，就会被消除</li>
+<li>off 删除指定事件的指定监听器</li>
+<li>allOff 删除指定事件的全部监听器</li>
+<li>emit 执行指定事件的全部监听器</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> EventEmit</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.__event </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">EventEmit</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">on</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">eventName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">listener</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> isValidListener</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">listener</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> listener </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> listener </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#B392F0"> isValidListener</span><span style="color:#E1E4E8">(listener.listener);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">eventName </span><span style="color:#F97583">||</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">listener) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#B392F0">isValidListener</span><span style="color:#E1E4E8">(listener)) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'listener must be a function'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> events </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.__event;</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> listeners </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (events[eventName] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> events[eventName] </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> []);</span></span>
+<span class="line"><span style="color:#E1E4E8">  listeners.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(listener);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">EventEmit</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">once</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">eventName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">listener</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(eventName, { listener, once: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">EventEmit</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">emit</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">eventName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">arg</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> that </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> listeners </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.__event[eventName];</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">listeners) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> listeners.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> listener</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> listeners[i];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">listener) </span><span style="color:#F97583">continue</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> listener </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      listener.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(that, arg);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      listener.listener.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(that, arg);</span></span>
+<span class="line"><span style="color:#E1E4E8">      that.</span><span style="color:#B392F0">off</span><span style="color:#E1E4E8">(eventName, listener.listener);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">EventEmit</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">off</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">eventName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">listener</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> listeners </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.__event[eventName];</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">listeners) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> listeners.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      listeners[i] </span><span style="color:#F97583">&#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">      (listeners[i] </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> listener </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> listeners[i].listener </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> listener)</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      listeners.</span><span style="color:#B392F0">splice</span><span style="color:#E1E4E8">(i, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">      break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">EventEmit</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">allOff</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">eventName</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (eventName </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.__event[eventName]) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.__event[eventName] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="arrayprototypemap">Array.prototype.map</h2>
+<p>map() 方法创建一个新数组，其结果是该数组中的每个元素是调用一次提供的函数后的返回值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> new_array </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#B392F0"> callback</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">currentValue</span><span style="color:#E1E4E8">[, </span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">[, </span><span style="color:#FFAB70">array</span><span style="color:#E1E4E8">]]) {</span></span>
+<span class="line"><span style="color:#6A737D"> // Return element for new_array</span></span>
+<span class="line"><span style="color:#E1E4E8">}[, thisArg])</span></span>
+<span class="line"><span style="color:#79B8FF">Array</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">map</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">callback</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">thisArg</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"Cannot read property 'map' of null"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> callback </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> "function"</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(callback </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> " is not a function"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //获取当数据和当前this</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#79B8FF"> O</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> Object</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#79B8FF"> T</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> thisArg;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> O</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> >>></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#79B8FF"> A</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Array</span><span style="color:#E1E4E8">(len); </span><span style="color:#6A737D">//创建新的数据</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (k </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (k </span><span style="color:#F97583">in</span><span style="color:#79B8FF"> O</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> kValue </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> O</span><span style="color:#E1E4E8">[k]; </span><span style="color:#6A737D">//当前数据</span></span>
+<span class="line"><span style="color:#79B8FF">      A</span><span style="color:#E1E4E8">[k] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> callback.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">T</span><span style="color:#E1E4E8">, kValue, k, </span><span style="color:#79B8FF">O</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    k</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#new-操作符"> new-操作符 </a><a class="depth-2" href="#instanceof-操作符"> instanceof 操作符 </a><a class="depth-2" href="#call--apply--bind-的实现"> call / apply / bind 的实现 </a><a class="depth-3" href="#中心思想"> 中心思想 </a><a class="depth-3" href="#call"> call </a><a class="depth-3" href="#apply"> apply </a><a class="depth-3" href="#bind"> bind </a><a class="depth-2" href="#flat-的实现"> flat 的实现 </a><a class="depth-3" href="#递归"> 递归 </a><a class="depth-3" href="#tostring--map"> toString + map </a><a class="depth-3" href="#reduce"> reduce </a><a class="depth-3" href="#some--扩展运算符"> some + 扩展运算符 </a><a class="depth-3" href="#层数控制"> 层数控制 </a><a class="depth-2" href="#防抖节流"> 防抖节流 </a><a class="depth-3" href="#防抖debounce"> 防抖(debounce) </a><a class="depth-3" href="#节流throttle"> 节流(throttle) </a><a class="depth-2" href="#jsonp-的实现"> jsonp 的实现 </a><a class="depth-2" href="#函数柯里化"> 函数柯里化 </a><a class="depth-2" href="#lazyman链式调用"> LazyMan(链式调用) </a><a class="depth-2" href="#数组去重"> 数组去重 </a><a class="depth-3" href="#双重循环兼容性好"> 双重循环(兼容性好) </a><a class="depth-3" href="#indexof简化上一个方法的内部操作"> indexOf(简化上一个方法的内部操作) </a><a class="depth-3" href="#reduce--sort-实现先排序在去重"> reduce + sort 实现(先排序在去重) </a><a class="depth-3" href="#对象实现"> 对象实现 </a><a class="depth-2" href="#类型判断"> 类型判断 </a><a class="depth-3" href="#typeof能够判断基本类型"> typeof(能够判断基本类型) </a><a class="depth-3" href="#objectprototypetostring"> Object.prototype.toString() </a><a class="depth-3" href="#类型判断函数"> 类型判断函数 </a><a class="depth-2" href="#深浅拷贝"> 深浅拷贝 </a><a class="depth-3" href="#浅拷贝"> 浅拷贝 </a><a class="depth-3" href="#深拷贝"> 深拷贝 </a><a class="depth-2" href="#jsonstringfy"> JSON.stringfy </a><a class="depth-2" href="#eventemit-发布订阅模式"> EventEmit 发布订阅模式 </a><a class="depth-2" href="#arrayprototypemap"> Array.prototype.map </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/webpack-split-chunk/">上一篇：Webpack SplitChunk 分包</a> <a href="/blog/base/extends-of--type-script/">下一篇：TypeScript 之 extends</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

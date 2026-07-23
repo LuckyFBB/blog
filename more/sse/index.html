@@ -1,15 +1,268 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="阅读笔记、系统知识和一些暂时没归类的内容。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>SSE | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link is-active" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">其他</a> <h1>SSE</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>随着 ChatGPT 的流行，SSE(Server Send Event) 这种请求方式也进入大众的视野。</p>
+<p><img src="/blog/imgs/SSE/chatgpt.gif" alt="chatgpt.gif"></p>
+<p>能够发现在接口发出之后，内容是逐渐返回的，一直处于连接状态且不断的有新的内容推送到接口中。</p>
+<h2 id="概述">概述</h2>
+<p>Server-Send Events 为服务器推送事件，简称 SSE，是服务器主动向客户端推送数据的。</p>
+<p>是 HTML5 规范中的一员，主要由 HTTP 协议和<code>EventSource</code>对象组成。</p>
+<p>这种服务端实时向客户端发送数据的传输方式，其实就是基于 EventStream 的事件流。</p>
+<h3 id="sse-的使用好处">SSE 的使用好处</h3>
+<p>在我们通常需要等待服务端返回数据的过程称为轮询。</p>
+<h2 id="技术原理">技术原理</h2>
+<h3 id="协议">协议</h3>
+<ol>
+<li>使用 SSE 来做服务器端向客户端做数据的实时推送，需要将对应的 http 响应头 <strong>contentType</strong> 设置为 <strong>text/event-stream</strong></li>
+<li>由于所有的数据都是实时推送的，因此不需要有缓存，<strong>Cache-Control</strong> 设置为 <strong>no-cache</strong></li>
+<li>SSE 本质还是一个 TCP 连接，且为了保持长时间开启，要将 <strong>Connection</strong> 设置为 <strong>keep-live</strong></li>
+</ol>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">Content-Type: text/event-stream</span></span>
+<span class="line"><span style="color:#E1E4E8">Cache-Control: no-cache</span></span>
+<span class="line"><span style="color:#E1E4E8">Connection: keep-alive</span></span></code></pre>
+<h3 id="消息格式">消息格式</h3>
+<p>EventStream 为 UTF-8 编码格式的文本或者 Base64 编码和 gzip 压缩的二进制消息。</p>
+<p>每一条消息由一行或者多行字段(<code>event</code>、<code>id</code>、<code>retry</code>、<code>data</code>)组成，每行字段为<code>字段名:字段值</code>。</p>
+<p>字段以行为单位，每行以<code>\n</code>结尾。以<code>冒号</code>开头的行为注释行，会被浏览器忽略。</p>
+<p>每次推送，可由多个消息组成，每个消息之间以空行分隔（即最后一个字段以<code>\n\n</code>结尾）。</p>
+<aside>
+⚠️
+<ol>
+<li>
+<p>在 SSE 之下，浏览器只会识别以上四种消息，其他字段名均会被忽略</p>
+</li>
+<li>
+<p>如果一行字段中不包含冒号，该行文本会被识别为字段名，字段值为空</p>
+</li>
+<li>
+<p>服务端时常通过发生注释行来保持连接
+:::</p>
+</li>
+<li>
+<p>event
+自定义事件类型。客户端可以根据不同的事件类型来执行不同的操作。事件类型就为该消息的字段值，如果字段值为空，默认触发 message 事件</p>
+</li>
+<li>
+<p>data
+事件的数据。如果数据跨越多行，每行都应该以 data:开始，数据内容只能以一个字符串的文本形式进行发送</p>
+</li>
+<li>
+<p>id
+事件的唯一标识符。客户端可以使用这个 ID 来恢复事件流</p>
+</li>
+<li>
+<p>retry
+建议的重新连接时间(毫秒)。如果连接中断，客户端将等待这段时间后尝试重新连接</p>
+</li>
+</ol>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#6A737D">// 该消息为注释</span></span>
+<span class="line"><span style="color:#E1E4E8">: this is comment</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 该消息只包含一个 data 字段，值为 this is first message</span></span>
+<span class="line"><span style="color:#E1E4E8">data: this is first message \n\n</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 该消息包含两个 data 字段，值为 this is second message \nthis is third message</span></span>
+<span class="line"><span style="color:#E1E4E8">data: this is second message \n</span></span>
+<span class="line"><span style="color:#E1E4E8">data: this is third message \n\n</span></span></code></pre>
+<h2 id="实践">实践</h2>
+<h3 id="浏览器-api">浏览器 API</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="html"><code><span class="line"><span style="color:#E1E4E8">&#x3C;!</span><span style="color:#85E89D">DOCTYPE</span><span style="color:#B392F0"> html</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">html</span><span style="color:#B392F0"> lang</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"en"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">head</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> charset</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"UTF-8"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> http-equiv</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"X-UA-Compatible"</span><span style="color:#B392F0"> content</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"IE=edge"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">meta</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"viewport"</span><span style="color:#B392F0"> content</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"width=device-width, initial-scale=1.0"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">title</span><span style="color:#E1E4E8">>SSE Demo&#x3C;/</span><span style="color:#85E89D">title</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">head</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">body</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">h1</span><span style="color:#E1E4E8">>SSE Demo&#x3C;/</span><span style="color:#85E89D">h1</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#B392F0"> onclick</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"</span><span style="color:#B392F0">connectSSE</span><span style="color:#9ECBFF">()"</span><span style="color:#E1E4E8">>建立 SSE 连接&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#B392F0"> onclick</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"</span><span style="color:#B392F0">closeSSE</span><span style="color:#9ECBFF">()"</span><span style="color:#E1E4E8">>断开 SSE 连接&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">br</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#B392F0"> id</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"sse"</span><span style="color:#E1E4E8">>&#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">script</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> sseElement</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> document.</span><span style="color:#B392F0">getElementById</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'sse'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> eventSource;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      // 建立 SSE 连接</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#B392F0"> connectSSE</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        eventSource </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> EventSource</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http://127.0.0.1:3000/sse'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">        // 监听消息事件</span></span>
+<span class="line"><span style="color:#E1E4E8">        eventSource.</span><span style="color:#B392F0">addEventListener</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'message'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">event</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> data</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">parse</span><span style="color:#E1E4E8">(event.data);</span></span>
+<span class="line"><span style="color:#E1E4E8">          sseElement.innerHTML </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">id</span><span style="color:#9ECBFF">} --- ${</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">time</span><span style="color:#9ECBFF">}`</span><span style="color:#F97583"> +</span><span style="color:#9ECBFF"> '&#x3C;br />'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">        eventSource.</span><span style="color:#B392F0">onopen</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">          sseElement.innerHTML </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `SSE 连接成功，状态${</span><span style="color:#E1E4E8">eventSource</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">readyState</span><span style="color:#9ECBFF">}&#x3C;br />`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">        eventSource.</span><span style="color:#B392F0">onerror</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">          sseElement.innerHTML </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `SSE 连接错误，状态${</span><span style="color:#E1E4E8">eventSource</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">readyState</span><span style="color:#9ECBFF">}&#x3C;br />`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        };</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      // 断开 SSE 连接</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#B392F0"> closeSSE</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        eventSource.</span><span style="color:#B392F0">close</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        sseElement.innerHTML </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `SSE 连接关闭，状态${</span><span style="color:#E1E4E8">eventSource</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">readyState</span><span style="color:#9ECBFF">}&#x3C;br />`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">script</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">body</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">html</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>使用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource">EventSource</a> 来建立连接，接受两个参数：URL 和 options</p>
+<ul>
+<li>URL：http 事件来源，一旦创建完成 EventSource 就会监听该 URL 推送的数据</li>
+<li>options：可选对象，包含 withCredentials 属性，是否设置了跨源(CORS)凭据，默认为 false</li>
+</ul>
+<p>可以使用创建的 eventSource 可以通过 onmessage/onerror/onopen 来监听，addEventListener 还可以监听自定义事件</p>
+<p>EventSource 对象的 close 方法断开和服务端的连接</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> http</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fs</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'fs'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">http</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> url</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> req.url;</span></span>
+<span class="line"><span style="color:#6A737D">    // 请求 html 返回</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (url </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '/'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> url </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'index.html'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      fs.</span><span style="color:#B392F0">readFile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'index.html'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (err) {</span></span>
+<span class="line"><span style="color:#E1E4E8">          res.</span><span style="color:#B392F0">writeHead</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">500</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">          res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Error loading'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">          res.</span><span style="color:#B392F0">writeHead</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">, { </span><span style="color:#9ECBFF">'Content-Type'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'text/html'</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#E1E4E8">          res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">(data);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 处理 sse 请求</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (url.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/sse'</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      res.</span><span style="color:#B392F0">writeHead</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">, {</span></span>
+<span class="line"><span style="color:#9ECBFF">        'Content-Type'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'text/event-stream'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">        'Cache-Control'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'no-cache'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        Connection: </span><span style="color:#9ECBFF">'keep-alive'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">        'Access-Control-Allow-Origin'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'*'</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 允许跨域</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      // 每隔 1 秒发送一条消息</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> id </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> intervalId</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> setInterval</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> data</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { id, time: </span><span style="color:#F97583">new</span><span style="color:#B392F0"> Date</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">toDateString</span><span style="color:#E1E4E8">() };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">        res.</span><span style="color:#B392F0">write</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`data: ${</span><span style="color:#79B8FF">JSON</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">stringify</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">data</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}</span><span style="color:#79B8FF">\n\n</span><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        id</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (id </span><span style="color:#F97583">>=</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">          clearInterval</span><span style="color:#E1E4E8">(intervalId);</span></span>
+<span class="line"><span style="color:#E1E4E8">          res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">      }, </span><span style="color:#79B8FF">1000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">      // 当客户端关闭连接时停止发送消息</span></span>
+<span class="line"><span style="color:#E1E4E8">      req.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'close'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">        clearInterval</span><span style="color:#E1E4E8">(intervalId);</span></span>
+<span class="line"><span style="color:#E1E4E8">        id </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">      // 如果请求的路径无效，返回 404 状态码</span></span>
+<span class="line"><span style="color:#E1E4E8">      res.</span><span style="color:#B392F0">writeHead</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">404</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Server listening on port 3000'</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><img src="/blog/imgs/SSE/Untitled.gif" alt="Untitled"></p>
+<p>能够发现每一秒能够接收到服务端推送过来的内容</p>
+<h3 id="fetch">Fetch</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> response</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> fetch</span><span style="color:#E1E4E8">(url, options);</span></span></code></pre>
+<p>接受用户传入 url 和 options 发起 fetch 请求。</p>
+<p>可以通过 header 中的 content-type 判断当前是否为 sse 请求</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> contentType</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> response.headers.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'content-type'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">contentType?.</span><span style="color:#B392F0">startsWith</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'text/event-stream'</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">  throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'SSE 请求必须设置 content-type 为 text/event-stream'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在我们之前使用 fetch 去后端请求数据的时候，针对于返回值我们都是采用的 response.json 的方式拿到对应的数据，但是 sse 请求返回的是 stream，response.body 拿到的就是对应的流，因此需要采用流相关的方式读取信息</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> reader</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> response.body.</span><span style="color:#B392F0">getReader</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> result</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ReadableStreamDefaultReadResult</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">Uint8Array</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">(result </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#E1E4E8"> reader.</span><span style="color:#B392F0">read</span><span style="color:#E1E4E8">()).done) {</span></span>
+<span class="line"><span style="color:#6A737D">  // 假定每一次 read 的 value 都是完整的消息</span></span>
+<span class="line"><span style="color:#B392F0">  onmessage</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">onChunk</span><span style="color:#E1E4E8">(result.value));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>使用 onChunk 方法处理处理事件流中的每一份数据</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 伪代码</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onChunk</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#F97583">:</span><span style="color:#B392F0"> Uint8Array</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> links</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> seekLinks</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 每一行消息都是以 \n 作为区分</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> seekLinks</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#F97583">:</span><span style="color:#B392F0"> Uint8Array</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> lines</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> buffer</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> bufLength</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> buffer.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> position </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> lineStart </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (position </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> bufLength) {</span></span>
+<span class="line"><span style="color:#6A737D">    // '\n'.charCodeAt() === 10;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (buffer[position] </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> 10</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      lines.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(buffer.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(lineStart, position));</span></span>
+<span class="line"><span style="color:#E1E4E8">      lineStart </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> position;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    position </span><span style="color:#F97583">+=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> lines;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>获取到每一行之后，对每一行做出对应的处理</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 伪代码</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onChunk</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#F97583">:</span><span style="color:#B392F0"> Uint8Array</span><span style="color:#E1E4E8">){</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> links</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> seekLinks</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> decoder</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TextDecoder</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> message </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    data: </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    event: </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    id: </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    retry: </span><span style="color:#79B8FF">undefined</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  }:</span></span>
+<span class="line"><span style="color:#E1E4E8">  links.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">line</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // ':'.charCodeAt() === 58;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> colon</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> line.</span><span style="color:#B392F0">findIndex</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">l</span><span style="color:#F97583"> =></span><span style="color:#E1E4E8"> l </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> 58</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> fieldArr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> line.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, colon);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> valueArr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> line.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(colon);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8">(colon </span><span style="color:#F97583">===</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">){</span></span>
+<span class="line"><span style="color:#6A737D">      // 当冒号作为开头的时候，解析成注释</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> field</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> decoder.</span><span style="color:#B392F0">decode</span><span style="color:#E1E4E8">(fieldArr);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> value</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> decoder.</span><span style="color:#B392F0">decode</span><span style="color:#E1E4E8">(valueArr);</span></span>
+<span class="line"><span style="color:#F97583">    switch</span><span style="color:#E1E4E8"> (field) {</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#9ECBFF"> 'data'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">          message.data </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> message.data</span></span>
+<span class="line"><span style="color:#F97583">              ?</span><span style="color:#E1E4E8"> message.data </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> value</span></span>
+<span class="line"><span style="color:#F97583">              :</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">          break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#9ECBFF"> 'event'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">          message.event </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">          break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#9ECBFF"> 'id'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">          message.id </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">          break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#9ECBFF"> 'retry'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> retry</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> parseInt</span><span style="color:#E1E4E8">(value, </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">          message.retry </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> retry</span></span>
+<span class="line"><span style="color:#F97583">          break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  	}</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> message;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>大致的完成了数据的解析问题，具体的可以参考 <a href="https://github.com/Azure/fetch-event-source%E4%BB%A3%E7%A0%81">https://github.com/Azure/fetch-event-source代码</a></p>
+<h2 id="总结">总结</h2>
+<p>SSE（Server-Send Events）是一种服务器向客户端推送数据的技术，基于 HTML5 规范和 EventStream 的事件流。</p>
+<p>SSE 可以在 Web 应用程序中实现诸如股票在线数据、日志推送、聊天室实时人数等即时数据推送功能。</p>
+<h2 id="参考链接">参考链接</h2>
+<p><a href="https://juejin.cn/post/7221125237500330039?searchId=20240514201144490F15F67EFCAB28F7A7#heading-20">一文读懂即时更新方案：SSE</a>
+<a href="https://juejin.cn/post/7355666189475954725">告别轮询，SSE 流式传输可太香了！</a></p></aside> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#概述"> 概述 </a><a class="depth-3" href="#sse-的使用好处"> SSE 的使用好处 </a><a class="depth-2" href="#技术原理"> 技术原理 </a><a class="depth-3" href="#协议"> 协议 </a><a class="depth-3" href="#消息格式"> 消息格式 </a><a class="depth-2" href="#实践"> 实践 </a><a class="depth-3" href="#浏览器-api"> 浏览器 API </a><a class="depth-3" href="#fetch"> Fetch </a><a class="depth-2" href="#总结"> 总结 </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/more/sem-and-signal/">上一篇：进程间通信之信号量和信号</a> <a href="/blog/more/memory-read-note/">下一篇：操作系统之内存管理读书笔记</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

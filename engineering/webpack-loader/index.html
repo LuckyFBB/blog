@@ -1,15 +1,226 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>webpack loader | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>webpack loader</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>webpack 有两种扩展方式。一种是 Loader 主要是负责将其他的资源形态转译成 webpack 可以处理的标准 JavaScript 代码；另一种是 Plugin 主要伴随着 webpack 整个生命周期，做一些重塑逻辑。</p>
+<p>本文主要介绍第一种扩展方式 Loader。</p>
+<h2 id="loader-是什么">Loader 是什么？</h2>
+<p>由于 webpack 只能处理标准的 JavaScript 代码，我们在使用 webpack 打包的过程中还需要处理图片/样式等等内容，那么这些内容都需要先转为 JS 代码才能够被 webpack 打包，因此需要 Loader 来帮我们实现。</p>
+<h3 id="loader-的本质">Loader 的本质</h3>
+<p>Loader 的本质是导出函数的 JavaScript 模块，其导出的函数可以实现内容的转换，简单的 Loader 框架如下，接受源代码做一些计算返回修改之后的代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">source</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sourceMap</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  // 执行计算</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> modifySource;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="loader-的分类">Loader 的分类</h3>
+<p>对于 Loader 来说，一共分为四种类型</p>
+<ul>
+<li>pre: 前置 loader</li>
+<li>normal: 普通 loader</li>
+<li>inline: 行内 loader</li>
+<li>post: 后置 loader</li>
+</ul>
+<p>可以通过 webpack enforce 属性来做配置 pre/post，如果不配置默认则为普通 loader</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //...</span></span>
+<span class="line"><span style="color:#E1E4E8">  module: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    rules: [</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#E1E4E8">        test:</span><span style="color:#9ECBFF"> /</span><span style="color:#85E89D;font-weight:bold">\.</span><span style="color:#DBEDFF">css</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        use: </span><span style="color:#9ECBFF">'css-loader'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">        // enforce: 'pre' | 'post',</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    ],</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>可以通过内联 import 语句添加前缀，可以覆盖配置中的所有 loader, preLoader 和 postLoader</p>
+<ul>
+<li>
+<p>使用 <code>!</code> 前缀，将禁用所有已配置的 normal loader(普通 loader)</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> Styles </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '!style-loader!css-loader?modules!./styles.css'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+</li>
+<li>
+<p>使用 <code>!!</code> 前缀，将禁用所有已配置的 loader（preLoader, loader, postLoader）</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> Styles </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '!!style-loader!css-loader?modules!./styles.css'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+</li>
+<li>
+<p>使用 <code>!</code> 前缀，将禁用所有已配置的 preLoader 和 loader，但是不禁用 postLoaders</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> Styles </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '-!style-loader!css-loader?modules!./styles.css'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+</li>
+</ul>
+<h3 id="normal-loader">Normal Loader</h3>
+<aside>
+🤔 什么是  Normal Loader 呢？
+<p>上述我们讲到 Loader 的本质是导出函数的 JS 模块，而该模块导出的函数就被称为 Normal Loader。</p>
+</aside>
+<p>首先我们先分别定义三个简单的 Normal Loader</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// ==== LoaderC ====</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> LoaderC</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">source</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderC run====='</span><span style="color:#E1E4E8">, source);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> source </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '~loaderC'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> LoaderC;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ==== LoaderB ====</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> LoaderB</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">source</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderB run====='</span><span style="color:#E1E4E8">, source);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> source </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '~loaderB'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> LoaderB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ==== LoaderA ====</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> LoaderA</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">source</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderA run====='</span><span style="color:#E1E4E8">, source);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#9ECBFF"> `module.exports = '${</span><span style="color:#E1E4E8">source</span><span style="color:#9ECBFF">}~loaderA'`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> LoaderA;</span></span></code></pre>
+<br>
+<aside>
+🤔 思考为什么 LoaderA 需要把 source 的内容赋值给 module.exports
+</aside>
+<p>在 webpack.config.js 中如下使用这些 loaders</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> path</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'path'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  entry: </span><span style="color:#9ECBFF">'./src/index.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  context: path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">  output: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    filename: </span><span style="color:#9ECBFF">'bundle.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    path: path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'dist'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  mode: </span><span style="color:#9ECBFF">'development'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  module: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    rules: [</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#E1E4E8">        test:</span><span style="color:#9ECBFF"> /</span><span style="color:#85E89D;font-weight:bold">\.</span><span style="color:#DBEDFF">js</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        use: [</span><span style="color:#9ECBFF">'babel-loader'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#E1E4E8">        test:</span><span style="color:#9ECBFF"> /</span><span style="color:#85E89D;font-weight:bold">\.</span><span style="color:#DBEDFF">txt</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        use: [</span></span>
+<span class="line"><span style="color:#E1E4E8">          path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'src/loaders/loaderA.js'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">          path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'src/loaders/loaderB.js'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">          path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'src/loaders/loaderC.js'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">        ],</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    ],</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>入口文件 index.js 添加一个 txt 的依赖模块</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> text </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './name.txt'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(text);</span></span></code></pre>
+<p>执行一次打包</p>
+<p><img src="/blog/imgs/webpackLoader/Untitled.png" alt="Untitled"></p>
+<p><img src="/blog/imgs/webpackLoader/Untitled%201.png" alt="Untitled"></p>
+<p>能够发现 Normal Loader 是从 C⇒B⇒A 的执行顺序，也就是从下往上或者从右往左的顺序。并且上一个 loader 返回的结果作为下一个 loader 的 source</p>
+<p><img src="/blog/imgs/webpackLoader/Untitled%202.png" alt="Untitled"></p>
+<h3 id="pitch-loader">Pitch Loader</h3>
+<aside>
+💡 为什么需要 Pitch Loader？
+<ol>
+<li>
+<p>Loader 一旦启动，链式调用会一直执行下去直到结束，无法中断除非显示抛出错误</p>
+</li>
+<li>
+<p>在某些情况下，并不需要关心资源的具体内容，到 Normal loader 需要在资源读取出来之后才会执行
+:::</p>
+</li>
+</ol>
+<p>上述我们讲到 Normal Loader 是 Loader 模块导出的函数，而对于导出的函数我们添加 pitch 属性，则导出的为 Pitch Loader</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@remainingRequest</span><span style="color:#6A737D"> 剩余请求，当前 loader 之后的资源请求字符串</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@precedingRequest</span><span style="color:#6A737D"> 前置请求，在执行当前 loader 之前经历过的 loader 列表</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@data</span><span style="color:#6A737D"> 数据对象，用于数据传递，即在 pitch 函数中往 data 对象上添加数据，之后在 normal 函数中通过 this.data 的方式读取已添加的数据</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">remainingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">precedingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D"> // some code</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>我们更改上述的三个 Loader</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">LoaderA.</span><span style="color:#B392F0">pitch</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">remainingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">precedingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderA.pitch===='</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    'remainingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    remainingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'precedingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    precedingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'data===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    data,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">LoaderB.</span><span style="color:#B392F0">pitch</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">remainingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">precedingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderB.pitch===='</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    'remainingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    remainingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'precedingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    precedingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'data===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    data,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">LoaderC.</span><span style="color:#B392F0">pitch</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">remainingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">precedingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderC.pitch===='</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    'remainingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    remainingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'precedingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    precedingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'data===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    data,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>执行打包得到如下结果</p>
+<p><img src="/blog/imgs/webpackLoader/Untitled%203.png" alt="Untitled"></p>
+<p>能够发现 Pitch Loader 是从上到下/从左到右执行了，与 Normal Loader 相反，运行过程如下图</p>
+<p><img src="/blog/imgs/webpackLoader/Untitled%204.png" alt="Untitled"></p>
+<p>当然 Pitch Loader 除了提前运行之外，并非一无是处，如果某一个 Pitch Loader 返回非 undefined 值，则会发生熔断</p>
+<p>如果更改上述了 loaderB</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">LoaderB.</span><span style="color:#B392F0">pitch</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">remainingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">precedingRequest</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'LoaderB.pitch===='</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    'remainingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    remainingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'precedingRequest===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    precedingRequest,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'data===='</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    data,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><img src="/blog/imgs/webpackLoader/Untitled%205.png" alt="Untitled"></p>
+<p><img src="/blog/imgs/webpackLoader/Untitled%206.png" alt="Untitled"></p>
+<p>当某一个 Pitch Loader 返回非 undefined 值之后，会发生熔断，不再执行后续的 Loader</p>
+<p><img src="/blog/imgs/webpackLoader/Untitled%207.png" alt="Untitled"></p>
+<h2 id="loader-是如何运行的">Loader 是如何运行的</h2>
+<p><img src="/blog/imgs/webpackLoader/Untitled%208.png" alt="Untitled"></p>
+<p>在 webpack 的核心流程中，我们有讲到在构建阶段会去调用 runLoaders 方法来讲资源处理成标准的 JS 代码。runLoaders 方法里面就是处理 loader 的核心逻辑。</p>
+<ul>
+<li>创建 loader 对象</li>
+<li>通过 iteratePitchLoaders 遍历 loader 做 pitch loader 处理</li>
+<li>通过 localContext.loaderIndex 来判断当前处于哪一个 loader
+<ul>
+<li>如果不是最后一个 laoder，通过 loadLoader 加载 loader 挂载相关属性
+<ul>
+<li>如果有 pitch 方法，执行 pitch loader。如果 pitch loader 有返回值则开始执行 iterateNormalLoaders(也就是之前说的熔断操作)；否则继续执行 iteratePitchLoaders</li>
+</ul>
+</li>
+<li>如果是最后一个 loader，开始执行 normal loader，开始从最后一个 loader 往前执行，直到所有的 loader 执行结束。</li>
+</ul>
+</li>
+</ul>
+<p>我们能够发现 loader 的加载顺序是按着从左到右加载的，该过程伴随着 pitch loader 的执行，当所有的 loader 加载完毕(pitch loader 执行完毕)。再从右往左执行 normal loader。符合我们上述讲得 loader 执行顺序</p>
+<h2 id="总结">总结</h2>
+<p>本文讲了 loader 的作用/分类，重点讲解了 pitch loader 和 normal loader 他们的执行顺序以及 runLoaders 的执行过程</p></aside> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#loader-是什么"> Loader 是什么？ </a><a class="depth-3" href="#loader-的本质"> Loader 的本质 </a><a class="depth-3" href="#loader-的分类"> Loader 的分类 </a><a class="depth-3" href="#normal-loader"> Normal Loader </a><a class="depth-3" href="#pitch-loader"> Pitch Loader </a><a class="depth-2" href="#loader-是如何运行的"> Loader 是如何运行的 </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/base-npm/">上一篇：npm 如何实现依赖管理</a> <a href="/blog/engineering/intl-cli/">下一篇：国际化工具</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

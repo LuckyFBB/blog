@@ -1,15 +1,513 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="常见数据结构、算法思路和刷题复盘。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>栈/队列的解题思路 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link is-active" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">数据结构</a> <h1>栈/队列的解题思路</h1> </header> <div class="article-grid"> <div class="prose"> <p>之前一直有断断续续在学习一些数据结构的知识，在前文中也有过一些总结，一直以来刷 leetcode 也是属于瞎刷，不能够很好的总结题型与解决方案。在此之后，准备按着数据结构类型和算法刷题。
+在刷完链表之后，着手开始栈/队列的刷题，也会在此篇博文中进行记录。</p>
+<!-- more -->
+<p>在<a href="/blog/data-structure/stack-and-queue">前文</a>中介绍了栈和队列的相关知识，可以进行查看阅读。</p>
+<h2 id="解题技巧">解题技巧</h2>
+<h3 id="单调栈">单调栈</h3>
+<p>单调栈实际上就是栈，使得每次新元素入栈后，栈内的元素都保持有序(单调递增或单调递减)。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">//构建单调递增栈</span></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> arr[i]) {</span></span>
+<span class="line"><span style="color:#6A737D">    //具体操作</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(arr[i]);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="栈">栈</h2>
+<h3 id="括号类问题">括号类问题</h3>
+<h4 id="有效的括号">有效的括号</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串，判断字符串是否有效。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>有效字符串需满足：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>左括号必须用相同类型的右括号闭合。</span></span>
+<span class="line"><span>左括号必须以正确的顺序闭合。</span></span>
+<span class="line"><span>注意空字符串可被认为是有效字符串。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:          示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: "()"       输入: "()[}{}"</span></span>
+<span class="line"><span>输出: true       输出: false</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/valid-parentheses">leetcode</a>
+分析 1：采用栈，将遇到的(,[,{压入栈中，当遇到),],}时，把取出栈顶元素与其进行匹配。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> isValid</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">s</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">s) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> s.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> s.</span><span style="color:#B392F0">charAt</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (curr </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '('</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '{'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '['</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> pre </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        (pre </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '('</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> ')'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">        (pre </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '['</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> ']'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">        (pre </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '{'</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> '}'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">      ) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 36.87% of JavaScript</span></span></code></pre>
+<p>分析 2：思路与分析 1 一样，引入对象的概念。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> isValid</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">s</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">s) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> map </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#9ECBFF">    '('</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">')'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '{'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'}'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    '['</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">']'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> s.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> char </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> s[i];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map[char]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(char);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (map[stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">()] </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> char) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 68 ms, faster than 97.79 % of JavaScript</span></span></code></pre>
+<h4 id="最长有效括号">最长有效括号</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个只包含 '(' 和 ')' 的字符串，找出最长的包含有效括号的子串的长度。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:                                  示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: "(()"                              输入: ")()())"</span></span>
+<span class="line"><span>输出: 2                                  输出: 4</span></span>
+<span class="line"><span>解释: 最长有效括号子串为 "()"             解释: 最长有效括号子串为 "()()"</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/longest-valid-parentheses">leetcode</a>
+分析 1：暴力解法。先明确有效括号肯定为偶数。第一步先判断当前字符串的长度是否为偶数。第二步通过截取判断当前长度的字符串是否是有效的，如果是有效括号就返回当前长度，否则遍历继续截取当长度的字符串继续判断。第三步当第二步没有找到合适的字符串，则把当前长度-2，循环第二步，直到 length 为 0。但是这个方法超时。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> longestValidParentheses</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">s</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> length </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> s.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  length </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> (length </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> length </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (length </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> s.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8"> length; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> str </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> s.</span><span style="color:#B392F0">substr</span><span style="color:#E1E4E8">(i, length);</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> flag</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> isValid</span><span style="color:#E1E4E8">(str);</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (flag) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> length;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    length </span><span style="color:#F97583">-=</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> isValid</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">s</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">s) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> map </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#9ECBFF">    '('</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">')'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> s.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> char </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> s[i];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map[char]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(char);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (map[stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">()] </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> char) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>分析 2：栈方法。往栈中引用-1 作为“参照物”，当前最大长度为：当前索引-出栈后新的栈顶索引。当 stack.length 为 0 的时候，说明栈中已经没有左括号的存在了，就需要新的参照物了。两种索引会入栈：等待被匹配的左括号索引、充当「分隔符号」的右括号索引。后者入栈因为：当左括号匹配光时，栈需要留一个「垫底」的「参照物」，用于计算一段连续的有效长度。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> longestValidParentheses</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">s</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> maxlen </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">  stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> s.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> char</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> s[i];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (char </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> '('</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> curMaxLen</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">        maxlen </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(maxlen, curMaxLen);</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> maxlen;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 92 ms, faster than 48.54% of JavaScript</span></span></code></pre>
+<h3 id="设计类问题">设计类问题</h3>
+<h4 id="最小栈">最小栈</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>push(x) —— 将元素 x 推入栈中。</span></span>
+<span class="line"><span>pop() —— 删除栈顶的元素。</span></span>
+<span class="line"><span>top() —— 获取栈顶元素。</span></span>
+<span class="line"><span>getMin() —— 检索栈中的最小元素。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/min-stack">leetcode</a></p>
+<p>分析 1：一个栈，使用常规的数组方法完成。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * initialize your data structure here.</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> MinStack</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">push</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">x</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(x);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">pop</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">top</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.stack[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getMin</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">min</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 236 ms, faster than 21.03% of JavaScript</span></span></code></pre>
+<p>分析 2：两个栈并行。min_stack 中栈顶始终保存最小元素。其他操作和上述一致。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> MinStack</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.min_stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">push</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">x</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(x);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(x);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">      x </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.min_stack[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#F97583">        ?</span><span style="color:#E1E4E8"> x</span></span>
+<span class="line"><span style="color:#F97583">        :</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.min_stack[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">pop</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">top</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.stack[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MinStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getMin</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.min_stack[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.min_stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 116 ms, faster than 89.31% of JavaScript</span></span></code></pre>
+<h4 id="用队列实现栈">用队列实现栈</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>使用队列实现栈的下列操作：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>push(x) -- 元素 x 入栈</span></span>
+<span class="line"><span>pop() -- 移除栈顶元素</span></span>
+<span class="line"><span>top() -- 获取栈顶元素</span></span>
+<span class="line"><span>empty() -- 返回栈是否为空</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/implement-stack-using-queues">leetcode</a>
+分析 1：对于 pop 方法出了要删除元素之外，还需要返回所删除的元素的值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> MyStack</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MyStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">push</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">x</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(x);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MyStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">pop</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (index </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> element</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(element);</span></span>
+<span class="line"><span style="color:#E1E4E8">    index</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MyStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">top</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (index </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> element</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(element);</span></span>
+<span class="line"><span style="color:#E1E4E8">    index</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> top</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(top);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> top;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">MyStack</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">empty</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> !</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms, faster than 58.17% of JavaScript</span></span></code></pre>
+<h3 id="单调栈问题">单调栈问题</h3>
+<h4 id="下一个更大元素-i">下一个更大元素 I</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定两个 没有重复元素 的数组 nums1 和 nums2 ，其中nums1 是 nums2 的子集。找到 nums1 中每个元素在 nums2 中的下一个比其大的值。</span></span>
+<span class="line"><span>nums1 中数字 x 的下一个更大元素是指 x 在 nums2 中对应位置的右边的第一个比 x 大的元素。如果不存在，对应位置输出 -1 。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: nums1 = [4,1,2], nums2 = [1,3,4,2].</span></span>
+<span class="line"><span>输出: [-1,3,-1]</span></span>
+<span class="line"><span>解释:</span></span>
+<span class="line"><span>    对于num1中的数字4，你无法在第二个数组中找到下一个更大的数字，因此输出 -1。</span></span>
+<span class="line"><span>    对于num1中的数字1，第二个数组中数字1右边的下一个较大数字是 3。</span></span>
+<span class="line"><span>    对于num1中的数字2，第二个数组中没有下一个更大的数字，因此输出 -1。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/next-greater-element-i">leetcode</a></p>
+<p>分析 1：暴力解法。对 nums1 进行遍历，查找到当前元素在 nums2 中的位置，截取数组 arr，遍历 arr 中的元素与当前元素比较，查找下一个更大元素。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> nextGreaterElement</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">nums1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">nums2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> result</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">  nums1.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> nums2.</span><span style="color:#B392F0">indexOf</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> nums2.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(index);</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; j </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> element</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> arr[j];</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (element </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> item) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(element);</span></span>
+<span class="line"><span style="color:#F97583">        break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (j </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 88 ms, faster than 42.88% of JavaScript</span></span></code></pre>
+<p>分析 2：单调栈解法。在 nums2 中分别找到元素的下一个更大元素，存储在 map 中。遍历 nums1，查找 nums1 的数据是否在 map 中存在。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> nextGreaterElement</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">nums1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">nums2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> map</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> nums2.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> nums2[i];</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> pop</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(pop, curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> res</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> nums1.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(nums1[i]) </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> res.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(nums1[i])) </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> res.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms, faster than 92.24% of JavaScript</span></span></code></pre>
+<h4 id="股票价格跨度">股票价格跨度</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>编写一个 StockSpanner 类，它收集某些股票的每日报价，并返回该股票当日价格的跨度。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>今天股票价格的跨度被定义为股票价格小于或等于今天价格的最大连续日数（从今天开始往回数，包括今天）。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>例如，如果未来7天股票的价格是 [100, 80, 60, 70, 60, 75, 85]，那么股票跨度将是 [1, 1, 1, 2, 1, 4, 6]。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/online-stock-span">leetcode</a></p>
+<p>分析 1：采用单调栈的方式。分别使用 prices 单调递减栈，weights 里面存储 prices 里面对应的跨度。遍历股票价格，当前元素与 prices 的栈顶比较，如果小于的话，将 prices 栈顶弹出，当前元素的 weight 加上栈顶 price 的 weight，一直循环。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> StockSpanner</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.prices </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.weights </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@param</span><span style="color:#B392F0"> {number}</span><span style="color:#E1E4E8"> price</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@return</span><span style="color:#B392F0"> {number}</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#79B8FF">StockSpanner</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">next</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">price</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> weight </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.prices.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.prices[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.prices.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> price) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.prices.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    weight </span><span style="color:#F97583">+=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.weights.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.prices.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(price);</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.weights.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(weight);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> weight;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 280 ms, faster than 95.65% of JavaScript</span></span></code></pre>
+<h4 id="每日温度">每日温度</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>请根据每日 气温 列表，重新生成一个列表。对应位置的输出为：要想观测到更高的气温，至少需要等待的天数。如果气温在这之后都不会升高，请在该位置用 0 来代替。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>例如，给定一个列表 temperatures = [73, 74, 75, 71, 69, 72, 76, 73]，你的输出应该是 [1, 1, 4, 2, 1, 1, 0, 0]。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/daily-temperatures">leetcode</a>
+分析 1：利用双层循环。判断后续值小于当前值，继续访问后续值。否则计算当前位置的结果值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> dailyTemperatures</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">T</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (j </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">[i] </span><span style="color:#F97583">>=</span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">[j]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#79B8FF">    T</span><span style="color:#E1E4E8">[i] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">?</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> :</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> i;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 836 ms, faster than 31.90 % of JavaScript</span></span></code></pre>
+<p>分析 2：利用栈，构建单调递减栈，从栈底到栈顶递减，栈顶为最小。当前元素都和栈顶元素进行判断，如果大于栈顶元素，两者的下标相减就是结果值；否则压入栈底。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> dailyTemperatures</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">T</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Array</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">T</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">fill</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">[i] </span><span style="color:#F97583">></span><span style="color:#79B8FF"> T</span><span style="color:#E1E4E8">[stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]]) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      result[temp] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 160 ms, faster than 67.79% of JavaScript</span></span></code></pre>
+<h4 id="最大宽度坡">最大宽度坡</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个整数数组 A，坡是元组 (i, j)，其中  i &#x3C; j 且 A[i] &#x3C;= A[j]。这样的坡的宽度为 j - i。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>找出 A 中的坡的最大宽度，如果不存在，返回 0 。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：[6,0,8,2,1,5]</span></span>
+<span class="line"><span>输出：4</span></span>
+<span class="line"><span>解释：</span></span>
+<span class="line"><span>最大宽度的坡为 (i, j) = (1, 5): A[1] = 0 且 A[5] = 5.</span></span>
+<span class="line"><span>示例 2：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：[9,8,1,0,1,9,4,0,4,1]</span></span>
+<span class="line"><span>输出：7</span></span>
+<span class="line"><span>解释：</span></span>
+<span class="line"><span>最大宽度的坡为 (i, j) = (2, 9): A[2] = 1 且 A[9] = 1.</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/maximum-width-ramp">leetcode</a>
+分析 1：单调栈方法。首先需要正向扫描数组记录单调递减 A[i]的下标。然后反向扫描数组比较 A[j]和栈顶元素的值，满足条件，则弹出栈顶元素，不断循环直至栈为空。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> maxWidthRamp</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">A</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ||</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">[i] </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">[stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; j </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; j</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">[j] </span><span style="color:#F97583">>=</span><span style="color:#79B8FF"> A</span><span style="color:#E1E4E8">[stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(res, j </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#E1E4E8">      stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 88 ms, faster than 95.24% of JavaScript</span></span></code></pre>
+<h4 id="柱状图中最大的矩形">柱状图中最大的矩形</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定 n 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>求在该柱状图中，能够勾勒出来的矩形的最大面积。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>以上是柱状图的示例，其中每个柱子的宽度为 1，给定的高度为 [2,1,5,6,2,3]。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/largest-rectangle-in-histogram">leetcode</a></p>
+<p>分析 1：暴力解法。以当前柱子为中心，往左右寻找所有比它还高的柱子构造矩形得到面积。与之前的面积值进行比较得到最大值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> largestRectangleArea</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">heights</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> heights.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (len </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> curHeight </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> heights[i];</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (left </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> heights[left </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> curHeight) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      left</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i;</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (right </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> heights[right </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> curHeight) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      right</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> width </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(res, width </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> curHeight);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 680 ms, faster than 28.22% of JavaScript</span></span></code></pre>
+<p>分析 2：利用栈，构建单调递增栈，当遇到某个元素小于当前元素(i)时，对栈顶元素进行出栈(curr)，在获得当前栈的栈顶元素与 i 的差值-1 得到矩形的宽度，再获得 curr 的高度得到面积值；否则直接入栈。技巧：两端添加 0 巧妙处理下面遍历 while 的终止条件。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> largestRectangleArea</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">heights</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">heights </span><span style="color:#F97583">||</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">heights.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  heights.</span><span style="color:#B392F0">unshift</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  heights.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> stack </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> heights.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> heights[i] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> heights[stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]]) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(res, (i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> stack[stack.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> heights[curr]);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(i);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="队列">队列</h2>
+<h3 id="设置类问题">设置类问题</h3>
+<h4 id="用栈实现队列">用栈实现队列</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>请你仅使用两个栈实现先入先出队列。队列应当支持一般队列的支持的所有操作（push、pop、peek、empty）：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>实现 MyQueue 类：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void push(int x) 将元素 x 推到队列的末尾</span></span>
+<span class="line"><span>int pop() 从队列的开头移除并返回元素</span></span>
+<span class="line"><span>int peek() 返回队列开头的元素</span></span>
+<span class="line"><span>boolean empty() 如果队列为空，返回 true ；否则，返回 false</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/implement-queue-using-stacks">leetcode</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> MyQueue</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * Push element x to the back of queue.</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@param</span><span style="color:#B392F0"> {number}</span><span style="color:#E1E4E8"> x</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@return</span><span style="color:#B392F0"> {void}</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#79B8FF">MyQueue</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">push</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">x</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(x);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * Removes the element from in front of queue and returns that element.</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@return</span><span style="color:#B392F0"> {number}</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#79B8FF">MyQueue</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">pop</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pop </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pop;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * Get the front element.</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@return</span><span style="color:#B392F0"> {number}</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#79B8FF">MyQueue</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">peek</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> pop </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.stack2[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack2.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> pop;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/**</span></span>
+<span class="line"><span style="color:#6A737D"> * Returns whether the queue is empty.</span></span>
+<span class="line"><span style="color:#6A737D"> * </span><span style="color:#F97583">@return</span><span style="color:#B392F0"> {boolean}</span></span>
+<span class="line"><span style="color:#6A737D"> */</span></span>
+<span class="line"><span style="color:#79B8FF">MyQueue</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">empty</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> !</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.stack1.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms, faster than 65.98% of JavaScript</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#解题技巧"> 解题技巧 </a><a class="depth-3" href="#单调栈"> 单调栈 </a><a class="depth-2" href="#栈"> 栈 </a><a class="depth-3" href="#括号类问题"> 括号类问题 </a><a class="depth-3" href="#设计类问题"> 设计类问题 </a><a class="depth-3" href="#单调栈问题"> 单调栈问题 </a><a class="depth-2" href="#队列"> 队列 </a><a class="depth-3" href="#设置类问题"> 设置类问题 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/data-structure/linked-list/">上一篇：链表</a> <a href="/blog/data-structure/set/">下一篇：集合</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,119 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="JS / TS、浏览器、语言机制与日常开发基础。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>TypeScript 之 extends | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link is-active" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">前端基础</a> <h1>TypeScript 之 extends</h1> </header> <div class="article-grid"> <div class="prose"> <p>extends 在 TS 中比较常用，但是也拥有不同的使用场景</p>
+<ul>
+<li>表示继承/拓展的含义</li>
+<li>表示约束的含义</li>
+<li>表示分配的含义</li>
+</ul>
+<h2 id="基础使用">基础使用</h2>
+<p>extends 是在 ES6 中引用的关键字，常常 class 用于继承</p>
+<h3 id="继承父类">继承父类</h3>
+<p>和在 JS 中的使用一致</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Animal</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  name</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> 'animal'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">name</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.name </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> name;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  sayHello</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`Hello, I am a ${</span><span style="color:#79B8FF">this</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}!`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Dog</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Animal</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    super</span><span style="color:#E1E4E8">(props);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  bark</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'wang wang'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> dog</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Dog</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'dog'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(dog.name); </span><span style="color:#6A737D">// dog</span></span>
+<span class="line"><span style="color:#E1E4E8">dog.</span><span style="color:#B392F0">sayHello</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// Hello, I am a dog!</span></span>
+<span class="line"><span style="color:#E1E4E8">dog.</span><span style="color:#B392F0">bark</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// wang wang</span></span></code></pre>
+<h3 id="继承类型">继承类型</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">interface</span><span style="color:#B392F0"> Animal</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  sayHello</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">interface</span><span style="color:#B392F0"> Dog</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Animal</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  bark</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Dog</span></span>
+<span class="line"><span style="color:#6A737D">// {</span></span>
+<span class="line"><span style="color:#6A737D">//     sayHello: () => void;</span></span>
+<span class="line"><span style="color:#6A737D">//     bark: () => void</span></span>
+<span class="line"><span style="color:#6A737D">// }</span></span></code></pre>
+<h2 id="条件判断">条件判断</h2>
+<p>如果是 <code>extends</code> 两侧类型相同的，此时的 <code>extends</code> 等同于 <code>===</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> result1</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> 'ab'</span><span style="color:#F97583"> extends</span><span style="color:#9ECBFF"> 'abc'</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> true</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// false</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> result2</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 123</span><span style="color:#F97583"> extends</span><span style="color:#79B8FF"> 123</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> true</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// true</span></span></code></pre>
+<p>如果位于 <code>extends</code> 右侧的类型包含位于 <code>extends</code> 左侧的类型，即狭窄类型 <code>extends</code> 宽泛类型</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> result1</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> string</span><span style="color:#F97583"> extends</span><span style="color:#79B8FF"> string</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> number</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> true</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// true</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> result2</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> boolean</span><span style="color:#F97583"> extends</span><span style="color:#79B8FF"> string</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> number</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> true</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// false</span></span></code></pre>
+<p>如果左右侧是对象时，如果对象中的 <code>key</code> 越多说明该对象定义的范围更为狭窄</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> result1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">age</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">extends</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8"> }</span></span>
+<span class="line"><span style="color:#F97583">  ?</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#F97583">  :</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// true</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> result2</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">extends</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">age</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8"> }</span></span>
+<span class="line"><span style="color:#F97583">  ?</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#F97583">  :</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// false</span></span></code></pre>
+<p>能够发现为对象时，<code>A extends B</code> 表示的是 A 是否可以分配给 B，而不是 A 是否为 B 的子集</p>
+<h2 id="泛型类型">泛型类型</h2>
+<p>在使用泛型的时候，往往希望对某一个泛型做一个限制，例如我们在使用 Redux 的时候都会给 dispatch 传入一个 type</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">interface</span><span style="color:#B392F0"> Dispatch</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#F97583"> extends</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">type</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8"> }> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  (</span><span style="color:#FFAB70">action</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">)</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>当泛型用于条件判断时，例如下述例子:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Test</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">U</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#B392F0"> T</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> U</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> never</span><span style="color:#F97583"> :</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> A</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> Test</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#9ECBFF">'a'</span><span style="color:#F97583"> |</span><span style="color:#9ECBFF"> 'b'</span><span style="color:#F97583"> |</span><span style="color:#9ECBFF"> 'c'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'a'</span><span style="color:#E1E4E8">>;</span></span></code></pre>
+<p>那么 A 会是什么类型呢？在第一个条件判断中我们讲到的方式解答该问题即为 <code>T("a" | "b" | "c")</code>。可正确答案却为 <code>"b" | "c"</code></p>
+<blockquote>
+<p>When conditional types act on a generic type, they become distributive when given a union type.</p>
+</blockquote>
+<p>在<a href="https://www.typescriptlang.org/zh/docs/handbook/2/conditional-types.html#%E5%88%86%E9%85%8D%E6%9D%A1%E4%BB%B6%E7%B1%BB%E5%9E%8B">官网</a>中，当传入的类型参数为联合类型时，他们会被分配类型，即联合类型会被拆分。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#E1E4E8">Test</span><span style="color:#F97583">&#x3C;</span><span style="color:#9ECBFF">"a"</span><span style="color:#F97583"> |</span><span style="color:#9ECBFF"> "b"</span><span style="color:#F97583"> |</span><span style="color:#9ECBFF"> "c"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"a"</span><span style="color:#F97583">></span></span>
+<span class="line"><span style="color:#6A737D">// 等价于</span></span>
+<span class="line"><span style="color:#9ECBFF">'a'</span><span style="color:#E1E4E8"> extends </span><span style="color:#9ECBFF">'a'</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> never </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> 'a'</span></span>
+<span class="line"><span style="color:#9ECBFF">'b'</span><span style="color:#E1E4E8"> extends </span><span style="color:#9ECBFF">'a'</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> never </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> 'b'</span></span>
+<span class="line"><span style="color:#9ECBFF">'c'</span><span style="color:#E1E4E8"> extends </span><span style="color:#9ECBFF">'a'</span><span style="color:#F97583"> ?</span><span style="color:#E1E4E8"> never </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> 'c'</span></span></code></pre>
+<p>那么答案即为 <code>never | 'b' | 'c'</code>，never 可以分配给任何类型，但是没有类型可以分配给 never，因此答案为 <code>'b' | 'c'</code></p>
+<p>只有在满足两个条件的时候才能适用分配律</p>
+<ul>
+<li>参数是泛型类型</li>
+<li>代入参数的是联合类型</li>
+</ul>
+<p>上述的实现则为 TS 中工具类型 <code>Exclude</code> 的实现</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Exclude</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">U</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#B392F0"> T</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> U</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> never</span><span style="color:#F97583"> :</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>另一个工具类型 Omit 则是借助 Exclude 实现的</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">interface</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  age</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  description</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Person1</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> Omit</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">Person</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'description'</span><span style="color:#E1E4E8">>;</span></span></code></pre>
+<p><code>Omit&#x3C;T,U></code> 需要过滤掉 T 中的 U</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Omit</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">K</span><span style="color:#F97583"> extends</span><span style="color:#F97583"> keyof</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  [</span><span style="color:#B392F0">P</span><span style="color:#F97583"> in</span><span style="color:#B392F0"> Exclude</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#F97583">keyof</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">K</span><span style="color:#E1E4E8">>]</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">[</span><span style="color:#B392F0">P</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>如何终止这种分配？</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> P</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">extends</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">'x'</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">?</span><span style="color:#79B8FF"> string</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> A1</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> P</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#9ECBFF">'x'</span><span style="color:#F97583"> |</span><span style="color:#9ECBFF"> 'y'</span><span style="color:#E1E4E8">>; </span><span style="color:#6A737D">// number</span></span></code></pre>
+<p>在条件判断类型的定义中，将泛型参数使用<code>[]</code>括起来，即可阻断条件判断类型的分配，此时，传入参数 T 的类型将被当做一个整体，不再分配。</p>
+<h2 id="类型推导">类型推导</h2>
+<blockquote>
+<p><code>infer</code>  表示在  <code>extends</code>  条件语句中待推断的类型变量</p>
+</blockquote>
+<p>在 TS 中，一般会结合 <code>extends</code> 来使用类型推导 <code>infer</code> 语法，实现自动推导类型。</p>
+<p>例如工具类型 ReturnType</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> ReturnType</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#B392F0"> T</span><span style="color:#F97583"> extends</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">...</span><span style="color:#FFAB70">args</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#F97583"> infer</span><span style="color:#B392F0"> R</span><span style="color:#F97583"> ?</span><span style="color:#B392F0"> R</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> never</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p>其中 <code>infer R</code> 表示待推导的类型，表示 T 如果能赋值给 <code>(...args: any) => infer R</code>，则结果为 R 否则为 never</p>
+<p>另一个例子，获取参数</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> ParamType</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#B392F0"> T</span><span style="color:#F97583"> extends</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">...</span><span style="color:#FFAB70">args</span><span style="color:#F97583">:</span><span style="color:#F97583"> infer</span><span style="color:#B392F0"> P</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> P</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> never</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#基础使用"> 基础使用 </a><a class="depth-3" href="#继承父类"> 继承父类 </a><a class="depth-3" href="#继承类型"> 继承类型 </a><a class="depth-2" href="#条件判断"> 条件判断 </a><a class="depth-2" href="#泛型类型"> 泛型类型 </a><a class="depth-2" href="#类型推导"> 类型推导 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/base/implementation-of-native--j-s-methods/">上一篇：原生 JS 方法的实现</a> <a href="/blog/data-structure/node-tree-problem-solving-ideas/">下一篇：二叉树的解题思路</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,202 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>webpack plugin | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>webpack plugin</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>Plugin 是 webpack 中最核心的机制，且是 webpack 生态中最关键的一部分，它让社区用户可以自定义 Plugin 来控制 webpack 的编译过程。</p>
+<p>该篇文章将会讲解 Plugin 的相关机制。</p>
+<h2 id="plugin">Plugin</h2>
+<p>webpack 在编译过程中，会初始化不同的 Hook，用户可以在 Plugin 通过这些 Hook 去注册相关的事件，在打包过程过会在不同阶段去触发这些事件从而实现自定义行为。</p>
+<p>该逻辑是由 Tapable 机制实现的，具体可以查看<a href="/blog/engineering/webpack-tapable">该文章</a></p>
+<h3 id="plugin-的主要构成">Plugin 的主要构成</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> DonePlugin</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  apply</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">compiler</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 调用 Compiler Hook 注册额外逻辑</span></span>
+<span class="line"><span style="color:#E1E4E8">    compiler.hooks.done.</span><span style="color:#B392F0">tap</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Done Plugin'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'compilation done'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> DonePlugin;</span></span></code></pre>
+<p>上述 Plugin 主要实现了在编译完成后输出”compilation done”</p>
+<ul>
+<li>Plugin 是一个 class，也可以是一个 Function</li>
+<li>Plugin 对象上要有一个 apply 方法，其接受 compiler 参数，在 webpack 创建 compiler 的时候会调用 Plugin 上的 apply 方法</li>
+<li>在 apply 中调用 Hook 方法，通过 hook.tap 注册对应的事件函数</li>
+<li>根据不同 Hook 类型在 webpack 不同阶段执行</li>
+</ul>
+<h3 id="plugin-主要对象">Plugin 主要对象</h3>
+<h4 id="compiler">compiler</h4>
+<p>compiler 对象包含了当前运行 webpack 的配置，包括 entry、output、loaders 等配置，该个对象在启动 webpack 时被实例化，而且是全局唯一的。Plugin 可以通过该对象获取到 webpack 的配置信息进行处理。</p>
+<p>常用的 hook 如下:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>钩子</th><th>类型</th><th>什么时候调用</th></tr></thead><tbody><tr><td>run</td><td>AsyncSeriesHook</td><td>在编译器开始读取记录前执行</td></tr><tr><td>compile</td><td>SyncHook</td><td>在一个新的 compilation 创建之前执行</td></tr><tr><td>compilation</td><td>SyncHook</td><td>在一次 compilation 创建后执行插件</td></tr><tr><td>make</td><td>AsyncParallelHook</td><td>完成一次编译之前执行</td></tr><tr><td>emit</td><td>AsyncSeriesHook</td><td>在生成文件到 output 目录之前执行，回调参数：compilation</td></tr><tr><td>afterEmit</td><td>AsyncSeriesHook</td><td>在生成文件到 output 目录之后执行</td></tr><tr><td>assetEmitted</td><td>AsyncSeriesHook</td><td>生成文件的时候执行，提供访问产出文件信息的入口，回调参数：file,info</td></tr><tr><td>done</td><td>AsyncSeriesHook</td><td>一次编译完成后执行，回调参数：stats</td></tr></tbody></table>
+<p>更多钩子可以<a href="https://webpack.docschina.org/api/compiler-hooks/">点击查看</a></p>
+<h4 id="compilation">compilation</h4>
+<p>compilation 对象代表一次资源构建，其职责就是构建模块和 chunk，并利用插件优化构建过程</p>
+<p>compiler 代表了整个 webpack 从启动到关闭的生命周期，而 compilation 只是代表了一次新的编译，只要文件有改动，compilation 就会被重新创建</p>
+<p>常用的 hook 如下:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>钩子</th><th>类型</th><th>什么时候调用</th></tr></thead><tbody><tr><td>processAssets</td><td>AsyncSeriesHook</td><td>asset 处理</td></tr><tr><td>buildModule</td><td>SyncHook</td><td>在模块开始缉译之前触发,可以用于修改模块</td></tr><tr><td>succeedModule</td><td>SyncHook</td><td>当一个模块被成功编译,会执行这个钩子</td></tr><tr><td>finishModules</td><td>AsyncSeriesHook</td><td>当所有模块都缉译成功后被调用</td></tr><tr><td>seal</td><td>SyncHook</td><td>当一次 compilation 停止接收新模块时发</td></tr><tr><td>optimizeDependencies</td><td>SyncBailHook</td><td>在依赖优化的开始执行</td></tr><tr><td>optimize</td><td>SyncHook</td><td>在优化阶段的开始执行</td></tr><tr><td>optimizeModules</td><td>SyncBailHook</td><td>在模块优化阶段开始时执行，插件可以在这个钩子里执行对模块的优化，回调参数：modules</td></tr><tr><td>optimizeChunks</td><td>SyncBailHook</td><td>在代码块优化阶段开始时执行，插件可以在这个钩子里执行对代码块的优化，回调参数：chunks</td></tr><tr><td>optimizeAssets</td><td>AsyncSeriesHook</td><td>优化存储在 compilation.assets 中的所有 asset，回调参数：asset</td></tr></tbody></table>
+<p>更多钩子可以<a href="https://webpack.docschina.org/api/compilation-hooks/">点击查看</a></p>
+<h2 id="手写-plugin">手写 Plugin</h2>
+<h3 id="filelistplugin">fileListPlugin</h3>
+<p>需求：每次打包完成之后，需要输出一个文件清单的 markdown 文件到 dist 目录</p>
+<p>思路如下：</p>
+<ul>
+<li>需要输出将 markdown 文件输出到 output 文件中，选择合适的钩子 compiler.hooks.compilation/compilation.hooks.processAssets 处理 assets</li>
+<li>通过 asset 获取到文件数量，自定义 md 文件写入相关的 content</li>
+<li>给 dist 文件夹里添加一个资源名称为 fileListName 的变量，写入资源的内容和文件大小</li>
+<li>执行回调，让 webpack 继续执行</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> FileListPlugin</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">opts</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.fileName </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> opts?.fileName </span><span style="color:#F97583">||</span><span style="color:#9ECBFF"> 'fileList.md'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  apply</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">compiler</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    compiler.hooks.compilation.</span><span style="color:#B392F0">tap</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FileListPlugin'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">compilation</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      compilation.hooks.processAssets.</span><span style="color:#B392F0">tapAsync</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#E1E4E8">          name: </span><span style="color:#9ECBFF">'FileListPlugin'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          stage: </span><span style="color:#9ECBFF">'PROCESS_ASSETS_STAGE_ADDITIONAL'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">        (</span><span style="color:#FFAB70">assets</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">callback</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> length</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(assets).</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">          let</span><span style="color:#E1E4E8"> content </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> `# ${</span><span style="color:#E1E4E8">length</span><span style="color:#9ECBFF">} file${</span></span>
+<span class="line"><span style="color:#E1E4E8">            length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> ?</span><span style="color:#9ECBFF"> 's'</span><span style="color:#F97583"> :</span><span style="color:#9ECBFF"> ''</span></span>
+<span class="line"><span style="color:#9ECBFF">          } emitted by webpack</span><span style="color:#79B8FF">\n\n</span><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">          for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> filename </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> assets) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            content </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `- ${</span><span style="color:#E1E4E8">filename</span><span style="color:#9ECBFF">}</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">          }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">          assets[</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.fileName] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">            source</span><span style="color:#E1E4E8">: () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> content,</span></span>
+<span class="line"><span style="color:#B392F0">            size</span><span style="color:#E1E4E8">: () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> content.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          };</span></span>
+<span class="line"><span style="color:#B392F0">          callback</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">      );</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>如果通过 compiler.hooks.emit 来获取 compilation.assets 会有警告，该 hook 会被遗弃掉，因此改为使用 compilation.hooks.processAssets</p>
+<h3 id="autopolyfillswebpackplugin">autoPolyfillsWebpackPlugin</h3>
+<p>需求：根据 browserslistrc 和 coreJS 生成对应的 polyfill</p>
+<p>思路如下：</p>
+<ul>
+<li>获取 browserslistrc 通过 core-js-builder 在当前目录下生成 polyfill 文件</li>
+<li>需要通过 html-webpack-plugin 的 beforeAssetTagGeneration 在生成 html 之前插入该 polyfill 文件</li>
+</ul>
+<p>具体代码<a href="https://github.com/DTStack/ko/blob/master/packages/auto-polyfills-webpack-plugin/index.ts">请查看</a></p>
+<p><img src="/blog/imgs/webpackPlugin/Untitled.png" alt="Untitled"></p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#plugin"> Plugin </a><a class="depth-3" href="#plugin-的主要构成"> Plugin 的主要构成 </a><a class="depth-3" href="#plugin-主要对象"> Plugin 主要对象 </a><a class="depth-2" href="#手写-plugin"> 手写 Plugin </a><a class="depth-3" href="#filelistplugin"> fileListPlugin </a><a class="depth-3" href="#autopolyfillswebpackplugin"> autoPolyfillsWebpackPlugin </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/webpack-tapable/">上一篇：webpack tapable</a> <a href="/blog/engineering/base-pnpm/">下一篇：pnpm 是为何吊打 npm/yarn 的</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

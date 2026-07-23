@@ -1,15 +1,144 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="AI 工具、Agent 工作流和新鲜技术探索。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>走进 Skill 的内部机制 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link is-active" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">AI</a> <h1>走进 Skill 的内部机制</h1> </header> <div class="article-grid"> <div class="prose"> <p><img src="/blog/imgs/ai/skill/skill-internals-mechanism.png" alt="skill-internals-mechanism.png"></p>
+<h2 id="skill-到底是什么">Skill 到底是什么？</h2>
+<p>很多人第一次看到 Skill，会把它理解成”一份写给模型看的 Markdown”。这个理解不能说错，但它只摸到了表面。真正有价值的 Skill，不是把经验写成文档，而是把一个可复用的工作流变成 Agent 能够发现、触发、加载、执行、验证和分发的能力包。</p>
+<p>换句话说，Skill 的核心不是”写说明”，而是”把一次靠谱的做事方式压缩成下次还能靠谱复现的机制”。</p>
+<h2 id="skill-为什么不是-markdown">Skill 为什么不是 Markdown</h2>
+<p><code>SKILL.md</code> 很重要，但 Skill 不等于 <code>SKILL.md</code>。</p>
+<p><code>SKILL.md</code> 是入口文件，负责告诉 Agent：这个 Skill 叫什么、什么时候该用、使用时应该遵循什么流程。可一个成熟的 Skill 往往还会带上引用材料、脚本、模板、图标、默认提示和工具依赖声明。</p>
+<p>一个常见结构大概长这样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>my-skill/</span></span>
+<span class="line"><span>├── SKILL.md</span></span>
+<span class="line"><span>├── references/</span></span>
+<span class="line"><span>├── scripts/</span></span>
+<span class="line"><span>├── assets/</span></span>
+<span class="line"><span>└── metadata-or-ui-config.yaml</span></span></code></pre>
+<p>所以，Markdown 更像 Skill 的控制面板。真正让它变成”能力”的，是这份入口说明背后的资源组织、触发机制和执行约束。</p>
+<h2 id="agent-是怎么发现一个-skill-的">Agent 是怎么发现一个 Skill 的</h2>
+<p>大多数支持 Skill 的 Agent，不会一开始就把所有 Skill 的完整内容都塞进上下文。它们通常先拿到一个轻量索引：<code>name</code>、<code>description</code> 和路径。只有当用户显式点名某个 Skill，或者任务和 <code>description</code> 匹配时，Agent 才会读取完整的 <code>SKILL.md</code>。</p>
+<p><img src="/blog/imgs/ai/skill/skill-lifecycle.png" alt="skill-lifecycle.png"></p>
+<p>这就是 Skill 的第一层机制：先发现，再加载。</p>
+<p>它带来一个很现实的后果：很多 Skill 不是正文写得不好，而是根本没有被正确发现。Agent 没读到正文之前，正文再精彩也没用。</p>
+<p>如果要进一步优化发现准确率，还需要面对一个真实场景：对于中英混用的团队，description 用中文写还是英文写？Agent 的查询语言和 description 语言不一致时是否仍能命中？目前大多数实现不处理这一问题，所以保守的做法是在 description 里同时包含中英文关键触发词，确保不同语言下的自然语言任务都能命中。</p>
+<h2 id="skill-真正保存的是做事方式">Skill 真正保存的是”做事方式”</h2>
+<p>如果把 Skill 当成知识库，很容易写成百科：背景、定义、概念、注意事项全塞进去。这样看起来很完整，但对 Agent 未必有用。</p>
+<p><img src="/blog/imgs/ai/skill/way-of-doing-things.png" alt="way-of-doing-things.png"></p>
+<p>这也是 Skill 和普通文档最大的区别。普通文档是给人看的，Skill 是给 Agent 执行的。它不追求”讲得多”，而追求”下次还能按这个流程做对”。</p>
+<h2 id="为什么-description-决定-skill-是否生效">为什么 description 决定 Skill 是否生效</h2>
+<p><code>description</code> 不是介绍文案，而是触发器。</p>
+<p>一个不好的 <code>description</code> 往往很泛：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">description</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">Help with reports.</span></span></code></pre>
+<p>它的问题不是英文短，而是不知道什么时候该触发。周报算 report 吗？PR 总结算 report 吗？线上事故复盘算 report 吗？Agent 只能猜。</p>
+<p>更好的写法应该把触发场景、边界和用户可能说的话放进去：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#85E89D">description</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">Use when the user asks to generate a weekly report from Notion records, summarize this week's completed work, classify items by scope, or produce a Chinese weekly status update.</span></span></code></pre>
+<p>这类描述更像路标，而不是名片。它告诉 Agent：看到哪些任务应该进来，哪些任务不该进来。</p>
+<p>还有一个容易被忽略的点：当安装的 Skill 很多时，初始 Skill 列表会受到上下文预算限制，描述可能被压缩，甚至部分 Skill 会被省略。所以触发词要前置，边界要简洁，最重要的信息要放在开头。</p>
+<p>另外，对于中英混用的协作环境，可以将中英文触发词并列放入 description，例如 <code>review code / 审查代码</code>，以兼容不同语言的自然语言查询。</p>
+<h2 id="为什么要渐进披露">为什么要渐进披露</h2>
+<p>Skill 的内部机制里，有一个非常关键的设计叫渐进披露。</p>
+<p><img src="/blog/imgs/ai/skill/skill-progressive_-disclosure.png" alt="skill-progressive -disclosure.png"></p>
+<p>它大概分三层：</p>
+<ol>
+<li><strong>第一层</strong>：只暴露 <code>name</code>、<code>description</code>、路径，用来决定是否触发。</li>
+<li><strong>第二层</strong>：触发后读取完整 <code>SKILL.md</code>，获得核心流程。</li>
+<li><strong>第三层</strong>：根据任务需要，再读取 <code>references/</code>，调用 <code>scripts/</code>，使用 <code>assets/</code>。</li>
+</ol>
+<p>这套机制的本质，是把上下文当成稀缺资源。Agent 不需要一开始知道所有细节，它只需要先知道”该不该用这个 Skill”。等真的命中任务，再读取更深的内容。</p>
+<p>所以，写 Skill 时不要把所有东西都塞进 <code>SKILL.md</code>。正文应该保留核心流程和判断规则，大段规范、案例、API 文档、业务字段说明，应该放到 <code>references/</code> 里按需读取。</p>
+<p><strong>渐进披露也带来一个被忽略的设计问题</strong>：当用户通过 <code>/skill-name</code> 反复手动触发同一个 Skill 时，之前的上下文会不会污染下一轮行为？稳妥的做法是每次手动触发时清空上下文、重新加载渲染后的 Skill 内容，确保复现一致。</p>
+<h2 id="skill-在运行时到底发生了什么">Skill 在运行时到底发生了什么</h2>
+<p>不同 Agent 对 Skill 的实现会有一些差异：目录位置不同、命令名规则不同、frontmatter 字段不同、权限模型不同。但它们的核心运行机制非常接近，可以先理解成一条管线：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>发现 Skill -> 建立索引 -> 判断触发 -> 读取正文 -> 渲染上下文 -> 执行任务 -> 验证结果</span></span></code></pre>
+<p>对应的流程大概是这样：</p>
+<p><img src="/blog/imgs/ai/skill/skill-runtime-flow.png" alt="skill-runtime-flow.svg"></p>
+<p>如果把这个过程写成伪源码，它大概不是”模型读一个 Markdown 文件”这么简单，而是一条从发现到执行的渲染管线。注意，下面代码是基于 Agent Skills 规范和 Claude Code 文档整理出的概念模型，不是某个具体 Agent 的真实源码。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> SkillMeta</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  description</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  location</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  commandName</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  disableModelInvocation</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  context</span><span style="color:#F97583">?:</span><span style="color:#9ECBFF"> 'inline'</span><span style="color:#F97583"> |</span><span style="color:#9ECBFF"> 'fork'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  allowedTools</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> runSkillLifecycle</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">userInput</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> catalog</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> skillRoots</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">flatMap</span><span style="color:#E1E4E8">(scanSkillDirs).</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(readFrontmatterOnly);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> skill</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> startsWithSlashCommand</span><span style="color:#E1E4E8">(userInput)</span></span>
+<span class="line"><span style="color:#F97583">    ?</span><span style="color:#B392F0"> findByCommandName</span><span style="color:#E1E4E8">(userInput, catalog)</span></span>
+<span class="line"><span style="color:#F97583">    :</span><span style="color:#B392F0"> modelSelectsFromCatalog</span><span style="color:#E1E4E8">(userInput, catalog);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">skill) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> runWithoutSkill</span><span style="color:#E1E4E8">(userInput);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> raw</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> readFile</span><span style="color:#E1E4E8">(skill.location);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> body</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> stripFrontmatter</span><span style="color:#E1E4E8">(raw);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> prompt</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> renderOnce</span><span style="color:#E1E4E8">(body, {</span></span>
+<span class="line"><span style="color:#E1E4E8">    arguments: </span><span style="color:#B392F0">parseArguments</span><span style="color:#E1E4E8">(userInput),</span></span>
+<span class="line"><span style="color:#E1E4E8">    dynamicContext: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> skill.context </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'fork'</span></span>
+<span class="line"><span style="color:#F97583">    ?</span><span style="color:#B392F0"> runSubagent</span><span style="color:#E1E4E8">(prompt, skill.allowedTools)</span></span>
+<span class="line"><span style="color:#F97583">    :</span><span style="color:#B392F0"> appendToMainConversation</span><span style="color:#E1E4E8">(prompt, skill.allowedTools);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>这里有几个关键点：</p>
+<ol>
+<li>发现阶段通常只读取 <code>name</code>、<code>description</code>、路径等轻量信息，不会把所有 <code>SKILL.md</code> 全部塞进上下文。</li>
+<li>触发可以来自用户显式输入 <code>/skill-name</code>，也可以来自模型根据 <code>description</code> 判断任务相关。</li>
+<li>渲染阶段会处理参数和动态上下文。有些实现会在模型看到 Skill 前先执行命令、读取文件或展开环境信息，并且通常只展开一轮，避免递归展开带来的风险。</li>
+<li>执行阶段可能把 Skill 内容注入主会话，也可能 fork 到子代理里隔离执行。前者适合持续指导当前任务，后者适合调研、总结、代码探索这类不想污染主会话上下文的工作。</li>
+</ol>
+<p>这也解释了为什么 Skill 看起来只是 Markdown，运行起来却更像一套轻量插件系统：它真正复用的不是一段文字，而是”发现、加载、渲染、执行和验证”这一整套工作流。</p>
+<h2 id="如何验证一个-skill-是否真的有效">如何验证一个 Skill 是否真的有效</h2>
+<p>判断一个 Skill 有没有价值，不是看它写得多完整，而是看它有没有改变 Agent 的行为。</p>
+<p>可以看五个指标：</p>
+<ol>
+<li>触发准确率：用户自然描述任务时，它是否会被正确选中？</li>
+<li>误触发率：不该用它的时候，它是否乱入？</li>
+<li>执行稳定性：同类任务重复执行，步骤是否一致？</li>
+<li>验证闭环：它是否要求 Agent 做必要检查？</li>
+<li>维护成本：新增边界时，是补充几句规则，还是要重写整份文档？</li>
+</ol>
+<p>还可以准备一组测试提示词：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>帮我从 Notion 生成这周周报</span></span>
+<span class="line"><span>把今天 GitLab 的 fix/feat/hotfix 提交同步到 Notion</span></span>
+<span class="line"><span>帮我 review 这个 GitLab MR</span></span>
+<span class="line"><span>为这个 Bug 生成禅道修复备注</span></span></code></pre>
+<p>观察它们是否命中对应 Skill，是否读取该读的 reference，是否运行该运行的脚本，是否给出符合团队习惯的输出。</p>
+<p>如果一个 Skill 只有在用户精确喊出名字时才工作，它还只是一个手册。如果用户自然描述需求时它也能稳定接管流程，它才真正进入了 Agent 的工作系统。</p>
+<p><strong>一个延伸问题：怎么测试 Skill 的稳定性？</strong> 由于 LLM 行为有随机性，同一个 Skill 多次执行可能得到不同结果。建议对输出不做”逐字一致”的断言，而是做关键动作校验——比如是否读了 <code>references/</code> 下的文件、是否运行了 <code>scripts/</code> 中的脚本、最终输出是否包含预期结构。这样既允许 LLM 的自然表达，又保证了流程的不变性。</p>
+<h2 id="一个好-skill-最值钱的是坑点清单">一个好 Skill 最值钱的是坑点清单</h2>
+<p>很多人写 Skill 时，会把精力放在”背景介绍”上。但真正值钱的部分，往往是坑点清单。</p>
+<p><strong>执行顺序</strong></p>
+<ol>
+<li>哪些步骤必须先做，不能颠倒？</li>
+<li>哪些操作应该脚本化，避免 Agent 每次临场重写？</li>
+</ol>
+<p><strong>判断与边界</strong></p>
+<ol>
+<li>哪些工具看起来能用，其实会产出错误结果？</li>
+<li>哪些场景必须先问用户，哪些可以直接合理假设？</li>
+<li>哪些输出必须验证，验证失败时怎么降级？</li>
+</ol>
+<p><strong>资源组织</strong></p>
+<ol>
+<li>哪些信息应该放正文，哪些应该放 <code>references/</code>？</li>
+<li>哪些动作需要审批，哪些文件不能动？</li>
+</ol>
+<p>按维度分组后，每个作者可以更快定位自己缺哪类坑点，而不是面对一排问题无从下手。</p>
+<p>Skill 的价值不是把人类知道的全部东西铺满，而是把任务中最容易翻车的地方提前标红。</p>
+<p>比如”生成图片”这个任务，难点不只是写 prompt，而是知道什么时候应该用图片生成工具，什么时候该直接画 SVG，透明背景什么时候可以色键抠图，什么时候需要提醒用户走原生透明路径。这样的判断，才是 Skill 的含金量。</p>
+<h2 id="会写-skill就是会把经验产品化">会写 Skill，就是会把经验产品化</h2>
+<p>我会用这个公式判断一个 Skill 是否值得存在：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>好 Skill = 清晰触发 + 精简正文 + 按需引用 + 确定性脚本 + 坑点前置 + 可验证输出</span></span></code></pre>
+<p>单次提示词像口头交代，<code>AGENTS.md</code> 像项目规矩，MCP 像外部工具接口，Hook 像生命周期拦截器，而 Skill 像可复用的任务方法论。它把触发条件、执行步骤、参考材料、脚本工具和验证标准打包在一起，让经验从”这次对了”变成”下次也能对”。</p>
+<p>所以，走进 Skill 的内部机制，真正要看的不是那一份 Markdown，而是它背后的触发路由、渐进加载、资源组织、运行时渲染和团队分发路径。</p>
+<p>会写 Skill，不只是会写文档，而是会把经验做成系统。</p>
+<h2 id="参考资料">参考资料</h2>
+<ol>
+<li><a href="https://code.claude.com/docs/en/skills">Claude Code Docs: Extend Claude with skills</a></li>
+<li><a href="https://agentskills.io/specification">Agent Skills Specification</a></li>
+</ol> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#skill-到底是什么"> Skill 到底是什么？ </a><a class="depth-2" href="#skill-为什么不是-markdown"> Skill 为什么不是 Markdown </a><a class="depth-2" href="#agent-是怎么发现一个-skill-的"> Agent 是怎么发现一个 Skill 的 </a><a class="depth-2" href="#skill-真正保存的是做事方式"> Skill 真正保存的是”做事方式” </a><a class="depth-2" href="#为什么-description-决定-skill-是否生效"> 为什么 description 决定 Skill 是否生效 </a><a class="depth-2" href="#为什么要渐进披露"> 为什么要渐进披露 </a><a class="depth-2" href="#skill-在运行时到底发生了什么"> Skill 在运行时到底发生了什么 </a><a class="depth-2" href="#如何验证一个-skill-是否真的有效"> 如何验证一个 Skill 是否真的有效 </a><a class="depth-2" href="#一个好-skill-最值钱的是坑点清单"> 一个好 Skill 最值钱的是坑点清单 </a><a class="depth-2" href="#会写-skill就是会把经验产品化"> 会写 Skill，就是会把经验产品化 </a><a class="depth-2" href="#参考资料"> 参考资料 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页">  <a href="/blog/ai/agent-loop/">下一篇：Agent Loop：让 Agent 真正跑起来的核心机制</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,89 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>React 中的数据流管理 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>React 中的数据流管理</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<aside>
+💡 为什么数据流管理重要？React 的核心思想为：UI=render(data)，data 就是所谓的数据，render 是 React 提供的纯函数，所以 UI 展示完全由数据层决定。
+</aside>
+<p>在本文中，会简单介绍 react 中的数据流管理，从自身的 context 到三方库的 redux 的相关概念，以及 redux 附属内容丐版实现。</p>
+<p>在正文之前，先简单介绍<strong>数据</strong>和<strong>状态</strong>的概念。React 是利用可复用的组件来构建界面，组件本质上有限状态机，能够记住当前组件的状态，根据不同的状态变化做出相关的操作。在 React 中，把这种状态定义为<code>state</code>。通过管理状态来实现对组件的管理，当<code>state</code>发生改变时，React 会自动去执行相应的操作。</p>
+<p>而数据，它不仅指 server 层返回给前端的数据，React 中的状态也是一种数据。当数据改变时，我们需要改变状态去引发界面的变更。</p>
+<h2 id="react-自身的数据流方案">React 自身的数据流方案</h2>
+<h3 id="基于-props-的单向数据流">基于 Props 的单向数据流</h3>
+<p>React 是自上而下的单向数据流，容器组件&#x26;展示组件是最常见的 React 组件设计方案。容器组件负责处理复杂的业务逻辑和数据，展示组件负责处理 UI 层。通常我们会把展示组件抽出来复用或者组件库的封装，容器组件自身通过 state 来管理状态，setState 更新状态，从而更新 UI，通过 props 将自身的 state 传递给展示组件实现通信</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/155837019-dc9ea4b9-0cac-4c97-be7f-b6e9cd3f9a23.png" alt="111"></p>
+<p>对于简单的通信，基于<code>props</code>串联父子和兄弟组件是很灵活的。</p>
+<p>但是对于嵌套深数据流组件，A→B→C→D→E，A 的数据需要传递给 E 使用，那么我们需要在 B/C/D 的<code>props</code>都加上该数据，导致最为中间组件的 B/C/D 来说会引入一些不属于自己的属性</p>
+<h3 id="使用-context-api-维护全局状态">使用 Context API 维护全局状态</h3>
+<p>Context API 是 React 官方提供的一种组件树全局通信方式</p>
+<p><code>Context</code>基于生产者-消费者模式，对应 React 中的三个概念: <strong>React.createContext</strong>、<strong>Provider</strong>、<strong>Consumer</strong>。通过调用<code>createContext</code>创建出一组<code>Provider</code>。<code>Provider</code>作为数据的提供方，可以将数据下发给自身组件树中的任意层级的<code>Consumer</code>，而<strong>Consumer 不仅能够读取到 Provider 下发的数据还能读取到这些数据后续的更新值</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> defaultValue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  count: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">  increment</span><span style="color:#E1E4E8">: () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {}</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> ValueContext</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">createContext</span><span style="color:#E1E4E8">(defaultValue);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">ValueContext.Provider</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.state.contextState}></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#B392F0"> className</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"App"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>Count: {count}&#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">ButtonContainer</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">ValueContainer</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#79B8FF">ValueContext.Provider</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">ValueContext.Consumer</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  {({ </span><span style="color:#FFAB70">increment</span><span style="color:#E1E4E8"> }) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#B392F0"> onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{increment} </span><span style="color:#B392F0">className</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"button"</span><span style="color:#E1E4E8">>increment&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  )}</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#79B8FF">ValueContext.Consumer</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p><a href="https://codesandbox.io/s/context-use-before-16-3-318qr2?file=/src/App.js">16.3 之前的用法</a>，<a href="https://codesandbox.io/s/context-use-after-16-3-j566ro?file=/src/App.js:581-643">16.3 之后的 createContext 用法</a>，<a href="https://codesandbox.io/s/context-use-hooks-2l55gw?file=/src/App.js">useContext 用法</a></p>
+<p>Context 工作流的简单图解：</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/b3767f46-ec28-40f7-abdf-465a9441cb9d" alt="Untitled"></p>
+<p>在 v16.3 之前由于各种局限性不被推荐使用</p>
+<ul>
+<li>代码不够简单优雅：生产者需要定义<code>childContextTypes</code>和<code>getChildContext</code>，消费者需要定义<code>ChildTypes</code>才能够访问<code>this.context</code>访问到生产者提供的数据</li>
+<li>数据无法及时同步：类组件中可以使用<code>shouldComponentUpdate</code>返回 false 或者是<code>PureComponent</code>，后代组件都不会被更新，这违背了 Context 模式的设置，导致生产者和消费者之间不能及时同步</li>
+</ul>
+<p>在 v16.3 之后的版本中做了对应的调整，即使组件的<code>shouldComponentUpdate</code>返回 false，它仍然可以”穿透”组件继续向后代组件进行传播，更改了声明方式变得更加语义化，使得 Context 成为了一种可行的通信方案</p>
+<p>但是 Context 的也是通过一个容器组件来管理状态的，但是<code>Consumer</code>和<code>Provider</code>是一一对应的，在项目复杂度高的时候，可能会出现多个<code>Provider</code>和<code>Consumer</code>，甚至一个<code>Consumer</code>需要对应多个<code>Provider</code>的情况</p>
+<p>当某个组件的业务逻辑变得非常复杂时，代码会越写越多，因为我们只能够在组件内部去控制数据流，这样导致 Model 和 View 都在 View 层，业务逻辑和 UI 实现都在一块，难以维护</p>
+<p>所以这个时候需要真正的数据流管理工具，从 UI 层完全抽离出来，只负责管理数据，让 React 只专注于 View 层的绘制</p>
+<h2 id="redux">Redux</h2>
+<p>Redux 是 <strong>JS 应用</strong>的状态容器，提供可预测的状态管理</p>
+<p>Redux 的三大原则</p>
+<ul>
+<li>单一数据源：整个应用的 state 都存储在一棵树上，并且这棵状态树只存在于唯一的 store 中</li>
+<li>state 是只读的：对 state 的修改只有触发 action</li>
+<li>用纯函数执行修改：reducer 根据旧状态和传进来的 action 来生成一个新的 state(类似与 reduce 的思想，接受上一个 state 和当前项 action，计算出来一个新值)</li>
+</ul>
+<p>Redux 工作流</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/1a7053b3-4880-4a12-9a3d-81a991c15119" alt="Untitled"></p>
+<p><strong>不可变性(Immutability)</strong></p>
+<p>mutable 意为可改变的，immutability 意为用不可改变的</p>
+<p>在 JS 的对象(object)和数组(array)默认都是 mutable，创建一个对象/数组都是可以改变内容</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> obj</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { name: </span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">, age: </span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#E1E4E8">obj.name </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'shuangxu'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">arr[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 6</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'change'</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p>改变对象或者数组，内存中的引用地址尚未改变，但是内容已经改变</p>
+<p>如果想用不可变的方式来更新，代码必须复制原来的对象/数组，更新它的复制体</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> obj</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { info: { name: </span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">, age: </span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8"> }, phone: </span><span style="color:#9ECBFF">'177xxx'</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> cloneObj</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">obj, info: { name: </span><span style="color:#9ECBFF">'shuangxu'</span><span style="color:#E1E4E8"> } };</span></span></code></pre>
+<p><strong>Redux 期望所有的状态都采用不可变的方式。</strong></p>
+<p><a href="%22/react/redux%22">点击查看</a>更多的 Redux 相关内容</p>
+<h2 id="总结">总结</h2>
+<p>本文意在讲解 react 的数据流管理。从 react 本身的提供的数据流方式出发</p>
+<ol>
+<li>基于<code>props</code>的单向数据流，串联父子和兄弟组件非常灵活，但是对于嵌套过深的组件，会使得中间组件都加上不需要的<code>props</code>数据</li>
+<li>使用 Context 维护全局状态，介绍了 v16.3 之前/v16.3 之后/hooks，不同版本<code>context</code>的使用，以及 v16.3 之前版本的<code>context</code>的弊端。</li>
+<li>引入 redux，第三方的状态容器，以及 react-redux API(Provider/connect)分析与丐版实现</li>
+</ol>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://github.com/sunyongjian/blog/issues/36">对 React 状态管理的理解及方案对比</a></li>
+<li><a href="https://juejin.cn/post/6844903566381940744">聊一聊我对 React Context 的理解以及应用</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#react-自身的数据流方案"> React 自身的数据流方案 </a><a class="depth-3" href="#基于-props-的单向数据流"> 基于 Props 的单向数据流 </a><a class="depth-3" href="#使用-context-api-维护全局状态"> 使用 Context API 维护全局状态 </a><a class="depth-2" href="#redux"> Redux </a><a class="depth-2" href="#总结"> 总结 </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/filter-rules/">上一篇：且或组件实现思路</a> <a href="/blog/react/react--router-principle-and-version-implementation/">下一篇：React-Router4 原理及丐版实现</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,393 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>简单聊聊 SWC | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>简单聊聊 SWC</h1> </header> <div class="article-grid"> <div class="prose"> <blockquote>
+<p>随着在编译中越来越卷，SWC 由于速度极快也出现在大众的视野中，本文会简单介绍一下 SWC。<a href="/blog/engineering/base-babel">前文</a>中有对 Babel 做相关介绍，大家可以一起阅读。</p>
+</blockquote>
+<h2 id="swc-是什么">SWC 是什么？</h2>
+<aside>
+💡 SWC(Speedy Web Complier) is a super-fast TypeScript / JavaScript compiler written in Rust.
+</aside>
+<p>SWC 出现的很大部分原因其实是替换掉工程中的 Babel，因此它的功能和 Babel 差不多。</p>
+<p>最大的区别可能就是：SWC is father than Babel</p>
+<aside>
+🏎️ SWC is 20x faster than Babel on a single thread and 70x faster on four cores.
+</aside>
+<p>🤔️ 其实 SWC 快的原因是由于底层语言 Rust 带来的。</p>
+<aside>
+🧤 JavaScript is single-threaded. The JS thread is not a good place to do heavy computation.
+</aside>
+<h2 id="swc-怎么用">SWC 怎么用？</h2>
+<p>和 babel 一样，提供了命令行工具包 <strong><code>@swc/cli</code></strong> 和核心包 <strong><code>@swc/core</code></strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">pnpm swc ./src/code.js  </span><span style="color:#6A737D">// 将文件编译输出到控制台</span></span></code></pre>
+<p>一样的在 <strong><code>@swc/core</code></strong> 包中也导出相关的 Node API 供大家使用。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> swc</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@swc/core'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> path</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'path'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fs</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'fs'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">swc</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">transformFile</span><span style="color:#E1E4E8">(path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'./code.js'</span><span style="color:#E1E4E8">), {</span></span>
+<span class="line"><span style="color:#E1E4E8">    sourceMaps: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    isModule: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    jsc: {</span></span>
+<span class="line"><span style="color:#E1E4E8">      parser: {</span></span>
+<span class="line"><span style="color:#E1E4E8">        syntax: </span><span style="color:#9ECBFF">'ecmascript'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">      transform: {},</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">    env: {</span></span>
+<span class="line"><span style="color:#E1E4E8">      targets: {</span></span>
+<span class="line"><span style="color:#E1E4E8">        ie: </span><span style="color:#9ECBFF">'8'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">then</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">output</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    fs.</span><span style="color:#B392F0">writeFileSync</span><span style="color:#E1E4E8">(path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'./targetCode.js'</span><span style="color:#E1E4E8">), output.code, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      encoding: </span><span style="color:#9ECBFF">'utf-8'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span></code></pre>
+<p>通过<code>swc.parser</code>也能够拿到 AST 相关数据</p>
+<h3 id="关于配置">关于配置</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">arr];</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> p</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">() {}</span></span>
+<span class="line"><span style="color:#B392F0">  say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="target">target</h4>
+<p>当我们在配置中写入对应的<code>browserslist</code>，swc 能够将对应的语法转换到浏览器支持的语法</p>
+<p><a href="https://github.com/swc-project/swc/issues/104">https://github.com/swc-project/swc/issues/104</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#9ECBFF">    "jsc"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">        "parser"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "syntax"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ecmascript"</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#9ECBFF">    "env"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">        "targets"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "ie"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"8"</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>将会被编译为如下代码：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">len</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (len </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, arr2 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Array</span><span style="color:#E1E4E8">(len); i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) arr2[i] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[i];</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr2;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _array_without_holes</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(arr)) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _class_call_check</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">instance</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">Constructor</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">(instance </span><span style="color:#F97583">instanceof</span><span style="color:#B392F0"> Constructor</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Cannot call a class as a function'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _defineProperties</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">target</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> props.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> descriptor </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> props[i];</span></span>
+<span class="line"><span style="color:#E1E4E8">    descriptor.enumerable </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> descriptor.enumerable </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    descriptor.configurable </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">'value'</span><span style="color:#F97583"> in</span><span style="color:#E1E4E8"> descriptor) descriptor.writable </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    Object.</span><span style="color:#B392F0">defineProperty</span><span style="color:#E1E4E8">(target, descriptor.key, descriptor);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _create_class</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">Constructor</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">protoProps</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">staticProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (protoProps) </span><span style="color:#B392F0">_defineProperties</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">Constructor</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">, protoProps);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (staticProps) </span><span style="color:#B392F0">_defineProperties</span><span style="color:#E1E4E8">(Constructor, staticProps);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Constructor;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _iterable_to_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">iter</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> Symbol </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'undefined'</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> iter[Symbol.iterator] </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">    iter[</span><span style="color:#9ECBFF">'@@iterator'</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span></span>
+<span class="line"><span style="color:#E1E4E8">  )</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">from</span><span style="color:#E1E4E8">(iter);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _non_iterable_spread</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    'Invalid attempt to spread non-iterable instance.</span><span style="color:#79B8FF">\\</span><span style="color:#9ECBFF">nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _to_consumable_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#B392F0">    _array_without_holes</span><span style="color:#E1E4E8">(arr) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#B392F0">    _iterable_to_array</span><span style="color:#E1E4E8">(arr) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#B392F0">    _unsupported_iterable_to_array</span><span style="color:#E1E4E8">(arr) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#B392F0">    _non_iterable_spread</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _unsupported_iterable_to_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">o</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">minLen</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">o) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> o </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(o, minLen);</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> n </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> Object</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.toString.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(o).</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Object'</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> o.</span><span style="color:#79B8FF">constructor</span><span style="color:#E1E4E8">) n </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> o.</span><span style="color:#79B8FF">constructor</span><span style="color:#E1E4E8">.name;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Map'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Set'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">from</span><span style="color:#E1E4E8">(n);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Arguments'</span><span style="color:#F97583"> ||</span><span style="color:#9ECBFF"> /</span><span style="color:#F97583">^</span><span style="color:#DBEDFF">(?:Ui</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">I)nt(?:8</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">16</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">32)(?:Clamped)</span><span style="color:#F97583">?</span><span style="color:#DBEDFF">Array</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(n))</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(o, minLen);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _to_consumable_array</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> Person </span><span style="color:#F97583">=</span><span style="color:#6A737D"> /*#__PURE__*/</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#9ECBFF">  'use strict'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#B392F0">    _class_call_check</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, Person);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  _create_class</span><span style="color:#E1E4E8">(Person, [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      key: </span><span style="color:#9ECBFF">'say'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">      value</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Person;</span></span>
+<span class="line"><span style="color:#E1E4E8">})();</span></span></code></pre>
+<h4 id="mode">mode</h4>
+<p>和 babel 的 useBuiltIns 配置一样，<a href="https://swc.rs/docs/configuration/supported-browsers#mode">swc/mode</a></p>
+<p><a href="https://github.com/swc-project/swc/issues/397">https://github.com/swc-project/swc/issues/397</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#9ECBFF">    "jsc"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">        "parser"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "syntax"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ecmascript"</span></span>
+<span class="line"><span style="color:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#9ECBFF">    "env"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">        "targets"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "ie"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"8"</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#9ECBFF">        "mode"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"usage"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">        "coreJs"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"3.22"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>将会被编译为如下代码：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">len</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (len </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, arr2 </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Array</span><span style="color:#E1E4E8">(len); i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) arr2[i] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[i];</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr2;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _array_without_holes</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(arr)) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _class_call_check</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">instance</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">Constructor</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">(instance </span><span style="color:#F97583">instanceof</span><span style="color:#B392F0"> Constructor</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Cannot call a class as a function'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _defineProperties</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">target</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> props.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> descriptor </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> props[i];</span></span>
+<span class="line"><span style="color:#E1E4E8">    descriptor.enumerable </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> descriptor.enumerable </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    descriptor.configurable </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">'value'</span><span style="color:#F97583"> in</span><span style="color:#E1E4E8"> descriptor) descriptor.writable </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    Object.</span><span style="color:#B392F0">defineProperty</span><span style="color:#E1E4E8">(target, descriptor.key, descriptor);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _create_class</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">Constructor</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">protoProps</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">staticProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (protoProps) </span><span style="color:#B392F0">_defineProperties</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">Constructor</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">, protoProps);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (staticProps) </span><span style="color:#B392F0">_defineProperties</span><span style="color:#E1E4E8">(Constructor, staticProps);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Constructor;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _iterable_to_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">iter</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> Symbol </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'undefined'</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> iter[Symbol.iterator] </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">    iter[</span><span style="color:#9ECBFF">'@@iterator'</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> null</span></span>
+<span class="line"><span style="color:#E1E4E8">  )</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">from</span><span style="color:#E1E4E8">(iter);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _non_iterable_spread</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    'Invalid attempt to spread non-iterable instance.</span><span style="color:#79B8FF">\\</span><span style="color:#9ECBFF">nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _to_consumable_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#B392F0">    _array_without_holes</span><span style="color:#E1E4E8">(arr) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#B392F0">    _iterable_to_array</span><span style="color:#E1E4E8">(arr) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#B392F0">    _unsupported_iterable_to_array</span><span style="color:#E1E4E8">(arr) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#B392F0">    _non_iterable_spread</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _unsupported_iterable_to_array</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">o</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">minLen</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">o) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> o </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(o, minLen);</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> n </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> Object</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.toString.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(o).</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Object'</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> o.</span><span style="color:#79B8FF">constructor</span><span style="color:#E1E4E8">) n </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> o.</span><span style="color:#79B8FF">constructor</span><span style="color:#E1E4E8">.name;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Map'</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Set'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">from</span><span style="color:#E1E4E8">(n);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (n </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Arguments'</span><span style="color:#F97583"> ||</span><span style="color:#9ECBFF"> /</span><span style="color:#F97583">^</span><span style="color:#DBEDFF">(?:Ui</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">I)nt(?:8</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">16</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">32)(?:Clamped)</span><span style="color:#F97583">?</span><span style="color:#DBEDFF">Array</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(n))</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> _array_like_to_array</span><span style="color:#E1E4E8">(o, minLen);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.array.includes.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.string.includes.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.promise.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.object.to-string.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _to_consumable_array</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> Person </span><span style="color:#F97583">=</span><span style="color:#6A737D"> /*#__PURE__*/</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#9ECBFF">  'use strict'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#B392F0">    _class_call_check</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, Person);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  _create_class</span><span style="color:#E1E4E8">(Person, [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      key: </span><span style="color:#9ECBFF">'say'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">      value</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Person;</span></span>
+<span class="line"><span style="color:#E1E4E8">})();</span></span></code></pre>
+<h4 id="helper-function">helper function</h4>
+<p>就如同我们在 babel 上说的一样，每一个都会引入这么多的辅助函数，明显不是我们所期望的，swc 也通过配置解决了这个问题</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#9ECBFF">    "jsc"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">        "parser"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "syntax"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ecmascript"</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#9ECBFF">        "externalHelpers"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#9ECBFF">    "env"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">        "targets"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "ie"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"8"</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#9ECBFF">        "mode"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"usage"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">        "coreJs"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"3.22"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>将会被编译为如下代码：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { _ </span><span style="color:#F97583">as</span><span style="color:#E1E4E8"> _class_call_check } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@swc/helpers/_/_class_call_check'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { _ </span><span style="color:#F97583">as</span><span style="color:#E1E4E8"> _create_class } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@swc/helpers/_/_create_class'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { _ </span><span style="color:#F97583">as</span><span style="color:#E1E4E8"> _to_consumable_array } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@swc/helpers/_/_to_consumable_array'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.array.includes.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.string.includes.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.promise.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> 'core-js/modules/es.object.to-string.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _to_consumable_array</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> Person </span><span style="color:#F97583">=</span><span style="color:#6A737D"> /*#__PURE__*/</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#9ECBFF">  'use strict'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#B392F0">    _class_call_check</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, Person);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  _create_class</span><span style="color:#E1E4E8">(Person, [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      key: </span><span style="color:#9ECBFF">'say'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">      value</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Person;</span></span>
+<span class="line"><span style="color:#E1E4E8">})();</span></span></code></pre>
+<p>在 swc 中，将所有的辅助函数放在了<code>@swc/helpers</code>中，也不需要像 babel 那样去引入额外的 plugin 来解决这个问题。</p>
+<h3 id="关于-plugin">关于 Plugin</h3>
+<p>在 SWC 中，也可以编写 JS plugin，但是提供的相关 API 是比较局限的。</p>
+<p><a href="https://github.com/swc-project/plugin-utils/blob/master/src/visitor.ts">plugin-utils/src/visitor.ts at master · swc-project/plugin-utils</a></p>
+<p>编写 SWC 的 JS plugin 时，需要继承 Visitor，然后通过访问对应的 AST 节点，对对应的 AST 节点进行处理的到我们想要的节点内容，返回回来</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> Visitor</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@swc/core/Visitor'</span><span style="color:#E1E4E8">).default;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> ConsoleStripper</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Visitor</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  visitCallExpression</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">expression</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (expression.callee.type </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'MemberExpression'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> expression;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      expression.callee.object.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Identifier'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">      expression.callee.object.value </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'console'</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (expression.callee.property.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'Identifier'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        expression.arguments </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">expression.arguments];</span></span>
+<span class="line"><span style="color:#E1E4E8">        expression.arguments.</span><span style="color:#B392F0">unshift</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">          spread: </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          expression: {</span></span>
+<span class="line"><span style="color:#E1E4E8">            type: </span><span style="color:#9ECBFF">'StringLiteral'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">            span: expression.span,</span></span>
+<span class="line"><span style="color:#E1E4E8">            value: </span><span style="color:#9ECBFF">`filename: ${</span><span style="color:#E1E4E8">expression</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">span</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">start</span><span style="color:#9ECBFF">} and ${</span><span style="color:#E1E4E8">expression</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">span</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">end</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">            raw: </span><span style="color:#9ECBFF">`filename: ${</span><span style="color:#E1E4E8">expression</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">span</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">start</span><span style="color:#9ECBFF">} and ${</span><span style="color:#E1E4E8">expression</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">span</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">end</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          },</span></span>
+<span class="line"><span style="color:#E1E4E8">        });</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">          ...</span><span style="color:#E1E4E8">expression,</span></span>
+<span class="line"><span style="color:#E1E4E8">        };</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> expression;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>当我们想要使用这个插件时，需要在 option 中声明该 plugin</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">swc</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">transformFile</span><span style="color:#E1E4E8">(path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'./code.js'</span><span style="color:#E1E4E8">), {</span></span>
+<span class="line"><span style="color:#B392F0">    plugin</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">m</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ConsoleStripper</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">visitProgram</span><span style="color:#E1E4E8">(m),</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">then</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">output</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    fs.</span><span style="color:#B392F0">writeFileSync</span><span style="color:#E1E4E8">(path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'./targetCode.js'</span><span style="color:#E1E4E8">), output.code, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      encoding: </span><span style="color:#9ECBFF">'utf-8'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span></code></pre>
+<p><a href="https://github.com/formatjs/formatjs/blob/main/packages/swc-plugin/tests/utils.ts">formatjs/packages/swc-plugin/tests/utils.ts at main · formatjs/formatjs</a></p>
+<h2 id="swc-编译">SWC 编译</h2>
+<aside>
+🎗️ 我们使用的上述 API，其实都是从二进制文件里面获取到的。
+</aside>
+<p>例如上述我们调用 transformFile 时，其源码如下</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">transformFile</span><span style="color:#E1E4E8">(path, options) {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> _a, _b, _c;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> __awaiter</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">void</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">void</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function*</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#6A737D">        //....</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">plugin</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> options, </span><span style="color:#79B8FF">newOptions</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> __rest</span><span style="color:#E1E4E8">(options, [</span><span style="color:#9ECBFF">"plugin"</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#6A737D">				//....</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (plugin) {</span></span>
+<span class="line"><span style="color:#F97583">            const</span><span style="color:#79B8FF"> m</span><span style="color:#F97583"> =</span><span style="color:#F97583"> yield</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">parseFile</span><span style="color:#E1E4E8">(path, (_c </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> options </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> options </span><span style="color:#F97583">===</span><span style="color:#F97583"> void</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> ?</span><span style="color:#F97583"> void</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> :</span><span style="color:#E1E4E8"> options.jsc) </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8"> _c </span><span style="color:#F97583">===</span><span style="color:#F97583"> void</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> ?</span><span style="color:#F97583"> void</span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> :</span><span style="color:#E1E4E8"> _c.parser);</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">transform</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">plugin</span><span style="color:#E1E4E8">(m), newOptions);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> bindings.</span><span style="color:#B392F0">transformFile</span><span style="color:#E1E4E8">(path, </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">toBuffer</span><span style="color:#E1E4E8">(newOptions));</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在无 plugin 的情况下，调用的是<code>bindings.transformFile</code>，有 plugin 的情况下调用的是<code>this.transform</code>，在<code>this.transform</code>中也会调用<code>bindings.xxx</code>方法</p>
+<p>那 bindings 是啥呢？</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> bindings</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> binding;</span></span>
+<span class="line"><span style="color:#F97583">  try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    binding </span><span style="color:#F97583">=</span><span style="color:#F97583"> !!</span><span style="color:#E1E4E8">bindingsOverride</span></span>
+<span class="line"><span style="color:#F97583">      ?</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">((</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, path_1.resolve)(bindingsOverride))</span></span>
+<span class="line"><span style="color:#F97583">      :</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./binding'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#6A737D">    // If native binding loaded successfully, it should return proper target triple constant.</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> triple</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> binding.</span><span style="color:#B392F0">getTargetTriple</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    assert.</span><span style="color:#B392F0">ok</span><span style="color:#E1E4E8">(triple, </span><span style="color:#9ECBFF">'Failed to read target triple from native binary.'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> binding;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (_) {</span></span>
+<span class="line"><span style="color:#6A737D">    // postinstall supposed to install `@swc/wasm` already</span></span>
+<span class="line"><span style="color:#E1E4E8">    fallbackBindings </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@swc/wasm'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">finally</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> binding;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">})();</span></span></code></pre>
+<p>binding 文件中是对 platform 和 arch 的判断，然后返回不同的 nativeBinding，最后我们使用的相关 Node API 就是从 nativeBinding 中获取到的</p>
+<p><img src="/blog/imgs/swc/Untitled.png" alt="Untitled"></p>
+<p><img src="/blog/imgs/swc/Untitled%201.png" alt="Untitled"></p>
+<p>大体的流程图如下：</p>
+<p><img src="/blog/imgs/swc/Untitled%202.png" alt="Untitled"></p>
+<h2 id="总结">总结</h2>
+<p>整体来说，SWC 和 Babel 是大同小异的，但是 SWC 在速度上完胜 Babel，一方面是 Rust 语言和 JS 的差距，另一方面是 SWC 相关的 API 均已经编译成为了二进制文件。</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#swc-是什么"> SWC 是什么？ </a><a class="depth-2" href="#swc-怎么用"> SWC 怎么用？ </a><a class="depth-3" href="#关于配置"> 关于配置 </a><a class="depth-3" href="#关于-plugin"> 关于 Plugin </a><a class="depth-2" href="#swc-编译"> SWC 编译 </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/intl-messageformat/">上一篇：国际化利器 Intl Messageformat</a> <a href="/blog/engineering/understanding-package/">下一篇：了解 package.json</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

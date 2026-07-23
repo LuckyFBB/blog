@@ -1,15 +1,189 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>国际化利器 Intl Messageformat | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>国际化利器 Intl Messageformat</h1> </header> <div class="article-grid"> <div class="prose"> <aside>
+Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.
+</aside>
+<h2 id="icu-信息语法">ICU 信息语法</h2>
+<p><a href="https://github.com/unicode-org/icu">ICU</a> 是 International Components for Unicode 的简称。处理多语言和复杂文本模板提供了一种标准化的语法。它的主要用途是通过模板描述消息内容，并根据上下文（如语言、复数规则、性别等）动态生成格式化的字符串。</p>
+<h3 id="核心功能">核心功能</h3>
+<p><strong>动态插值</strong></p>
+<p>在模板中插入变量值，格式为<code>{key, type, format}</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Hello, {name}!</span></span>
+<span class="line"><span>I have {workNum, number} things to do</span></span>
+<span class="line"><span>Almost {pctBlack, number, percent} of them are black.</span></span></code></pre>
+<p>变量<code>{key}</code>会被实际值替换，例如：<code>Hello, FBB!</code></p>
+<p><strong>复数规则(Plurals)</strong></p>
+<p>处理与数量相关的消息变化，格式为<code>{key, plural, matches}</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>{count, plural, =0{no items} one {1 item} other {# items}}</span></span></code></pre>
+<p>会根据传入的 count 会动态处理成合适的文本</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>count = 0   ===>   no items</span></span>
+<span class="line"><span>count = 1   ===>   1 item</span></span>
+<span class="line"><span>count = 4   ===>   4 items</span></span></code></pre>
+<p><strong>条件选择(Select)</strong></p>
+<p>基于条件选择消息内容，格式为<code>{key, select, matches}</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>{gender, select, male {He} female {She} other {They}} liked your post.</span></span></code></pre>
+<p>会根据 gender 的传入动态输出</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>gender = male     ===>   He liked your post.</span></span>
+<span class="line"><span>gender = female   ===>   She liked your post.</span></span>
+<span class="line"><span>gender = other    ===>   They liked your post.</span></span></code></pre>
+<p><strong>日期与时间格式化</strong></p>
+<p>格式化日期和时间值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>The event is scheduled on {date, date, long}.</span></span></code></pre>
+<p>输出格式依赖于区域设置，如: <code>January 1, 2024</code></p>
+<h3 id="总结">总结</h3>
+<ul>
+<li>强大的模版支持，提供了多种模式供用户选择</li>
+<li>跨平台支持，可以用于不同语言</li>
+</ul>
+<h2 id="intl-messageformat"><strong>Intl Messageformat</strong></h2>
+<p>Intl MessageFormat 是一个基于 JavaScript 实现的库，用于处理多语言国际化场景，主要功能是动态格式化文本消息。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> add</span><span style="color:#9ECBFF"> intl-messageformat</span></span></code></pre>
+<h3 id="基础使用">基础使用</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { IntlMessageFormat } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'intl-messageformat'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> formatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Hello, {name}!'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ name: </span><span style="color:#9ECBFF">'World'</span><span style="color:#E1E4E8"> });</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> formatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  '{count, plural, =0{no items} one {1 item} other {# items}}'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message2</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(message, message1, message2); </span><span style="color:#6A737D">// no items 1 items 10 items</span></span></code></pre>
+<p>发现了一个小小的问题，为什么在<code>{ count: 1 }</code>的时候，输出的是<code>1 items</code>？</p>
+<p><code>IntlMessageFormat</code>还接受其他的参数，第二个参数为<code>locales</code>用于指定当前的语言。
+如果不特殊指定会通过<code>new Intl.NumberFormat().resolvedOptions().locale</code>获取默认值，此时的默认值为<code>zh-CN</code>，无法处理<code>one</code>这条规则，因此匹配到了<code>other</code>这条规则。
+在<code>locale</code>为<code>en</code>的语言下能够成为我们的期望值。</p>
+<p>那么我们只能更改传入的<code>message</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> formatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  '{count, plural, =0{no items} =1{1 item} other {# items}}'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message2</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(message, message1, message2); </span><span style="color:#6A737D">// no items 1 item 10 items</span></span></code></pre>
+<p>在我们的产品中会有这样的场景，每月 x 号，每周星期 x 的情况，当我们做国际化的时候就可以使用 ICU 信息来做。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `The {day, selectordinal,</span></span>
+<span class="line"><span style="color:#9ECBFF">    one {#st}</span></span>
+<span class="line"><span style="color:#9ECBFF">    two {#nd}</span></span>
+<span class="line"><span style="color:#9ECBFF">    few {#rd}</span></span>
+<span class="line"><span style="color:#9ECBFF">    other {#th}</span></span>
+<span class="line"><span style="color:#9ECBFF">} day of month`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> formatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(message, </span><span style="color:#9ECBFF">'en'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ day: </span><span style="color:#79B8FF">22</span><span style="color:#E1E4E8"> })); </span><span style="color:#6A737D">// The 22nd day of month</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ day: </span><span style="color:#79B8FF">26</span><span style="color:#E1E4E8"> })); </span><span style="color:#6A737D">// The 26th day of month</span></span></code></pre>
+<p>这里又出来一种新的类型<code>selectordinal</code>，主要用于处理序数词，适用于描述顺序或排名。</p>
+<p><code>one/two/few/other</code> 分别对应着不同的序数形式。<code>one</code>通常用于以 1 结尾的数字除了 11），<code>two</code> 用于以 2 结尾的数字除了 12），<code>few</code>用于以 3 结尾的数字(除了 13），而<code>other</code>则用于所有其他情况。</p>
+<h3 id="自定义-formatter">自定义 formatter</h3>
+<p>在<code>intl-messageformat</code>中，您可以为消息模板中的自定义类型定义自己的格式化逻辑。例如，默认支持<code>number</code>、<code>date</code>和<code>time</code>类型，但通过自定义<code>formatters</code>，您可以添加自己的格式化类型或扩展现有类型。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> customFormatters</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  getDateTimeFormat</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">locales</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">options</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> originalFormatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> Intl.</span><span style="color:#B392F0">DateTimeFormat</span><span style="color:#E1E4E8">(locales, options);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">      format</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#9ECBFF"> `📅 ${</span><span style="color:#E1E4E8">originalFormatter</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">format</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">value</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  'The event is on {eventDate, date}'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  'en'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  {},</span></span>
+<span class="line"><span style="color:#E1E4E8">  { formatters: customFormatters },</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> msg</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> message.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ eventDate: </span><span style="color:#F97583">new</span><span style="color:#B392F0"> Date</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'2024-01-01'</span><span style="color:#E1E4E8">) });</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(msg); </span><span style="color:#6A737D">// The event is on 📅 1/1/2024</span></span></code></pre>
+<p>在<a href="https://github.com/formatjs/formatjs/blob/main/packages/intl-messageformat/src/formatters.ts#L49"><code>formatters</code></a>中只能定义<code>getNumberFormat/getDateTimeFormat/getPluralRules</code>三种类型方法</p>
+<p>在前面的时候我们说到<code>{pctBlack, number, percent}/{date, date, long}</code>，最后一个称为<code>style</code>可以用于扩展内置的格式化功能</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> customFormatters</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  getDateTimeFormat</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">locales</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">style</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (style </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'customDate'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> originalFormatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> Intl.</span><span style="color:#B392F0">DateTimeFormat</span><span style="color:#E1E4E8">(locales, style);</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">        format</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#9ECBFF"> `📅 ${</span><span style="color:#E1E4E8">originalFormatter</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">format</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">value</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">} 📅`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Intl.</span><span style="color:#B392F0">DateTimeFormat</span><span style="color:#E1E4E8">(locales, style);</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  'The event is on {eventDate, date, customDate}'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">  'en'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  { date: { customDate: </span><span style="color:#9ECBFF">'customDate'</span><span style="color:#E1E4E8"> } },</span></span>
+<span class="line"><span style="color:#E1E4E8">  { formatters: customFormatters },</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> msg</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> message.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ eventDate: </span><span style="color:#F97583">new</span><span style="color:#B392F0"> Date</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'2024-01-01'</span><span style="color:#E1E4E8">) });</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(msg); </span><span style="color:#6A737D">// The event is on 📅 1/1/2024 📅</span></span></code></pre>
+<h3 id="总结-1">总结</h3>
+<p>在我们后续如果要去国际化的时候，遇到一些需要做单复数/数词的时候，应该去修改我们的英文 JSON，最后在子产品内部调用<code>I18N.get</code>方法即可。因为在<code>get</code>方法使用了<code>IntlMessageFormat</code>去做转换</p>
+<h2 id="intl-messageformat-的实现原理"><strong>Intl Messageformat 的实现原理</strong></h2>
+<p>Intl Messageformat 需要将传入的<code>message</code>做一个拆解，获取到对应<code>{}</code>中的数据，在 <code>format</code>的时候通过传入的数据做填充。</p>
+<h3 id="icu-messageformat-parser">icu-m<strong>essageformat-parser</strong></h3>
+<p>针对于<code>icu message string</code>官方提供了对应的<code>parser</code>来解析，和我们生成<code>AST</code>一样，会生成固定类型的数据。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { parse } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> '@formatjs/icu-messageformat-parser'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> ast</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> parse</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  'Hello, {name}! You have {count, plural, one {# message} other {# messages}}.'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// [</span></span>
+<span class="line"><span style="color:#6A737D">//   { type: 0, value: "Hello, " },</span></span>
+<span class="line"><span style="color:#6A737D">//   { type: 1, value: "name" },</span></span>
+<span class="line"><span style="color:#6A737D">//   { type: 0, value: "! You have " },</span></span>
+<span class="line"><span style="color:#6A737D">//   {</span></span>
+<span class="line"><span style="color:#6A737D">//     type: 6,</span></span>
+<span class="line"><span style="color:#6A737D">//     value: "count",</span></span>
+<span class="line"><span style="color:#6A737D">//     options: {</span></span>
+<span class="line"><span style="color:#6A737D">//       "=0": { value: [{ type: 0, value: "no items" }] },</span></span>
+<span class="line"><span style="color:#6A737D">//       one: { value: [{ type: 0, value: "1 item" }] },</span></span>
+<span class="line"><span style="color:#6A737D">//       other: { value: [{ type: 7 }, { type: 0, value: " items" }] },</span></span>
+<span class="line"><span style="color:#6A737D">//     },</span></span>
+<span class="line"><span style="color:#6A737D">//     offset: 0,</span></span>
+<span class="line"><span style="color:#6A737D">//     pluralType: "cardinal",</span></span>
+<span class="line"><span style="color:#6A737D">//   },</span></span>
+<span class="line"><span style="color:#6A737D">//   { type: 0, value: "." },</span></span>
+<span class="line"><span style="color:#6A737D">// ]</span></span></code></pre>
+<h3 id="format-方法">format 方法</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span></span>
+<span class="line"><span style="color:#9ECBFF">  'Hello, {name}! You have {count, plural, =0{no items} one {1 item} other {# items}}.'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> formatter</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> IntlMessageFormat</span><span style="color:#E1E4E8">(message, </span><span style="color:#9ECBFF">'en'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">formatter.</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">({ name: </span><span style="color:#9ECBFF">'World'</span><span style="color:#E1E4E8">, count: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> });</span></span></code></pre>
+<p>当我们调用<code>format</code>的时候，其实就是遍历上述的<code>AST</code>，针对于不同的<code>type</code>使用不同的<code>formatter</code></p>
+<p>处理好数据。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 处理普通文本</span></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">isArgumentElement</span><span style="color:#E1E4E8">(el)) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">value </span><span style="color:#F97583">||</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> value </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span><span style="color:#F97583"> ||</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> value </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'number'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    value </span><span style="color:#F97583">=</span></span>
+<span class="line"><span style="color:#F97583">      typeof</span><span style="color:#E1E4E8"> value </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span><span style="color:#F97583"> ||</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> value </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'number'</span></span>
+<span class="line"><span style="color:#F97583">        ?</span><span style="color:#B392F0"> String</span><span style="color:#E1E4E8">(value)</span></span>
+<span class="line"><span style="color:#F97583">        :</span><span style="color:#9ECBFF"> ''</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">    type: </span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> value </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span><span style="color:#F97583"> ?</span><span style="color:#79B8FF"> PART_TYPE</span><span style="color:#E1E4E8">.literal </span><span style="color:#F97583">:</span><span style="color:#79B8FF"> PART_TYPE</span><span style="color:#E1E4E8">.object,</span></span>
+<span class="line"><span style="color:#E1E4E8">    value,</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">as</span><span style="color:#B392F0"> ObjectPart</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>)</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 处理 Date</span></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">isDateElement</span><span style="color:#E1E4E8">(el)) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> style</span><span style="color:#F97583"> =</span></span>
+<span class="line"><span style="color:#F97583">    typeof</span><span style="color:#E1E4E8"> el.style </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span></span>
+<span class="line"><span style="color:#F97583">      ?</span><span style="color:#E1E4E8"> formats.date[el.style]</span></span>
+<span class="line"><span style="color:#F97583">      :</span><span style="color:#B392F0"> isDateTimeSkeleton</span><span style="color:#E1E4E8">(el.style)</span></span>
+<span class="line"><span style="color:#F97583">        ?</span><span style="color:#E1E4E8"> el.style.parsedOptions</span></span>
+<span class="line"><span style="color:#F97583">        :</span><span style="color:#79B8FF"> undefined</span></span>
+<span class="line"><span style="color:#E1E4E8">  result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">    type: </span><span style="color:#79B8FF">PART_TYPE</span><span style="color:#E1E4E8">.literal,</span></span>
+<span class="line"><span style="color:#E1E4E8">    value: formatters.</span><span style="color:#B392F0">getDateTimeFormat</span><span style="color:#E1E4E8">(locales, style).</span><span style="color:#B392F0">format</span><span style="color:#E1E4E8">(value </span><span style="color:#F97583">as</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="总结-2">总结</h2>
+<p><code>Intl MessageFormat</code>是一个功能强大且成熟的国际化工具。通过结合<code>ICU</code>信息语法和 JS 的<code>Intl API</code>，它能够为多语言应用提供高效、灵活的消息格式化解决方案</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#icu-信息语法"> ICU 信息语法 </a><a class="depth-3" href="#核心功能"> 核心功能 </a><a class="depth-3" href="#总结"> 总结 </a><a class="depth-2" href="#intl-messageformat"> Intl Messageformat </a><a class="depth-3" href="#基础使用"> 基础使用 </a><a class="depth-3" href="#自定义-formatter"> 自定义 formatter </a><a class="depth-3" href="#总结-1"> 总结 </a><a class="depth-2" href="#intl-messageformat-的实现原理"> Intl Messageformat 的实现原理 </a><a class="depth-3" href="#icu-messageformat-parser"> icu-messageformat-parser </a><a class="depth-3" href="#format-方法"> format 方法 </a><a class="depth-2" href="#总结-2"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/code-inspection/">上一篇：代码检查</a> <a href="/blog/engineering/base-swc/">下一篇：简单聊聊 SWC</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

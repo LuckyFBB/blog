@@ -1,15 +1,166 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Node 运行时、Buffer、进程通信与服务端基础能力。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Node 中的孤儿/僵尸/守护进程 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link is-active" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">Node</a> <h1>Node 中的孤儿/僵尸/守护进程</h1> </header> <div class="article-grid"> <div class="prose"> <h3 id="孤儿进程">孤儿进程</h3>
+<p>父进程已经退出，它的一个或者多个子进程还在运行，上述的子进程会成为孤儿进程</p>
+<p>孤儿进程会被 init 进程(pid 为 1)收养，并由 init 进程完成对它们的状态收集工作 <a href="./../../src/Process/orphan_process/master.js">master 对应代码</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fork</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">).fork;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> server</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'net'</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">server.</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> worker</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./worker.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">process.title </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'FBB master'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">worker.</span><span style="color:#B392F0">send</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'server'</span><span style="color:#E1E4E8">, server);</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`worker created, ppid is ${</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}, pid is ${</span><span style="color:#E1E4E8">worker</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p>下面是 worker 对应的代码 <a href="./../../src/Process/orphan_process/worker.js">worker 对应代码</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> http</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> server</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> http.</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`I am worker process, pid: ${</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}, ppid: ${</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">ppid</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> worker </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'message'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sendHandle</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (message </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'server'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    worker </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> sendHandle;</span></span>
+<span class="line"><span style="color:#E1E4E8">    worker.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'connection'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">socket</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      server.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'connection'</span><span style="color:#E1E4E8">, socket);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>执行 node master.js，开启两个进程，当我们执行第一次<code>curl http://127.0.0.1:3000</code>，能够打印出来期望的 pid/ppid；当我们在活动监视器退出掉我们的 master 进程，再次执行，这个时候 ppid 就变成了 1，此时的 worker 已经变成了孤儿进程</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/170860074-b7577b15-d2bf-4efd-9fca-ccec9e7db884.png" alt="10"></p>
+<h3 id="僵尸进程">僵尸进程</h3>
+<p>主进程通过 fork 创建了子进程，如果子进程退出之后父进程没有获取子进程的状态信息，那么子进程中保存的进程号/退出状态/运行时间等都不会被释放，进程号会一直被占用</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fork</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">).fork;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">zombie</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> zombie</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> worker</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./worker.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`Worker is created, pid: ${</span><span style="color:#E1E4E8">worker</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}, ppid: ${</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">) {} </span><span style="color:#6A737D">// 主进程永久阻塞</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><img src="https://user-images.githubusercontent.com/38368040/170860077-e0a32859-b8c7-4a77-9128-be57481d8d42.png" alt="11"></p>
+<p>进程的状态</p>
+<ul>
+<li>R 运行状态(running): 并不意味着进程一定在运行中，它表明进程要么是在运行中要么在运行队列里。</li>
+<li>S 睡眠状态(sleeping): 意味着进程在等待事件完成(这里的睡眠有时候也叫做可中断睡眠 interruptible sleep)</li>
+<li>D 磁盘休眠状态(Disk sleep): 有时候也叫不可中断睡眠状态（uninterruptible sleep），在这个状态的进程通常会等待 IO 的结束</li>
+<li>T 停止状态(stopped): 可以通过发送 SIGSTOP 信号给进程来停止（T）进程。这个被暂停的进程可以通过发送 SIGCONT 信号让进程继续运行</li>
+<li>X 死亡状态(dead): 这个状态只是一个返回状态，你不会在任务列表里看到这个状态。</li>
+<li>Z 僵死状态(zombie)</li>
+</ul>
+<p>原本在 Node 中，子进程退出之后，父进程可以感知到并且清理子进程资源，正常情况下，开发者是无需感知的。</p>
+<p>该示例之所以能够成为僵尸进程是因为<code>while(1){}</code>吃满了父进程的 CPU，无法处理子进程的退出信号。</p>
+<p>修改上述代码，子进程退出之后，父进程可以监听到，就不会有僵尸进程的产生。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fork</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">).fork;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">zombie</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> zombie</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> worker</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./worker.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  worker</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'exit'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'exit'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'close'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'close'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="僵尸进程和孤儿进程区别">僵尸进程和孤儿进程区别</h4>
+<p><img src="https://user-images.githubusercontent.com/38368040/170860078-0dc0ae33-1713-414d-b46c-c5e52b6471be.png" alt="12"></p>
+<h3 id="守护进程">守护进程</h3>
+<h4 id="是什么">是什么</h4>
+<p>守护进程是一个在后台运行并且不受任何终端控制的进程，并且能够因为某个异常导致进程退出的时候重启子进程
+守护进程一般在系统启动时开始运行，除非强行终止，否则直到系统关机都保持运行</p>
+<h4 id="为什么脱离终端">为什么脱离终端</h4>
+<p>当我们编写 Node 代码的时候，我们会使用终端来启动一个进程，通过命令行(Ctrl + C)或者手动关闭终端，当前程序会被关掉这样进程也被关掉了。
+但是对于守护进程来说，它需要脱离这种限制，需要在整个系统关闭时才退出，所以不能够依赖终端</p>
+<h4 id="如何查看守护进程">如何查看守护进程</h4>
+<p>使用命令 ps axj a: 显示所有 x: 显示没有终端控制的进程 j: 显示相关信息</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/174937045-3444580c-ffe1-4ff0-9307-57abb369296e.png" alt="image"></p>
+<h4 id="进程组会话控制终端">进程组/会话/控制终端</h4>
+<h5 id="进程组是什么">进程组是什么</h5>
+<ul>
+<li>每个进程属于一个进程组</li>
+<li>每个进程组都有一个进程组号(PGID)，等于该进程组组长的 PID</li>
+<li>一个进程只能为它自己或子进程设置 PGID 号，默认情况下新创建的进程会继承父进程的 PGID</li>
+</ul>
+<h5 id="会话期是什么">会话期是什么</h5>
+<ul>
+<li>是一个或多个进程组的集合，使用 SID 来标识</li>
+<li>登录后新建一个会话，登录之后的第一个进程就是会话领头进程，对于领头进程来说 PID = SID</li>
+<li>一个会话对应一个控制终端</li>
+</ul>
+<h5 id="控制终端">控制终端</h5>
+<p>一个会话会有一个控制终端用于执行操作，控制进程打开一个终端之后，该终端就会成为当前会话的控制终端</p>
+<h5 id="前台进程组后台进程组">前台进程组/后台进程组</h5>
+<p>前台进程组：该进程组的进程能够对终端设备进行读写操作
+后台进程组：该进程组的进程能够对终端设备进行写操作</p>
+<h5 id="它们的关系">它们的关系</h5>
+<p><img src="https://user-images.githubusercontent.com/38368040/174974029-bfcf28f5-b9f3-43dd-affd-807594e57eae.png" alt="image"></p>
+<h4 id="怎么做">怎么做</h4>
+<h5 id="实现监听子进程退出">实现监听子进程退出</h5>
+<p>利用 NodeJS 的事件机制，监听 exit 事件</p>
+<ul>
+<li>在 master.js 中使用 fork 创建子进程</li>
+<li>监听 exit 事件，1s 之后创建一个新的子进程</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// master.js</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">fork</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> forkChild</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> child</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'log.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  child.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'exit'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    setTimeout</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">      forkChild</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }, </span><span style="color:#79B8FF">1000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">forkChild</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// log.js</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fs</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'fs'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> path</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'path'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">fs.</span><span style="color:#B392F0">open</span><span style="color:#E1E4E8">(path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'log.txt'</span><span style="color:#E1E4E8">), </span><span style="color:#9ECBFF">'w'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">fd</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  setInterval</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    fs.</span><span style="color:#B392F0">write</span><span style="color:#E1E4E8">(fd, process.pid </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {});</span></span>
+<span class="line"><span style="color:#E1E4E8">  }, </span><span style="color:#79B8FF">2000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>使用 node master 启动项目之后，使用 kill 命令杀掉对应的子进程，能够成功重启子进程，守护进程生效~</p>
+<img width="721" alt="image" src="https://user-images.githubusercontent.com/38368040/175310465-ae81f9f2-bef8-4c32-a6e6-62915f13f16d.png">
+<h5 id="如何退出终端运行">如何退出终端运行？</h5>
+<p>使用 setsid，那 setsid 能做什么？</p>
+<ul>
+<li>该进程变成一个新会话的会话组长</li>
+<li>该进程变成一个新进程组的组长</li>
+<li>该进程没有控制终端</li>
+</ul>
+<p>在 Node 中如何调用 setsid 方法呢？
+Node 尚未对 setsid 进程封装，但是我们可以通过 child_process.spawn 来调用该方法。
+spawn 中有一个配置项 detached，当其<code>detached: true</code>时，会调用 setsid 方法 > 在非 Windows 平台上，如果 options.detached 设置为 true，则子进程将成为新进程组和会话的领导者。 子进程可以在父进程退出后继续运行。</p>
+<p>开始实现</p>
+<ol>
+<li>在 command 中使用 child_process.spawn(master) 创建子进程</li>
+<li>对进程 master 执行 setsid 方法</li>
+<li>进程 command 退出，进程 master 由 init 进程接管，此时进程 master 为守护进程</li>
+</ol>
+<p>创建 command，使用 spawn 方法衍生子进程</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">//command.js</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">spawn</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">spawn</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'node'</span><span style="color:#E1E4E8">, [</span><span style="color:#9ECBFF">'./master.js'</span><span style="color:#E1E4E8">], {</span></span>
+<span class="line"><span style="color:#E1E4E8">  detached: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">exit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<img width="863" alt="image" src="https://user-images.githubusercontent.com/38368040/175311494-63935f58-bef4-4822-9455-f60f0bee0bc0.png">
+<p>当我们执行 node command 之后，我们的主进程就会关闭，但是我们的子进程还在继续运行，且不受终端控制，该进程就是我们创建的守护进程</p>
+<p>🤔 我们为什么会 fork/spawn 两次？
+第一次执行 spawn：让 master 去调用 setsid 方法，成为会话期的组长，切不受终端的控制
+第二次执行 fork：因为第一次 spawn 出来的 master 通过 setsid 成为会话期的组长，能够再一次打开控制终端。再一次 fork 之后，创建出来 log 进程，无法打开新的控制终端</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-3" href="#孤儿进程"> 孤儿进程 </a><a class="depth-3" href="#僵尸进程"> 僵尸进程 </a><a class="depth-3" href="#守护进程"> 守护进程 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/node/process-and-thread-in--node-js/">上一篇：NodeJS 中的线程和进程</a> <a href="/blog/node/buffer/">下一篇：NodeJS 中的 Buffer 究竟是什么？</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,151 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="常见数据结构、算法思路和刷题复盘。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>堆 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link is-active" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">数据结构</a> <h1>堆</h1> </header> <div class="article-grid"> <div class="prose"> <p>翻了翻博客，大概在前年的时候，总结过一些数据结构的知识以及使用，但是始终没有发现堆的影子。也是从去年总结到今年的<a href="https://luckyfbb.github.io/2020/12/11/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E5%90%88%E9%9B%86/#more">常见算法合集</a>中，遇到需要用堆来解决的算法，一筹莫展。所以将对堆的常规操作做一个总结，以便记忆。</p>
+<!-- more -->
+<h2 id="堆的基础概念">堆的基础概念</h2>
+<p>堆是一种特殊的树。满足于下列两点要求，他就是一个堆。</p>
+<ol>
+<li>堆是一个完全二叉树。</li>
+<li>堆中每个节点的值都必须大于等于(小于等于)其子树中每个节点的值。</li>
+</ol>
+<p>第一点，堆是完全二叉树。完全二叉树要求，除了最后一层，其他层的节点个数都是满的，且最后一层的节点都靠左排列。
+第二点，堆中每个节点的值都必须大于等于(小于等于)其子树中每个节点的值，换种说法，堆中每个节点的值都大于等于(小于等于)其左右子节点的值。</p>
+<p>堆可以分为两种。</p>
+<ul>
+<li>对于每个节点的值都大于等于子树中每个节点的值的堆，叫做大顶堆</li>
+<li>对于每个节点的值都小于等于子树中每个节点的值得堆，叫做小顶堆。</li>
+</ul>
+<h2 id="如何实现一个堆">如何实现一个堆</h2>
+<p>实现一个堆，首先需要知道<strong>堆都支持什么操作</strong>以及<strong>如何存储一个堆</strong>。</p>
+<h3 id="堆的存储">堆的存储</h3>
+<p>堆是一个完全二叉树，用数组来存储完全二叉树是非常节省空间的，可以单纯通过数组的下标就找到一个节点的左右节点以及父节点。</p>
+<p><img src="/blog/imgs/algorithm/heap.png" alt=""></p>
+<p>从图中可以看出，数组中下标为 i 的节点，其左节点的下标为 2*i，其右节点的下标为 2*i+1，其父节点的下标为 i/2。</p>
+<h3 id="堆操作">堆操作</h3>
+<h4 id="插入一个元素">插入一个元素</h4>
+<p>往堆中插入一个元素之后，依旧需要满足堆的两个特性。
+需要进行调整以满足对的特性，这个过程叫做堆化。
+堆化有两种方法，从下往上和从上往下。</p>
+<p>堆化非常简单，就是顺着节点所在路径，向上或者向下对比，然后交换。
+分析从下往上的堆化过程。</p>
+<ol>
+<li>先把数据插入堆中，然后与其父节点比大小。</li>
+<li>如果新节点大于父节点，就交换两个节点。</li>
+<li>一直重复这个过程，直到父节点大于等于新节点。</li>
+</ol>
+<p>当前过程翻译成为代码，如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> MaxHeap</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.data </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //插入元素</span></span>
+<span class="line"><span style="color:#B392F0">  insertItem</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.data.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__shiftUp</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getSize</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //获取堆的大小</span></span>
+<span class="line"><span style="color:#B392F0">  getSize</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //向上堆化</span></span>
+<span class="line"><span style="color:#B392F0">  __shiftUp</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">k</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (k </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[k] </span><span style="color:#F97583">></span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[</span><span style="color:#B392F0">parseInt</span><span style="color:#E1E4E8">(k </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">)]) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__swap</span><span style="color:#E1E4E8">(k, </span><span style="color:#B392F0">parseInt</span><span style="color:#E1E4E8">(k </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">      k </span><span style="color:#F97583">=</span><span style="color:#B392F0"> parseInt</span><span style="color:#E1E4E8">(k </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //交换元素</span></span>
+<span class="line"><span style="color:#B392F0">  __swap</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">i</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">j</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[i], </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[j]] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[j], </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[i]];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="删除堆顶元素">删除堆顶元素</h4>
+<p>在堆的定义中，任何节点都大于等于(小于等于)其左右节点的值，由此可得堆顶元素就是堆中数据的最大值(最小值)。
+上述代码中，我们构建的是大顶堆，堆顶就是最大元素。
+删除思路：
+<del>删除堆顶元素之后，把第二大的元素放到堆顶，也就是其左右节点中较大的。迭代删除第二大节点，以此类推，直到叶子节点被删除。</del>
+<del>这种方法会有问题，可能最后堆化出来的堆不满足完全二叉树的特性。</del></p>
+<ol>
+<li>为了满足完全二叉树的特性，可以把最后一个节点放到堆顶</li>
+<li>使用同样父子节点比较的方式，对于不满足关系的父子节点，交换两个节点</li>
+<li>重复这个过程，直到父子关系均满足大小关系</li>
+</ol>
+<p>上述步骤就是从上往下堆化法。</p>
+<p>当前过程翻译成为代码，如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> MaxHeap</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //删除堆顶</span></span>
+<span class="line"><span style="color:#B392F0">  deleteMax</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getSize</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.data[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__shiftDown</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getSize</span><span style="color:#E1E4E8">(), </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //向下堆化</span></span>
+<span class="line"><span style="color:#B392F0">  __shiftDown</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">len</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">k</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> maxPos </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> k;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[k] </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k]) maxPos </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> &#x3C;=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[maxPos] </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">])</span></span>
+<span class="line"><span style="color:#E1E4E8">        maxPos </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (k </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> maxPos) </span><span style="color:#F97583">break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__swap</span><span style="color:#E1E4E8">(maxPos, k);</span></span>
+<span class="line"><span style="color:#E1E4E8">      k </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> maxPos;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何基于堆实现排序">如何基于堆实现排序</h2>
+<p>堆排序的过程大致分为两个步骤：<strong>建堆</strong>和<strong>排序</strong>。</p>
+<h3 id="建堆">建堆</h3>
+<p>将数组原地组建成一个堆。所谓’原地’就是，不借助另一个数组，在原数组上操作。
+建堆有两种思路：</p>
+<ul>
+<li>在堆中插入一个元素的思路。起初堆中只包含一个数据，就是下标为 1 的数据，调用插入操作，将下标从 2 到 n 的数据依次插入到堆中，采用从下往上堆化的的方式。</li>
+<li>从后往前处理数组，并且每个数据都是从上往下堆化。</li>
+</ul>
+<p>采用第二种思路，叶子节点向下堆化只能和自己本身比较，所以从第一个非叶子节点开始，依次堆化。
+在完全二叉树中，小标 n/2+1 到 n 的节点是叶子节点，我们不需要堆化，下标从 1 到 n/2 的数据进行堆化。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __buildHeap</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">num</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#B392F0"> parseInt</span><span style="color:#E1E4E8">(num </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">); i </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">    __shiftDown</span><span style="color:#E1E4E8">(arr, num, i);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __shiftDown</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">len</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">k</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> maxPos </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> k;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> arr[k] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k]) maxPos </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> &#x3C;=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> arr[maxPos] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]) maxPos </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (k </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> maxPos) </span><span style="color:#F97583">break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    __swap</span><span style="color:#E1E4E8">(arr, maxPos, k);</span></span>
+<span class="line"><span style="color:#E1E4E8">    k </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> maxPos;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __swap</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">i</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">j</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  [arr[i], arr[j]] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [arr[j], arr[i]];</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="排序">排序</h3>
+<p>建堆结束之后，数组中的数据都已经按着大顶堆的特性排列。数组中的第一个元素是堆顶，也就是最大的元素。
+思路：</p>
+<ol>
+<li>我们把它跟最后一个元素交换一下，那么最大的元素就放到下标为 n 的位置。(类似删除堆顶元素)</li>
+<li>用堆化的方法，将剩下的 n-1 元素重新构建成堆。</li>
+<li>再取堆顶元素，放到下标 n-1 的位置，一直重复这个过程，直到堆中只剩下标为 1 的元素，排序完成。</li>
+</ol>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> sort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">num</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  __buildHeap</span><span style="color:#E1E4E8">(arr, num);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> num;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (len </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">    __swap</span><span style="color:#E1E4E8">(arr, len, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    len</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    __shiftDown</span><span style="color:#E1E4E8">(arr, len, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>堆排序包括建堆和排序两个操作，建堆的复杂度是 O(n)，堆排序的复杂度是 O(nlogn)，所以整体的复杂度为 O(nlogn)。
+堆排序不是稳定的排序算法，因为在排序的过程中，堆嘴后一个元素和堆顶节点交换，可能改变值相同数据原始的相对顺序。</p>
+<p><a href="https://github.com/LuckyFBB/data_structure/blob/4b2abac3fa34d398ca5a2f48f83353262e7bf76b/heap/maxHeap.js">完整代码</a></p>
+<h2 id="总结">总结</h2>
+<p>堆是一种完全二叉树。最大的特性是：每个节点的值大于等于(小于等于)其子树节点的值。因此分为大顶堆和小顶堆。</p>
+<p>堆中最重要的操作是插入数据和删除堆顶数据。插入数据时，把新数据放到最后，从下往上堆化。删除堆顶元素时，把最后一个元素放到堆顶，从上往下堆化。两者的复杂程度都是 O(logn)。</p>
+<p>堆排序包含两个过程：建堆和堆化。建堆时，将下标从 n/2 到 1 的节点依次从上到下的堆化操作，然后可以把数组中的数字变成堆这种数据结构。排序时，堆顶的元素放到堆的末尾，并将堆的大小减一，然后再堆化，重复这个过程，直到堆中只剩下一个元素。</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#堆的基础概念"> 堆的基础概念 </a><a class="depth-2" href="#如何实现一个堆"> 如何实现一个堆 </a><a class="depth-3" href="#堆的存储"> 堆的存储 </a><a class="depth-3" href="#堆操作"> 堆操作 </a><a class="depth-2" href="#如何基于堆实现排序"> 如何基于堆实现排序 </a><a class="depth-3" href="#建堆"> 建堆 </a><a class="depth-3" href="#排序"> 排序 </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/data-structure/dictionary/">上一篇：字典和散列表</a> <a href="/blog/data-structure/node-tree/">下一篇：二叉树</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

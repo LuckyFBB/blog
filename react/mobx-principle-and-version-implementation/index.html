@@ -1,15 +1,381 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Mobx 原理及丐版实现 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>Mobx 原理及丐版实现</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>在之前的文章中，我们讲述了 React 的数据流管理，从 props → context → Redux，以及 Redux 相关的三方库 React-Redux。</p>
+<p>那其实说到 React 的状态管理器，除了 Redux 之外，Mobx 也是应用较多的管理方案。Mobx 是一个响应式库，在某种程度上可以看作没有模版的 Vue，两者的原理差不多</p>
+<p>先看一下 Mobx 的简单使用，<a href="https://codesandbox.io/s/mobx-todos-8kvgj?file=/src/App.js">线上示例</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> TodoList</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  @observable </span><span style="color:#FFAB70">todos</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  @computed </span><span style="color:#F97583">get</span><span style="color:#B392F0"> getUndoCount</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.todos.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">todo</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">todo.done).</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  @action </span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">task</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.todos.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({ task, done: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  @action </span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.todos.</span><span style="color:#B392F0">splice</span><span style="color:#E1E4E8">(index, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>Mobx 借助于装饰器来实现，是的代码更加简洁。使用了可观察对象，Mobx 可以直接修改状态，不用像 Redux 那样写 actions/reducers。Redux 是遵循 setState 的流程，MobX 就是干掉了 setState 的机制</p>
+<p>通过响应式编程使得状态管理变得简单和可扩展。MobX v5 版本利用 ES6 的<code>proxy</code>来追踪属性，以前的旧版本通过<code>Object.defineProperty</code>实现的。通过隐式订阅，自动追踪被监听的对象变化</p>
+<p>Mobx 的执行流程，一张官网结合上述例子的图</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/167146141-237e3426-dc43-42c3-8de2-8f269e049f9c.png" alt="mobx"></p>
+<p>MobX 将应用变为响应式可归纳为下面三个步骤</p>
+<ol>
+<li>
+<p>定义状态并使其可观察</p>
+<p>使用<code>observable</code>对存储的数据结构成为可观察状态</p>
+</li>
+<li>
+<p>创建视图以响应状态的变化</p>
+<p>使用<code>observer</code>来监听视图，如果用到的数据发生改变视图会自动更新</p>
+</li>
+<li>
+<p>更改状态</p>
+<p>使用<code>action</code>来定义修改状态的方法</p>
+</li>
+</ol>
+<h2 id="mobx-核心概念">Mobx 核心概念</h2>
+<h3 id="observable">observable</h3>
+<p>给数据对象添加可观察的功能，支持任何的数据结构</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> todos</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> observable</span><span style="color:#E1E4E8">([</span></span>
+<span class="line"><span style="color:#E1E4E8">  {</span></span>
+<span class="line"><span style="color:#E1E4E8">    task: </span><span style="color:#9ECBFF">'Learn Mobx'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    done: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 更多的采用装饰器的写法</span></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Store</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  @observable </span><span style="color:#FFAB70">todos</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      task: </span><span style="color:#9ECBFF">'Learn Mobx'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      done: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  ];</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="computed">computed</h3>
+<p>在 Redux 中，我们需要计算已经 completeTodo 和 unCompleteTodo，我们可以采用：在 mapStateToProps 中，通过 allTodos 过滤出对应的值，<a href="https://codesandbox.io/s/todo-redux-forked-75vhvj?file=/src/TodoApp.js">线上示例</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> mapStateToProps</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">visibilityFilter</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> state;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> todos</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getTodosByVisibilityFilter</span><span style="color:#E1E4E8">(state, visibilityFilter);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> { todos };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>在 Mobx 中可以定义相关数据发生变化时自动更新的值，通过<code>@computed</code>调用<code>getter</code>/<code>setter</code>函数进行变更</p>
+<p>一旦 todos 的发生改变，getUndoCount 就会自动计算</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> TodoList</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  @observable </span><span style="color:#FFAB70">todos</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  @computed </span><span style="color:#F97583">get</span><span style="color:#B392F0"> getUndo</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.todos.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">todo</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">todo.done);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  @computed </span><span style="color:#F97583">get</span><span style="color:#B392F0"> getCompleteTodo</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.todos.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">todo</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> todo.done);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="action">action</h3>
+<p>动作是任何用来修改状态的东西。MobX 中的 action 不像 redux 中是必需的，把一些修改 state 的操作都规范使用 action 做标注。</p>
+<p>在 MobX 中可以随意更改<code>todos.push({ title:'coding', done: false })</code>，state 也是可以有作用的，但是这样杂乱无章不好定位是哪里触发了 state 的变化，建议在任何更新<code>observable</code>或者有副作用的函数上使用 actions。</p>
+<p>在严格模式<code>useStrict(true)</code>下，强制使用 action</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 非action使用</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">button</span></span>
+<span class="line"><span style="color:#B392F0">    onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> todoList.todos.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({ task: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.inputRef.value, done: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8"> })}</span></span>
+<span class="line"><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    Add New Todo</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// action使用</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">button</span></span>
+<span class="line"><span style="color:#B392F0">    onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> todoList.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.inputRef.value)}</span></span>
+<span class="line"><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    Add New Todo</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> TodoList</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @action </span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">task</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#E1E4E8">.todos.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({ task, done: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="reactions">Reactions</h3>
+<p>计算值 computed 是自动响应状态变化的值。反应是自动响应状态变化是的副作用，反应可以确保相关状态变化时指定的副作用执行。</p>
+<ol>
+<li>
+<p>autorun</p>
+<p><code>autorun</code>负责运行所提供的<code>sideEffect</code>并追踪在<code>sideEffect</code>运行期间访问过的<code>observable</code>的状态</p>
+<p>接受一个函数<code>sideEffect</code>，当这个函数中依赖的可观察属性发生变化的时候，<code>autorun</code>里面的函数就会被触发。除此之外，<code>autorun</code>里面的函数在第一次会立即执行一次。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">autorun</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Current name : '</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props.myName.name);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 追踪函数外的间接引用不会生效</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> name</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props.myName.name;</span></span>
+<span class="line"><span style="color:#B392F0">autorun</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Current name : '</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> name);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+</li>
+<li>
+<p>reaction</p>
+<p><code>reaction</code>是<code>autorun</code>的变种，在如何追踪<code>observable</code>方面给予了更细粒度的控制。 它接收两个函数，第一个是追踪并返回数据，该数据用作第二个函数，也就是副作用的输入。</p>
+<p>autorun 会立即执行一次，但是 reaction 不会</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">reaction</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">  () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props.todoList.getUndoCount,</span></span>
+<span class="line"><span style="color:#E1E4E8">  (</span><span style="color:#FFAB70">data</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Current count : '</span><span style="color:#E1E4E8">, data);</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span></code></pre>
+</li>
+</ol>
+<h3 id="observer">observer</h3>
+<p>使用 Redux 时，我们会引入 React-Redux 的 connect 函数，使得我们的组件能够通过 props 获取到 store 中的数据</p>
+<p>在 Mobx 中也是一样的道理，我们需要引入 observer 将组件变为响应式组件</p>
+<p>包裹 React 组件的高阶组件，在组件的 render 函数中任何使用的<code>observable</code>发生变化时，组件都会调用 render 重新渲染，更新 UI</p>
+<aside>
+⚠️ 不要放在顶层 Page，如果一个 state 改变，整个 Page 都会 render，所以 observer 尽量取包裹小组件，组件越小重新渲染的变化就越小
+</aside>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">@observer</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> TodoListView</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">todoList</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#B392F0"> className</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"todoView"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#B392F0"> className</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"todoView__list"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">          {todoList.todos.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">todo</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">            &#x3C;</span><span style="color:#79B8FF">TodoItem</span></span>
+<span class="line"><span style="color:#B392F0">              key</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{index}</span></span>
+<span class="line"><span style="color:#B392F0">              todo</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{todo}</span></span>
+<span class="line"><span style="color:#B392F0">              onDelete</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> todoList.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(index)}</span></span>
+<span class="line"><span style="color:#E1E4E8">            /></span></span>
+<span class="line"><span style="color:#E1E4E8">          ))}</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="mobx-原理实现">Mobx 原理实现</h2>
+<p>前文中提到 Mobx 实现响应式数据，采用了<code>Object.defineProperty</code>或者<code>Proxy</code></p>
+<p>上面讲述到使用 autorun 会在第一次执行并且依赖的属性变化时也会执行。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> user</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> observable</span><span style="color:#E1E4E8">({ name: </span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">, age: </span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#B392F0">autorun</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(user.name);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>当我们使用 observable 创建了一个可观察对象<code>user</code>，autorun 就会去监听<code>user.name</code>是否发生了改变。等于<code>user.name</code>被 autorun 监控了，一旦有任何变化就要去通知它</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">user.name.watchers.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(watch);</span></span>
+<span class="line"><span style="color:#6A737D">// 一旦user的数据发生了改变就要去通知观察者</span></span>
+<span class="line"><span style="color:#E1E4E8">user.name.watchers.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">watch</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> watch</span><span style="color:#E1E4E8">());</span></span></code></pre>
+<p><img src="https://user-images.githubusercontent.com/38368040/167146483-d49a1e31-a716-4171-a9c8-71e1366657dd.png" alt="action"></p>
+<h3 id="observable-1">observable</h3>
+<p>装饰器一般接受三个参数: 目标对象、属性、属性描述符</p>
+<p>通过上面的分析，通过 observable 创建的对象都是可观察的，也就是创建对象的每个属性都需要被观察</p>
+<p>每一个被观察对象都需要有自己的订阅方法数组</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> counter</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> observable</span><span style="color:#E1E4E8">({ count: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> user</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> observable</span><span style="color:#E1E4E8">({ name: </span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">, age: </span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#B392F0">autorun</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#B392F0"> func1</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">user</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">} and ${</span><span style="color:#E1E4E8">counter</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">count</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"><span style="color:#B392F0">autorun</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#B392F0"> func2</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(user.name);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>对于上述代码来说，counter.count 的 watchers 只有 func1，user.name 的 watchers 则有 func1/func2</p>
+<p>实现一下观察者类 Watcher，借助 shortid 来区分不同的观察者实例</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Watcher</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  id</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  value</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">v</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">property</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.id </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> `ob_${</span><span style="color:#E1E4E8">property</span><span style="color:#9ECBFF">}_${</span><span style="color:#B392F0">shortid</span><span style="color:#9ECBFF">()</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> v;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // 调用get时，收集所有观察者</span></span>
+<span class="line"><span style="color:#B392F0">  collect</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    dependenceManager.</span><span style="color:#B392F0">collect</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.id);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.value;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // 调用set时，通知所有观察者</span></span>
+<span class="line"><span style="color:#B392F0">  notify</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">v</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> v;</span></span>
+<span class="line"><span style="color:#E1E4E8">    dependenceManager.</span><span style="color:#B392F0">notify</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.id);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>实现一个简单的装饰器，需要拦截我们属性的 get/set 方法，并且使用 Object.defineProperty 进行深度拦截</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> observable</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#FFAB70">  target</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">  name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">  descriptor</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#B392F0">initializer</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> v</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> descriptor.</span><span style="color:#B392F0">initializer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#B392F0">  createDeepWatcher</span><span style="color:#E1E4E8">(v);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> watcher</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Watcher</span><span style="color:#E1E4E8">(v, name);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    enumerable: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    configurable: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">    get</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> watcher.</span><span style="color:#B392F0">collect</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#B392F0">    set</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">v</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> watcher.</span><span style="color:#B392F0">notify</span><span style="color:#E1E4E8">(v);</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> createDeepWatcher</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">target</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> target </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'object'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> property </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> target) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (target.</span><span style="color:#B392F0">hasOwnProperty</span><span style="color:#E1E4E8">(property)) {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> watcher</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Watcher</span><span style="color:#E1E4E8">(target[property], property);</span></span>
+<span class="line"><span style="color:#E1E4E8">        Object.</span><span style="color:#B392F0">defineProperty</span><span style="color:#E1E4E8">(target, property, {</span></span>
+<span class="line"><span style="color:#B392F0">          get</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> watcher.</span><span style="color:#B392F0">collect</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">          },</span></span>
+<span class="line"><span style="color:#B392F0">          set</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> watcher.</span><span style="color:#B392F0">notify</span><span style="color:#E1E4E8">(value);</span></span>
+<span class="line"><span style="color:#E1E4E8">          },</span></span>
+<span class="line"><span style="color:#E1E4E8">        });</span></span>
+<span class="line"><span style="color:#B392F0">        createDeepWatcher</span><span style="color:#E1E4E8">(target[property]);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在上面 Watcher 类中的<code>get/set</code>中调用了 dependenceManager 的方法还未写完。在调用属性的<code>get</code>方法时，会将函数收集到当前 id 的 watchers 中，调用属性的<code>set</code>方法则是去通知所有的 watchers，触发对应收集函数</p>
+<p>那这这里其实我们还需要借助一个类，也就是依赖收集类<code>DependenceManager</code>，马上就会实现</p>
+<h3 id="autorun">autorun</h3>
+<p>前面说到 autorun 会立即执行一次，并且会将函数收集起来，存储到对应的<code>observable.id</code>的 watchers 中。autorun 实现了收集依赖，执行对应函数。再执行对应函数的时候，会调用到对应<code>observable</code>对象的<code>get</code>方法，来收集依赖</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> autorun</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">handler</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  dependenceManager.</span><span style="color:#B392F0">beginCollect</span><span style="color:#E1E4E8">(handler);</span></span>
+<span class="line"><span style="color:#B392F0">  handler</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  dependenceManager.</span><span style="color:#B392F0">endCollect</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>实现<code>DependenceManager</code>类:</p>
+<ul>
+<li>beginCollect: 标识开始收集依赖，将依赖函数存到一个类全局变量中</li>
+<li>collect(id): 调用<code>get</code>方法时，将依赖函数放到存入到对应 id 的依赖数组中</li>
+<li>notify: 当执行<code>set</code>的时候，根据 id 来执行数组中的函数依赖</li>
+<li>endCollect: 清除刚开始的函数依赖，以便于下一次收集</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> DependenceManager</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  _store</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">  static</span><span style="color:#FFAB70"> Dep</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">  beginCollect</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">handler</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    DependenceManager.Dep </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> handler;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  collect</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">id</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (DependenceManager.Dep) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">._store[id] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">._store[id] </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">._store[id].watchers </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">._store[id].watchers </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">._store[id].watchers.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(DependenceManager.Dep))</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#E1E4E8">._store[id].watchers.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(DependenceManager.Dep);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  notify</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">id</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> store</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">._store[id];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (store </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> store.watchers) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      store.watchers.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#B392F0">watch</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        watch.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  endCollect</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    DependenceManager.Dep </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>一个简单的 Mobx 框架都搭建好了~</p>
+<h3 id="computed-1">computed</h3>
+<p>computed 的三个特点:</p>
+<ul>
+<li>computed 方法是一个 get 方法</li>
+<li>computed 会根据依赖的属性重新计算值</li>
+<li>依赖 computed 的函数也会被重新执行</li>
+</ul>
+<p>发现 computed 的实现大致和 observable 相似，从以上特点可以推断出 computed 需要两次收集依赖，一次是收集 computed 所依赖的属性，一次是依赖 computed 的函数</p>
+<p>首先定义一个 computed 方法，是一个装饰器</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> computed</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">target</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">descriptor</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> getter</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> descriptor.get; </span><span style="color:#6A737D">// get 函数</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> _computed</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ComputedWatcher</span><span style="color:#E1E4E8">(target, getter);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    enumerable: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    configurable: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">    get</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">      _computed.target </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> _computed.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>实现 ComputedWatcher 类，和 Watcher 类差不多。在执行 get 方法的时候，我们和之前一样，去收集一下依赖 computed 的函数，丰富 get 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> ComputedWatcher</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  // 标识是否绑定过recomputed依赖，只需要绑定一次</span></span>
+<span class="line"><span style="color:#FFAB70">  hasBindAutoReCompute</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> boolean</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  value</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">  // 绑定recompute 和 内部涉及到的观察值的关系</span></span>
+<span class="line"><span style="color:#B392F0">  _bindAutoReCompute</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.hasBindAutoReCompute) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.hasBindAutoReCompute </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      dependenceManager.</span><span style="color:#B392F0">beginCollect</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">._reComputed, </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">_reComputed</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      dependenceManager.</span><span style="color:#B392F0">endCollect</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // 依赖属性变化时调用的函数</span></span>
+<span class="line"><span style="color:#B392F0">  _reComputed</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.value </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.getter.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.target);</span></span>
+<span class="line"><span style="color:#E1E4E8">    dependenceManager.</span><span style="color:#B392F0">notify</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.id);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // 提供给外部调用时收集依赖使用</span></span>
+<span class="line"><span style="color:#B392F0">  get</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">_bindAutoReCompute</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    dependenceManager.</span><span style="color:#B392F0">collect</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.id);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.value;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="observer-1">observer</h3>
+<p>observer 相对实现会简单一点，其实是利用 React 的 render 函数对依赖进行收集，我们采用在 componnetDidMount 中调用 autorun 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> observer</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">target</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> componentDidMount</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> target</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.componentDidMount;</span></span>
+<span class="line"><span style="color:#79B8FF">  target</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">componentDidMount</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">    componentDidMount </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> componentDidMount.</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    autorun</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">render</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">forceUpdate</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>至此一个简单的 Mobx 就实现了，<a href="https://github.com/LuckyFBB/Front-End-Examples/tree/defineProperty_mobx/mini-mobx">线上代码地址</a></p>
+<p>文章中使用的 Object.defineProperty 实现，Proxy 实现差不多，<a href="https://github.com/LuckyFBB/Front-End-Examples/tree/proxy_mobx/mini-proxy-mobx">线上代码地址</a></p>
+<h2 id="mobx-vs-redux">Mobx vs Redux</h2>
+<ol>
+<li>
+<p>数据流</p>
+<p>Mobx 和 Redux 都是单向数据流，都通过 action 触发全局 state 更新，再通知视图</p>
+<p>Redux 的数据流</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/167146564-cc3f3f4f-2510-48eb-9b71-06a58fe82230.png" alt="redux"></p>
+<p>Mobx 的数据流</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/167146604-eb1b5ef5-278d-482a-b4a3-dd3d40d71c38.png" alt="mobx1"></p>
+</li>
+<li>
+<p>修改数据的方式</p>
+<ul>
+<li>他们修改状态的方式是不同的，Redux 每一次都返回了新的 state。Mobx 每次修改的都是同一个状态对象，基于响应式原理，<code>get</code>时收集依赖，<code>set</code>时通知所有的依赖</li>
+<li>当 state 发生改变时，Redux 会通知所有使用 connect 包裹的组件；Mobx 由于收集了每个属性的依赖，能够精准通知</li>
+<li>当我们使用 Redux 来修改数据时采用的是 reducer 函数，函数式编程思想；Mobx 使用的则是面向对象代理的方式</li>
+</ul>
+</li>
+<li>
+<p>Store 的区别</p>
+<ul>
+<li>Redux 是单一数据源，采用集中管理的模式，并且数据均是普通的 JavaScript 对象。state 数据可读不可写，只有通过 reducer 来改变</li>
+<li>Mobx 是多数据源模式，并且数据是经过<code>observable</code>包裹的 JavaScript 对象。state 既可读又可写，在非严格模式下，action 不是必须的，可以直接赋值</li>
+</ul>
+</li>
+</ol>
+<h2 id="总结">总结</h2>
+<p>本文从 Mobx 的简单示例开始，讲述了一下 Mobx 的执行流程，引入了对应的核心概念，然后从零开始实现了一个简版的 Mobx，最后将 Mobx 和 Redux 做了一个简单的对比</p>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://github.com/yinguangyao/blog/issues/54#">从零实现 Mobx：深入理解 Mobx 原理</a></li>
+<li><a href="https://mp.weixin.qq.com/s/KnlRBGr0iS2BBrsVB4oUsw">MobX 实现原理揭秘</a></li>
+<li><a href="https://github.com/sunyongjian/blog/issues/28">引入 Mobx</a></li>
+<li><a href="https://xie.infoq.cn/article/d90440a8fb574299b4454ef96">实现一个简单的 MobX</a></li>
+<li><a href="https://segmentfault.com/a/1190000013682735">用故事解读 MobX 源码</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#mobx-核心概念"> Mobx 核心概念 </a><a class="depth-3" href="#observable"> observable </a><a class="depth-3" href="#computed"> computed </a><a class="depth-3" href="#action"> action </a><a class="depth-3" href="#reactions"> Reactions </a><a class="depth-3" href="#observer"> observer </a><a class="depth-2" href="#mobx-原理实现"> Mobx 原理实现 </a><a class="depth-3" href="#observable-1"> observable </a><a class="depth-3" href="#autorun"> autorun </a><a class="depth-3" href="#computed-1"> computed </a><a class="depth-3" href="#observer-1"> observer </a><a class="depth-2" href="#mobx-vs-redux"> Mobx vs Redux </a><a class="depth-2" href="#总结"> 总结 </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/talk-about-connect-design-again/">上一篇：再谈 Connect 设计</a> <a href="/blog/react/redux-toolkit/">下一篇：Redux-Toolkit 使用及原理实现</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,319 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Webpack SplitChunk 分包 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>Webpack SplitChunk 分包</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="理解-chunk">理解 chunk</h2>
+<p><code>Webpack</code>可以看成一个模块打包机器，我们编写的文件对于<code>Webpack</code>来说都是模块(<code>module</code>)，我们可以在<code>Webpack</code>中配置对应模块的处理方式。</p>
+<p><code>chunk</code>是<code>Webpack</code>在打包过程中处理一些<code>module</code>的合集。配置<code>entry</code>入口文件，入口文件再依赖其他的<code>module</code>，<code>webpack</code>会根据这些引用关系逐个打包模块，将<code>module</code>打包在一起，也就形成了 <code>chunk</code>。</p>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled.png" alt="Untitled"></p>
+<p><code>chunk</code>是构建流程中的中间产物，会根据一些默认配置决定那些模块合并打包；也可以通过 <code>splitChunks</code>自定义打包策略。</p>
+<h3 id="默认三种分包处理">默认三种分包处理</h3>
+<ul>
+<li>Initial Chunk
+<code>entry</code> 模块及相应子模块打包成 Initial Chunk</li>
+<li>Async Chunk
+通过<code>import('./xx')</code>等语句导入的异步模块及相应子模块组成的 Async Chunk</li>
+<li>Runtime Chunk
+运行时代码抽离成 Runtime Chunk，可通过 <a href="https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Fentry-context%2F%23dependencies">entry.runtime</a> 配置项实现</li>
+</ul>
+<h2 id="默认情况"><strong>默认情况</strong></h2>
+<p>默认情况下，它只会影响到按需加载的<code>chunks</code>，因为修改 initial chunks 会影响到项目的 HTML 文件中的脚本标签。</p>
+<p>Webpack 将根据以下条件自动拆分<code>chunks</code>：</p>
+<ul>
+<li>新的<code>chunk</code>可以被共享，或者模块来自于  <code>node_modules</code>  文件夹</li>
+<li>新的<code>chunk</code>体积大于 20kb（在进行 min+gz 之前的体积）</li>
+<li>当加载<code>Async Chunk</code>时，并行请求的最大数量不得超过 30</li>
+<li>当加载<code>Initial Chunk</code>时，并发请求的最大数量不得超过 30</li>
+</ul>
+<p>当尝试满足最后两个条件时，最好使用较大的<code>chunks</code>。</p>
+<p>Webpack spiltChunks 默认的<code>config</code>如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //...</span></span>
+<span class="line"><span style="color:#E1E4E8">  optimization: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    splitChunks: {</span></span>
+<span class="line"><span style="color:#E1E4E8">      chunks: </span><span style="color:#9ECBFF">'async'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      // 表示新分离出的chunk必须大于等于minSize，默认为20000，约20kb。</span></span>
+<span class="line"><span style="color:#E1E4E8">      minSize: </span><span style="color:#79B8FF">20000</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      // 用于确保在分割 chunk 之后，剩余部分的大小不小于某个阈值</span></span>
+<span class="line"><span style="color:#E1E4E8">      minRemainingSize: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      // 表示一个模块至少应被minChunks个chunk所包含才能分割。默认为1。</span></span>
+<span class="line"><span style="color:#E1E4E8">      minChunks: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      // 表示按需加载文件时，并行请求的最大数目。默认为5。</span></span>
+<span class="line"><span style="color:#E1E4E8">      maxAsyncRequests: </span><span style="color:#79B8FF">30</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      // 表示加载入口文件时，并行请求的最大数目。默认为3。</span></span>
+<span class="line"><span style="color:#E1E4E8">      maxInitialRequests: </span><span style="color:#79B8FF">30</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      enforceSizeThreshold: </span><span style="color:#79B8FF">50000</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      cacheGroups: {</span></span>
+<span class="line"><span style="color:#E1E4E8">        defaultVendors: {</span></span>
+<span class="line"><span style="color:#E1E4E8">          test:</span><span style="color:#9ECBFF"> /</span><span style="color:#79B8FF">[</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#79B8FF">]</span><span style="color:#DBEDFF">node_modules</span><span style="color:#79B8FF">[</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#79B8FF">]</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">          // 缓存组优先级，当一个模块可能属于多个 chunkGroup，这里是优先级</span></span>
+<span class="line"><span style="color:#E1E4E8">          priority: </span><span style="color:#F97583">-</span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">          // 如果该chunk包含的modules都已经另一个被分割的chunk中存在，那么直接引用已存在的chunk，不会再重新产生一个</span></span>
+<span class="line"><span style="color:#E1E4E8">          reuseExistingChunk: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">        default: {</span></span>
+<span class="line"><span style="color:#E1E4E8">          minChunks: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          priority: </span><span style="color:#F97583">-</span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          reuseExistingChunk: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="模块均为同步导入">模块均为同步导入</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { Home } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './component/home'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { sum } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'lodash'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> App</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">Home</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#E1E4E8"> App;</span></span></code></pre>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%201.png" alt="Untitled"></p>
+<p>打包出来只有一个<code>main</code>文件，也就是我们的入口文件</p>
+<h3 id="lodash-动态导入">lodash 动态导入</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> Home </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './component/home'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">import</span><span style="color:#E1E4E8">(</span><span style="color:#6A737D">/* webpackChunkName: "async_lodash" */</span><span style="color:#9ECBFF"> 'lodash'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> App</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">Home</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#E1E4E8"> App;</span></span></code></pre>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%202.png" alt="Untitled"></p>
+<p><code>lodash</code>被单独打包出来了，因为异步加载的模块会被单独打包</p>
+<h3 id="react-组件按需加载">React 组件按需加载</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// Home.jsx</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { merge } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'lodash'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> Home</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>home,{</span><span style="color:#B392F0">merge</span><span style="color:#E1E4E8">({ a: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8"> }, { b: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8"> })}&#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// App.jsx</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> Home</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">lazy</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#F97583"> import</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./component/home'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> App</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">Home</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#E1E4E8"> App;</span></span></code></pre>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%203.png" alt="Untitled"></p>
+<p>被打包成了三个文件，由于<code>Home</code>组件时按需加载的因此单独打包。因为在<code>Home</code>中引入了 <code>lodash</code>，因此<code>lodash</code>是异步加载的，也会被单独打包。</p>
+<h3 id="lodash-按需加载">lodash 按需加载</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> sum </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'lodash/sum'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> Home</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>home,{</span><span style="color:#B392F0">sum</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)}&#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#E1E4E8"> Home;</span></span></code></pre>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%204.png" alt="Untitled"></p>
+<p>因为<code>lodash/sum</code>的文件大小小于 20kb，不会被单独打包，会和<code>Home</code>组件打包在一个文件中，因此只有两个文件</p>
+<h3 id="共享模块的打包">共享模块的打包</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// Home</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">            &#x3C;</span><span style="color:#79B8FF">Button2</span><span style="color:#E1E4E8">>1111&#x3C;/</span><span style="color:#79B8FF">Button2</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Home2</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">            &#x3C;</span><span style="color:#79B8FF">Button2</span><span style="color:#E1E4E8">>2222&#x3C;/</span><span style="color:#79B8FF">Button2</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Button</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;></span></span>
+<span class="line"><span style="color:#E1E4E8">						 {</span><span style="color:#6A737D">/* 放一张超过 20kb 的图片，使 button 的大小超过 20kb */</span><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">            &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">>{props.children}&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;/></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>分析一下依赖视图如下：</p>
+<p><img src="/blog/imgs/webpackSplitChunk/image.png" alt="image.png"></p>
+<p>打包出来结果如下：</p>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%205.png" alt="Untitled"></p>
+<p>看到一共有四个文件，分别是<code>mian</code>、<code>Home</code>、<code>Home2</code>、<code>button</code>，由于<code>button</code>满足上诉的默认分包情况，因此会被单独拎出来。</p>
+<h3 id="入口模块和异步模块的公共库">入口模块<strong>和异步模块的公共库</strong></h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// App</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { sum } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'lodash'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> Home</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">lazy</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#F97583"> import</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./component/home'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> App</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span><span style="color:#B392F0">sum</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)}</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">Home</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Home</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { sum } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'lodash'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>{</span><span style="color:#B392F0">sum</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)}&#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%206.png" alt="Untitled"></p>
+<p>这种情况下，lodash 会打包在入口文件中，Home 组件中不在打包 lodash 会和入口文件用一份</p>
+<h2 id="配置项">配置项</h2>
+<p>目前<code>SplitChunksPlugin</code>已经在<code>Webpack</code>内部支持了，我们引入的时候不需要在添加一来了，可以直接修改 <a href="https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F%23optimizationsplitchunks">optimization.splitChunks</a> 或者通过<code>plugins</code>的方式修改<code>optimize.SplitChunksPlugin({})</code></p>
+<h3 id="分包范围">分包范围</h3>
+<p>SplitChunks 在默认的情况下只会对 Async Chunk 生效，提供了<code>chunks</code>字段来调整范围</p>
+<ul>
+<li>字符串<code>'all'</code> ：对 Initial Chunk 与 Async Chunk 都生效，建议优先使用该值；</li>
+<li>字符串<code>'initial'</code> ：只对 Initial Chunk 生效；</li>
+<li>字符串<code>'async'</code> ：只对 Async Chunk 生效；</li>
+<li>函数<code>(chunk) => boolean</code> ：该函数返回<code>true</code>时生效；</li>
+</ul>
+<h3 id="使用频率">使用频率</h3>
+<p>可以根据<code>module</code>被<code>chunk</code>引用的次数来决定是否分包。通过<code>minChuks</code>来配置最小引用次数，可以将频繁使用的模块打包成独立文件，减少重复代码。</p>
+<p>⚠️ 注意：这里的引用次数不代表为<code>import</code>的次数，而是取决于上有引用者是否被作为了<code>Initial Chunk</code>或者<code>Async Chunk</code>。</p>
+<p><code>minChunks</code>默认值为 1</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// common.js</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#9ECBFF"> 'common chunk'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// async-module.js</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> common </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './common'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// entry-a.js</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> common </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './common'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./async-module'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// entry-b.js</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> common </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './common'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<p><code>entry-a/entry-b</code>是<code>Initial Chunk</code>处理；<code>async-module</code>作为<code>Async Chunk</code>处理，那么 <code>common</code>被 3 个不同的<code>chunk</code>依赖；被引用次数为 3 次</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  entry: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    entry1: </span><span style="color:#9ECBFF">'./src/entry-a.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    entry2: </span><span style="color:#9ECBFF">'./src/entry-b.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#6A737D">  // ...</span></span>
+<span class="line"><span style="color:#E1E4E8">  optimization: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    splitChunks: {</span></span>
+<span class="line"><span style="color:#E1E4E8">      minChunks: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      //...</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>根据上述配置，最终可能被分成四个包，entry-a/entry-b/async-module/common</p>
+<h3 id="限制分包数量">限制分包数量</h3>
+<p>如果我们分包的数量很多，会导致<code>http</code>网络请求比较多，反而降低性能。提供了<code>maxAsyncRequests</code>/<code>maxInitialRequests</code></p>
+<ul>
+<li>maxAsyncRequests
+按需加载时候最大的并行请求数，默认为 30</li>
+<li>maxInitialRequests
+入口文件的最大并行请求数，默认为 30</li>
+</ul>
+<aside>
+💡 何为请求数？
+<p>是指加载一个 chunk 的时候需要加载的所有分包数量。</p>
+<p>例如对于一个 chunk A 来说，通过分包规则(如模块引用次数、第三方包)分离出来了若干的子 chunk[i]，那么加载 chunk A 的时候就回去加载 chunk[i]，那么等于浏览器需要同时加载 chunk A 和所有的分离 chunk[i]，此时的并行请求数量为主包 A 加上 i 个分包，即 i+1</p>
+</aside>
+<p><img src="/blog/imgs/webpackSplitChunk/image%201.png" alt="image.png"></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  mode: </span><span style="color:#9ECBFF">'development'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  devtool: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  entry: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    entry1: </span><span style="color:#9ECBFF">'./src/entry-a.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    entry2: </span><span style="color:#9ECBFF">'./src/entry-b.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    entry3: </span><span style="color:#9ECBFF">'./src/entry-c.js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  output: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    filename: </span><span style="color:#9ECBFF">'[name].js'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    path: path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(__dirname, </span><span style="color:#9ECBFF">'dist'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  optimization: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    splitChunks: {</span></span>
+<span class="line"><span style="color:#E1E4E8">      minChunks: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      chunks: </span><span style="color:#9ECBFF">'all'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      minSize: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>针对于上述的配置，最后打包结果如下：</p>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%207.png" alt="Untitled"></p>
+<p>三个入口文件和对应两个<code>common</code>文件都满足打包条件</p>
+<p>那在此时对于<code>entry-b</code>来说，请求<code>entry-b</code>的同时需要请求<code>common-1/common-2</code>，并行数量为 3，我们将<code>maxInitialRequests</code>设置为 2，打包结果如下</p>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%208.png" alt="Untitled"></p>
+<p>会发现<code>common-1</code>这个文件，打包进入了<code>entry-a/entry-b</code>文件中</p>
+<h3 id="限制分包体积">限制分包体积</h3>
+<p>提供了一系列大小判断的条件来处理<code>chunk</code>，可以在<code>chunk</code>过小时取消打包；在<code>chunk</code>过大时，再次尝试拆解。</p>
+<ul>
+<li>minSize: 超过这个尺寸的<code>chunk</code>才会正式被分包；</li>
+<li>maxSize: 超过这个尺寸的<code>chunk</code>会尝试进一步拆分出更小的<code>chunk</code>；</li>
+<li>maxAsyncSize: 与<code>maxSize</code>功能类似，但只对异步引入的模块生效；</li>
+<li>maxInitialSize: 与<code>maxSize</code>类似，但只对<code>entry</code>配置的入口模块生效；</li>
+</ul>
+<p>根据这几个规则，<code>SplitChunksPlugin</code>的流程如下：</p>
+<ul>
+<li>将命中<code>minChunks</code>规则的<code>module</code>统一抽到一个额外的<code>chunk</code>对象；</li>
+<li>判断该<code>chunk</code>是否满足<code>maxInitialRequests</code>阈值，若满足则进行下一步；</li>
+<li>判断该<code>chunk</code>资源的体积是否大于上述配置项<code>minSize</code>声明的下限阈值；
+<ul>
+<li>如果体积小于<code>minSize</code>则取消这次分包，对应的<code>module</code>依然会被合并入原来的<code>chunk</code></li>
+<li>如果<code>chunk</code>体积大于<code>minSize</code>则判断是否超过<code>maxSize</code>、<code>maxAsyncSize</code>、<code>maxInitialSize</code>声明的上限阈值，如果超过则尝试将该<code>chunk</code>继续分割成更小的部分</li>
+</ul>
+</li>
+</ul>
+<p><img src="/blog/imgs/webpackSplitChunk/image%202.png" alt="image.png"></p>
+<p>对于上面这种依赖关系来说，假设配置<code>minChunks</code>大于 2，<code>minInitialRequests</code>大于 2，如果<code>common</code>包的体积大于<code>miniSize</code>分包成功，<code>common</code>作为独立的<code>chunk</code>，否则会分别合并进入 3 个<code>chunk</code>中</p>
+<h3 id="缓存组-cachegroups">缓存组 cacheGroups</h3>
+<p>上面讲到的都是对哪些<code>module</code>做分包处理，可以使用<code>cacheGroups</code>为不同的文件组设置不同的规则。</p>
+<p>如果匹配上<code>cacheGroups</code>的分组会优先使用改组下的<code>minChunks/minSize</code>等条件配置。</p>
+<p>当<code>cacheGroups</code>也有独有的配置项：</p>
+<ul>
+<li>test: 接受正则表达式、函数、字符串，所有符合 test 判断的都会被分到改组</li>
+<li>name: 当前分组的名字</li>
+<li>priority: 数字型，用于设置改分组的优先级，若命中多个缓存组，优先被分到 priority 更大的组</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  optimization: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    splitChunks: {</span></span>
+<span class="line"><span style="color:#E1E4E8">      cacheGroups: {</span></span>
+<span class="line"><span style="color:#E1E4E8">        vendor: {</span></span>
+<span class="line"><span style="color:#E1E4E8">          test:</span><span style="color:#9ECBFF"> /</span><span style="color:#79B8FF">[</span><span style="color:#85E89D;font-weight:bold">\\</span><span style="color:#79B8FF">/]</span><span style="color:#DBEDFF">node_modules</span><span style="color:#79B8FF">[</span><span style="color:#85E89D;font-weight:bold">\\</span><span style="color:#79B8FF">/]</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          name: </span><span style="color:#9ECBFF">'vendor'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>上述配置的话，能够把所有的第三方库都帮我们打包到命名为 vendor 的分组中</p>
+<p><img src="/blog/imgs/webpackSplitChunk/Untitled%209.png" alt="Untitled"></p>
+<p>对于默认配置中的<code>cacheGroups</code>来说，能帮助我们：</p>
+<ul>
+<li>将所有<code>node_modules</code>中的资源单独打包到<code>vendors-xxx-xx.js</code>命名的产物</li>
+<li>对引用次数大于等于 2 的模块，也就是被多个<code>chunk</code>引用的模块，单独打包</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">cacheGroups</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#B392F0">  defaultVendors</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#B392F0">    test</span><span style="color:#E1E4E8">:</span><span style="color:#9ECBFF"> /</span><span style="color:#79B8FF">[</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#79B8FF">]</span><span style="color:#DBEDFF">node_modules</span><span style="color:#79B8FF">[</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#79B8FF">]</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">    priority</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">-</span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">    reuseExistingChunk</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#F97583">  default</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    minChunks: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    priority: </span><span style="color:#F97583">-</span><span style="color:#79B8FF">20</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    reuseExistingChunk: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">},</span></span></code></pre>
+<h2 id="总结">总结</h2>
+<p>该篇文章主要讲解了<code>splitChunk</code>的对应的分包策略，相关配置项的具体使用。</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#理解-chunk"> 理解 chunk </a><a class="depth-3" href="#默认三种分包处理"> 默认三种分包处理 </a><a class="depth-2" href="#默认情况"> 默认情况 </a><a class="depth-3" href="#模块均为同步导入"> 模块均为同步导入 </a><a class="depth-3" href="#lodash-动态导入"> lodash 动态导入 </a><a class="depth-3" href="#react-组件按需加载"> React 组件按需加载 </a><a class="depth-3" href="#lodash-按需加载"> lodash 按需加载 </a><a class="depth-3" href="#共享模块的打包"> 共享模块的打包 </a><a class="depth-3" href="#入口模块和异步模块的公共库"> 入口模块和异步模块的公共库 </a><a class="depth-2" href="#配置项"> 配置项 </a><a class="depth-3" href="#分包范围"> 分包范围 </a><a class="depth-3" href="#使用频率"> 使用频率 </a><a class="depth-3" href="#限制分包数量"> 限制分包数量 </a><a class="depth-3" href="#限制分包体积"> 限制分包体积 </a><a class="depth-3" href="#缓存组-cachegroups"> 缓存组 cacheGroups </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/webpack-hmr/">上一篇：Webpack 模块热替换</a> <a href="/blog/base/implementation-of-native--j-s-methods/">下一篇：原生 JS 方法的实现</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

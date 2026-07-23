@@ -1,15 +1,144 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="阅读笔记、系统知识和一些暂时没归类的内容。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Base64 产生的思考 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link is-active" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">其他</a> <h1>Base64 产生的思考</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="什么是编码">什么是编码</h2>
+<p>编码，是信息从一种形式转变为另一种形式的过程，简要来说就是语言的翻译。</p>
+<p>将机器语言(二进制)转变为自然语言。</p>
+<h2 id="五花八门的编码">五花八门的编码</h2>
+<h3 id="ascii-码">ASCII 码</h3>
+<p>ASCII 码是一种字符编码标准，用于将数字、字母和其他字符转换为计算机可以理解的二进制数。</p>
+<p>它最初是由美国信息交换标准所制定的，它包含了 128 个字符，其中包括了数字、大小写字母、标点符号、控制字符等等。</p>
+<p>在计算机中一个字节可以表示 256 种不同的状态，就对应 256 字符，从 0000000 到 11111111。ASCII 码一共规定了 128 字符，所以只需要占用一个字节的后面 7 位，最前面一位均为 0，所以 ASCII 码对应的二进制位 00000000 到 01111111。</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/222965840-df5e6a11-2191-40e0-b62a-55fb09635206.png" alt="Untitled"></p>
+<h3 id="非-ascii-码">非 ASCII 码</h3>
+<p>当其他国家需要使用计算机显示的时候就无法使用 ASCII 码如此少量的映射方法。因此技术革新开始啦。</p>
+<ul>
+<li>
+<p>GB2312</p>
+<p>收录了 6700+的汉字，使用两个字节作为编码字符集的空间</p>
+</li>
+<li>
+<p>GBK</p>
+<p>GBK 在保证不和 GB2312/ASCII 冲突的情况下，使用两个字节的方式编码了更多的汉字，达到了 2w</p>
+</li>
+<li>
+<p>GB18030</p>
+</li>
+</ul>
+<h2 id="全面统一的-unicode">全面统一的 Unicode</h2>
+<p>面对五花八门的编码方式，同一个二进制数会被解释为不同的符号，如果使用错误的编码的方式去读区文件，就会出现乱码的问题。</p>
+<p>那能否创建一种编码能够将所有的符号纳入其中，每一个符号都有唯一对应的编码，那么乱码问题就会消失。因此 Unicode 借此机会统一江湖。</p>
+<p>Unicode 最常用的就是使用两个字节来表示一个字符(如果是更为偏僻的字符，可能所需字节更多)。现代操作系统都直接支持 Unicode。</p>
+<aside>
+Unicode 和 ASCII 的区别
+</aside>
+<ul>
+<li>
+<p>ASCII 编码通常是一个字节，Unicode 编码通常是两个字节</p>
+<p>字母 A 用 ASCII 编码十进制为 65，二进制位 01000001；而在 Unicode 编码中，需要在前面全部补 0，即为 0000000 01000001</p>
+</li>
+<li>
+<p>问题产生了，虽然使用 Unicode 解决乱码的问题，但是为纯英文的情况，存储空间会大一倍，传输和存储都不划算。</p>
+</li>
+</ul>
+<h2 id="问题对应的解决方案之-utf-8">问题对应的解决方案之 UTF-8</h2>
+<p>本着节约的精神，又出现了把 Unicode 编码转为可变长编码的 UTF-8。可以根据不同字符而变化字节长度，使用 1~4 字节表示一个符号。UTF-8 是 Unicode 的实现方式之一。</p>
+<h3 id="utf-8-的编码规则">UTF-8 的编码规则</h3>
+<ol>
+<li>对于单字节的符号，字节的第一位设置为 0，后面七位为该字符的 Unicode 码。因此对于英文字母，UTF-8 编码和 ASCII 编码是相同的。</li>
+<li>对于 n 字节的符号，第一个字节的前 n 位都是 1，第 n+1 位为 0，后面的字节的前两位均为 10。剩下的位所填充的二进制就是这个字符的 Unicode 码</li>
+</ol>
+<p>对应的编码表格</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Unicode 符号范围                      ｜     UTF-8 编码方式</span></span>
+<span class="line"><span>0000 0000-0000 007F  (0-127)               0xxxxxxx</span></span>
+<span class="line"><span>0000 0080-0000 07FF  (128-2047)            110xxxxx 10xxxxxx</span></span>
+<span class="line"><span>0000 0800-0000 FFFF  (2048-65535)          1110xxxx 10xxxxxx 10xxxxxx</span></span>
+<span class="line"><span>0001 0000-0010 FFFF  (65536往上)            1111xxxx 10xxxxxx 10xxxxxx 10xxxxxxx</span></span></code></pre>
+<p>在 Unicode 对应表中查找到“杪”所在的位置，以及其对应的十六进制 676A，对应的十进制为 26474(110011101101010)，对应三个字节 1110xxxx 10xxxxxx 10xxxxxx</p>
+<p>将<code>110011101101010</code>的最后一个二进制依次填充到<code>1110xxxx 10xxxxxx 10xxxxxx</code>从后往前的 x ，多出的位补 0 即可，中，得到<code>11100110 10011101 10101010</code> ，转换得到<code>39a76a</code>，即是杪字对应的 UTF-8 的编码</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/222965781-243c58fc-94a0-45a9-8d35-5bc13f2fa812.png" alt="Untitled 1"></p>
+<h2 id="问题对应的解决方案之-utf-16">问题对应的解决方案之 UTF-16</h2>
+<p>在 Unicode 编码中，最常用的字符是 0-65535，UTF-16 将 0–65535 范围内的字符编码成 2 个字节，超过这个的用 4 个字节编码</p>
+<h3 id="utf-16-编码规则">UTF-16 编码规则</h3>
+<ol>
+<li>对于 Unicode 码小于  0x10000  的字符， 使用  2  个字节存储，并且是直接存储 Unicode 码，不用进行编码转换</li>
+<li>对于 Unicode 码在  0x10000  和  0x10FFFF  之间的字符，使用  4  个字节存储，这  4  个字节分成前后两部分，每个部分各两个字节，其中，前面两个字节的前  6  位二进制固定为  110110，后面两个字节的前 6 位二进制固定为  110111，前后部分各剩余 10 位二进制表示符号的 Unicode 码 减去  0x10000  的结果</li>
+<li>大于  0x10FFFF  的 Unicode 码无法用 UTF-16 编码</li>
+</ol>
+<p>对应的编码表格</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Unicode 符号范围                   |     具体Unicode码                ｜     UTF-16 编码方式                         ｜   字节</span></span>
+<span class="line"><span>0000 0000-0000 FFFF  (0-65535)    |     xxxxxxxx xxxxxxxx           ｜     xxxxxxxx xxxxxxxx                      |   2字节</span></span>
+<span class="line"><span>0001 0000-0010 FFFF  (65536往上)   |     yy yyyyyyyy xx xxxxxxxx     |     110110yy yyyyyyyy 110111xx xxxxxxxx     |   4字节</span></span></code></pre>
+<p>“杪”字的 Unicode 码为 676A(26474)，小于 65535，所以对应的 UTF-16 编码也为 676A</p>
+<p>找一个大于 0x10000 的字符，<a href="https://symbl.cc/cn/1101F/">0x1101F</a>，进行 UTF-16 编码</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/222965808-29da0d8d-5b35-4caa-aac6-3f5592a6701e.png" alt="Untitled 2"></p>
+<h2 id="字节序">字节序</h2>
+<p>字节序就是字节之间的顺序，当传输或者存储时，如果超过一个字节，需要指定字节间的顺序。</p>
+<p>最小编码单元是多字节才会有字节序的问题存在，UTF-8 最小编码单元是一个字节，所以它是没有字节序的问题，UTF-16 最小编码单元是两个个字节，在解析一个 UTF-16 字符之前，需要知道每个编码单元的字节序。</p>
+<p>比如：前面提到过，“杪”字的 Unicode 码是  676A，“橧”字的 Unicode 码是 6A67，当我们收到一个 UTF-16 字节流  676A 时，计算机如何识别它表示的是字符  “杪”还是 字符  “橧”呢 ?</p>
+<p>对于多字节的编码单元需要有一个标识显式的告诉计算机，按着什么样的顺序解析字符，也就是字节序。</p>
+<ul>
+<li>大端字节序(Big-Endian)，表示高位字节在前面，低位字节在后面。高位字节保存在内存的低地址端，低位字节保存在在内存的高地址端。</li>
+<li>小端字节序(Little-Endian)，表示低位字节在前，高位字节在后面。高位字节保存在内存的高地址端，而低位字节保存在内存的低地址端。</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/38368040/222965864-e980f3ce-0916-437f-a1c8-d3b8f07ca805.png" alt="Untitled 3"></p>
+<h3 id="简单聊聊-arraybuffer-和-typedarraydataview">简单聊聊 ArrayBuffer 和 TypedArray、DataView</h3>
+<p><img src="https://user-images.githubusercontent.com/38368040/223735182-548576bf-a071-4e65-94ef-09ccb50e12e8.png" alt="Untitled 4"></p>
+<ul>
+<li>
+<p>ArrayBuffer</p>
+<p>ArrayBuffer 是一段存储二进制的内存，是字节数组。</p>
+<p>它不能够被直接读写，需要创建<strong>视图</strong>来对它进行操作，指定具体格式操作二进制数据。</p>
+<p>可以通过它创建连续的内存区域，参数是内存大小(byte)，默认初始值都是 0</p>
+</li>
+<li>
+<p>TypedArray</p>
+<p>ArrayBuffer 的一种操作视图，数据都存储到底层的 ArrayBuffer 中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> buf</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ArrayBuffer</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> int8Array</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Int8Array</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#E1E4E8">int8Array[</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 44</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> int16Array</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Int16Array</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#E1E4E8">int16Array[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 42</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(int16Array); </span><span style="color:#6A737D">// [42, 11264, 0, 0]</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(int8Array); </span><span style="color:#6A737D">// [42, 0, 0, 44, 0, 0, 0, 0]</span></span></code></pre>
+<p>使用 int8 和 int16 两种方式新建的视图是相互影响的，都是直接修改的底层 buffer 的数据</p>
+</li>
+<li>
+<p>DataView</p>
+<p>DataView 是另一种操作视图，并且支持设置字节序</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> buf</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ArrayBuffer</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> dataview</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> DataView</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#E1E4E8">dataView.</span><span style="color:#B392F0">setInt8</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">); </span><span style="color:#6A737D">// 小端序</span></span></code></pre>
+</li>
+</ul>
+<h3 id="明确电脑的字节序">明确电脑的字节序</h3>
+<p>上述讲到，在存储多字节的时候，我们会采用不同的字节序来做存储。那对我们的操作系统来说是有一种默认的字节序的。下面就用上述知识来明确 MacOS 的默认字节序。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> isLittleEndian</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> buf</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ArrayBuffer</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> view</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> DataView</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#E1E4E8">  view.</span><span style="color:#B392F0">setInt16</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Int8Array</span><span style="color:#E1E4E8">(buf));</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> int16Array</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Int16Array</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> int16Array[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> 256</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">isLittleEndian</span><span style="color:#E1E4E8">());</span></span></code></pre>
+<p>通过上诉代码我们可以得出此款 MacOS 是小端序列存储</p>
+<p>一个 🌰</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> buffer</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ArrayBuffer</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> int8Array</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Int8Array</span><span style="color:#E1E4E8">(buffer);</span></span>
+<span class="line"><span style="color:#E1E4E8">int8Array[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 30</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">int8Array[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 41</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> dataView</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> DataView</span><span style="color:#E1E4E8">(buffer);</span></span>
+<span class="line"><span style="color:#E1E4E8">dataView.</span><span style="color:#B392F0">setInt16</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">256</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> int16Array</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Int16Array</span><span style="color:#E1E4E8">(buffer);</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(int16Array); </span><span style="color:#6A737D">// [10526, 526, 0, 0]</span></span>
+<span class="line"><span style="color:#E1E4E8">int16Array[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 256</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> int8Array1</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Int8Array</span><span style="color:#E1E4E8">(buffer);</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(int8Array1);</span></span></code></pre>
+<aside>
+虽然 TypedArray 无法指定字节序，但是在存储的时候采用操作系统默认的字节序。所以当我们设置 int16Array[0] = 256 时，内存中存储的为 00 01
+</aside>
+<p><img src="https://user-images.githubusercontent.com/38368040/223735133-b3bc5ab7-ba7d-4177-b65d-4e113fe46ff4.png" alt="Untitled 5"></p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#什么是编码"> 什么是编码 </a><a class="depth-2" href="#五花八门的编码"> 五花八门的编码 </a><a class="depth-3" href="#ascii-码"> ASCII 码 </a><a class="depth-3" href="#非-ascii-码"> 非 ASCII 码 </a><a class="depth-2" href="#全面统一的-unicode"> 全面统一的 Unicode </a><a class="depth-2" href="#问题对应的解决方案之-utf-8"> 问题对应的解决方案之 UTF-8 </a><a class="depth-3" href="#utf-8-的编码规则"> UTF-8 的编码规则 </a><a class="depth-2" href="#问题对应的解决方案之-utf-16"> 问题对应的解决方案之 UTF-16 </a><a class="depth-3" href="#utf-16-编码规则"> UTF-16 编码规则 </a><a class="depth-2" href="#字节序"> 字节序 </a><a class="depth-3" href="#简单聊聊-arraybuffer-和-typedarraydataview"> 简单聊聊 ArrayBuffer 和 TypedArray、DataView </a><a class="depth-3" href="#明确电脑的字节序"> 明确电脑的字节序 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/more/process-read-notes/">上一篇：进程线程读书笔记</a> <a href="/blog/more/pipe-and-fifo/">下一篇：进程间通信之管道</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

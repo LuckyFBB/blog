@@ -1,15 +1,102 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="常见数据结构、算法思路和刷题复盘。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>集合 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link is-active" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">数据结构</a> <h1>集合</h1> </header> <div class="article-grid"> <div class="prose"> <p>集合是由一组无序且唯一（即不能重复）的项组成的。</p>
+<p>可以把集合想象成一个既没有重复元素，也没有顺序概念的数组。</p>
+<h4 id="创建集合">创建集合</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Set</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  var</span><span style="color:#E1E4E8"> items </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">has</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //判断该值是否在集合中，在则返回true，否则返回false</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> items.</span><span style="color:#B392F0">hasOwnProperty</span><span style="color:#E1E4E8">(value);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">add</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //向集合中添加元素</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(value)) {</span></span>
+<span class="line"><span style="color:#6A737D">      //判断该值是否在集合中</span></span>
+<span class="line"><span style="color:#E1E4E8">      items[value] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">remove</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //删除某个值</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(value)) {</span></span>
+<span class="line"><span style="color:#6A737D">      //判断集合中是否有这个值</span></span>
+<span class="line"><span style="color:#F97583">      delete</span><span style="color:#E1E4E8"> items[value];</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">clear</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#6A737D">    //清空集合</span></span>
+<span class="line"><span style="color:#E1E4E8">    items </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">size</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(items).</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">values</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#6A737D">    //返回当前集合的元素</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(items);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">union</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">otherSet</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //求两个集合的并集</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> unionSet </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Set</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">//新建集合</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> values </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    values.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      unionSet.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">    values </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> otherSet.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    values.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      unionSet.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> unionSet;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">intersection</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">otherSet</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //求两个集合的交集</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> intersectionSet </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Set</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> values </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    values.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (otherSet.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(item)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        intersectionSet.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> intersectionSet;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">difference</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">otherSet</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //求两个集合的差集</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> differenceSet </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Set</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> values </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    values.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">otherSet.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(item)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        differenceSet.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(item);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> differenceSet;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">subSet</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">otherSet</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //求当前集合是否是另一个集合的子集</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> otherSet.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      var</span><span style="color:#E1E4E8"> values </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.values;</span></span>
+<span class="line"><span style="color:#E1E4E8">      values.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">otherSet.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(item)) {</span></span>
+<span class="line"><span style="color:#F97583">          return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong>  </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/data-structure/stack-queue-problem-solving-ideas/">上一篇：栈/队列的解题思路</a> <a href="/blog/data-structure/top-ten-sorting-algorithms/">下一篇：十大排序算法</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

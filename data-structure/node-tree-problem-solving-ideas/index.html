@@ -1,15 +1,645 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="常见数据结构、算法思路和刷题复盘。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>二叉树的解题思路 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link is-active" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">数据结构</a> <h1>二叉树的解题思路</h1> </header> <div class="article-grid"> <div class="prose"> <p>在<a href="/blog/data-structure/node-tree">前文</a>中介绍了二叉树的相关知识，可以进行查看阅读。</p>
+<h2 id="解题技巧">解题技巧</h2>
+<h3 id="前中后序">前/中/后序</h3>
+<p>二叉树的遍历框架，非线性的递归遍历</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> TreeNode</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">val</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.val </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> val </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.left </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.right </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> recursion</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //前序</span></span>
+<span class="line"><span style="color:#B392F0">  recursion</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#6A737D">  //中序</span></span>
+<span class="line"><span style="color:#B392F0">  recursion</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#6A737D">  //后序</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="层级遍历bfs">层级遍历(bfs)</h3>
+<p>广度遍历的思想就是先进先出，以层来做为入队和出队的判断条件</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> bfs</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> queue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [root];</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> levelLength</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> levelLength; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#6A737D">      //对curr做处理</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="dfs">dfs</h3>
+<p>dfs 其实是树的前序遍历，上面的代码中已经使用递归的思想实现了
+如果用迭代的思想，需要借助栈结构，采用先进后出的思想</p>
+<ul>
+<li>递归</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> dfs</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  //对当前数据做点啥</span></span>
+<span class="line"><span style="color:#B392F0">  dfs</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#B392F0">  dfs</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<ul>
+<li>非递归</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> bfs</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [root];</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#6A737D">    //对curr做处理</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="基本性质">基本性质</h2>
+<h3 id="树的最大高度">树的最大高度</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定二叉树 [3,9,20,null,null,15,7]，</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    3</span></span>
+<span class="line"><span>   / \</span></span>
+<span class="line"><span>  9  20</span></span>
+<span class="line"><span>    /  \</span></span>
+<span class="line"><span>   15   7</span></span>
+<span class="line"><span>返回它的最大深度 3 。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/maximum-depth-of-binary-tree">leetcode</a>
+分析：求树的高度需要找出左右子树的高度，两者中最大的那个+1 就是当前树高，对于子树也是这个逻辑。当遍历的节点为空时就递归结束，root===null。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> maxDepth</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> lefth </span><span style="color:#F97583">=</span><span style="color:#B392F0"> maxDepth</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> righth </span><span style="color:#F97583">=</span><span style="color:#B392F0"> maxDepth</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(lefth, righth) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">// Runtime: 52 ms, faster than 100% of JavaScript</span></span></code></pre>
+<h3 id="二叉树的最小深度">二叉树的最小深度</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>说明: 叶子节点是指没有子节点的节点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>给定二叉树 [3,9,20,null,null,15,7],</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    3</span></span>
+<span class="line"><span>   / \</span></span>
+<span class="line"><span>  9  20</span></span>
+<span class="line"><span>    /  \</span></span>
+<span class="line"><span>   15   7</span></span>
+<span class="line"><span>返回它的最小深度  2.</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/minimum-depth-of-binary-tree">leetcode</a></p>
+<p>分析 1：采用 BFS，一层层遍历。发现当前层的某个节点没有子节点，意味着这是树的最小深度。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> minDepth</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> queue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [root];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> depth </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> size</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    depth</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> size; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">curr.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">curr.right) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> depth;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> depth;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>分析 2：采用 DFS</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> minDepth</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> dfs</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> left</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> right</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">right) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">left) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">right) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">min</span><span style="color:#E1E4E8">(left, right) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="平衡树">平衡树</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>示例 1:                                          示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>给定二叉树 [3,9,20,null,null,15,7]               给定二叉树 [1,2,2,3,3,null,null,4,4]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    3                                                  1</span></span>
+<span class="line"><span>   / \                                                / \</span></span>
+<span class="line"><span>  9  20                                              2   2</span></span>
+<span class="line"><span>    /  \                                            / \</span></span>
+<span class="line"><span>   15   7                                          3   3</span></span>
+<span class="line"><span>                                                  / \</span></span>
+<span class="line"><span>                                                 4  4</span></span>
+<span class="line"><span>返回 true                                        返回 false</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/balanced-binary-tree">leetcode</a>
+分析：平衡树就是结点的左右子树的高度&#x3C;=1。递归找到左右子树的高度，如果左右子树高度差大于 1 返回 false，否则返回 true。所以当前节点的左右子树高度&#x3C;=1&#x26;&#x26;当前节点的左子树的左右子树高度&#x3C;=1&#x26;&#x26;当前节点的右子树的左右子树高度&#x3C;=1，但这个条件成立的时候，返回 true</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> isBalanced</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> getDepth</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> left</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getDepth</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> right</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getDepth</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(left, right) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">abs</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">getDepth</span><span style="color:#E1E4E8">(root.left) </span><span style="color:#F97583">-</span><span style="color:#B392F0"> getDepth</span><span style="color:#E1E4E8">(root.right)) </span><span style="color:#F97583">&#x3C;=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> isBalanced</span><span style="color:#E1E4E8">(root.left) </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> isBalanced</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 96 ms, faster than 46.01% of JavaScript</span></span></code></pre>
+<h3 id="翻转二叉树">翻转二叉树</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>翻转一棵二叉树。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>     4</span></span>
+<span class="line"><span>   /   \</span></span>
+<span class="line"><span>  2     7</span></span>
+<span class="line"><span> / \   / \</span></span>
+<span class="line"><span>1   3 6   9</span></span>
+<span class="line"><span>输出：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>     4</span></span>
+<span class="line"><span>   /   \</span></span>
+<span class="line"><span>  7     2</span></span>
+<span class="line"><span> / \   / \</span></span>
+<span class="line"><span>9   6 3   1</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/invert-binary-tree">leetcode</a>
+分析：利用递归，交换左右子树翻转结果，直到最后一个节点的左右子树都是 null，返回结果</p>
+<p>题解：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> invertTree</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> root.left;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> root.right;</span></span>
+<span class="line"><span style="color:#E1E4E8">  root.right </span><span style="color:#F97583">=</span><span style="color:#B392F0"> invertTree</span><span style="color:#E1E4E8">(left);</span></span>
+<span class="line"><span style="color:#E1E4E8">  root.left </span><span style="color:#F97583">=</span><span style="color:#B392F0"> invertTree</span><span style="color:#E1E4E8">(right);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> root;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Runtime: 72 ms, faster than 86.03% of JavaScript</span></span></code></pre>
+<h3 id="归并两棵树">归并两棵树</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>输入:</span></span>
+<span class="line"><span>	Tree 1                     Tree 2</span></span>
+<span class="line"><span>          1                         2</span></span>
+<span class="line"><span>         / \                       / \</span></span>
+<span class="line"><span>        3   2                     1   3</span></span>
+<span class="line"><span>       /                           \   \</span></span>
+<span class="line"><span>      5                             4   7</span></span>
+<span class="line"><span>输出:</span></span>
+<span class="line"><span>合并后的树:</span></span>
+<span class="line"><span>	     3</span></span>
+<span class="line"><span>	    / \</span></span>
+<span class="line"><span>	   4   5</span></span>
+<span class="line"><span>	  / \   \</span></span>
+<span class="line"><span>	 5   4   7</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/merge-two-binary-trees">leetcode</a>
+分析：二叉树的合并就是一棵树的节点值加上另一棵树的节点值。使用递归，当前节点相加，左右子树分别合并的结果就是最后需要放回的树。直到两棵树都遍历完结束。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> mergeTrees</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">t1</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">t2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">t1 </span><span style="color:#F97583">||</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">t2) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> t1 </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> t2;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TreeNode</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    t1.val </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> t2.val,</span></span>
+<span class="line"><span style="color:#B392F0">    mergeTrees</span><span style="color:#E1E4E8">(t1.left, t2.left),</span></span>
+<span class="line"><span style="color:#B392F0">    mergeTrees</span><span style="color:#E1E4E8">(t1.right, t2.right),</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 112 ms, faster than 73.12% of JavaScript</span></span></code></pre>
+<h2 id="二叉树遍历">二叉树遍历</h2>
+<h3 id="从前序与中序遍历序列构造二叉树">从前序与中序遍历序列构造二叉树</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>你可以假设树中没有重复的元素。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>例如，给出</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>前序遍历 preorder = [3,9,20,15,7]</span></span>
+<span class="line"><span>中序遍历 inorder = [9,3,15,20,7]</span></span>
+<span class="line"><span>返回如下的二叉树：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    3</span></span>
+<span class="line"><span>   / \</span></span>
+<span class="line"><span>  9  20</span></span>
+<span class="line"><span>    /  \</span></span>
+<span class="line"><span>   15   7</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal">leetcode</a>
+分析：对于前序遍历序列来说第一个数据就是当前树根节点，在中序遍历中根节点左右两侧的分别是左右子树序列。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> buildTree</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">preorder</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">inorder</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> buildTreeFunc</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">start</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">end</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (start </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> end) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> tree</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TreeNode</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> val</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> preorder.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    tree.val </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> val;</span></span>
+<span class="line"><span style="color:#E1E4E8">    tree.left </span><span style="color:#F97583">=</span><span style="color:#B392F0"> buildTreeFunc</span><span style="color:#E1E4E8">(start, inorder.</span><span style="color:#B392F0">indexOf</span><span style="color:#E1E4E8">(val) </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    tree.right </span><span style="color:#F97583">=</span><span style="color:#B392F0"> buildTreeFunc</span><span style="color:#E1E4E8">(inorder.</span><span style="color:#B392F0">indexOf</span><span style="color:#E1E4E8">(val) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, end);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> tree;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> buildTreeFunc</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, preorder.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 132 ms, faster than 46.85 % of javascript   待优化</span></span></code></pre>
+<h3 id="左叶子之和">左叶子之和</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>    3</span></span>
+<span class="line"><span>   / \</span></span>
+<span class="line"><span>  9  20</span></span>
+<span class="line"><span>    /  \</span></span>
+<span class="line"><span>   15   7</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>在这个二叉树中，有两个左叶子，分别是 9 和 15，所以返回 24</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/sum-of-left-leaves/">leetcode</a></p>
+<p>分析：每次递归前，要先判断节点是不是空。如果左子树存在并且没有子节点，就累计结果；否则继续递归。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> sumOfLeftLeaves</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> recur</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (root.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">root.left.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">root.left.right) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      res </span><span style="color:#F97583">+=</span><span style="color:#E1E4E8"> root.left.val;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    root.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> recur</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">    root.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> recur</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  recur</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="二叉树的层平均值">二叉树的层平均值</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>输入：</span></span>
+<span class="line"><span>    3</span></span>
+<span class="line"><span>   / \</span></span>
+<span class="line"><span>  9  20</span></span>
+<span class="line"><span>    /  \</span></span>
+<span class="line"><span>   15   7</span></span>
+<span class="line"><span>输出：[3, 14.5, 11]</span></span>
+<span class="line"><span>解释：</span></span>
+<span class="line"><span>第 0 层的平均值是 3 ,  第1层是 14.5 , 第2层是 11 。因此返回 [3, 14.5, 11] 。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/average-of-levels-in-binary-tree">leetcode</a></p>
+<p>分析：采用层级遍历，套用上文的 bfs 模板。第一层循环表示层级，第二层循坏表示循环当前层级的所有节点。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> averageOfLevels</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> queue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> res</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">  queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> sum </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> levelLen</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> queue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; index </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> levelLen; index</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">      sum </span><span style="color:#F97583">+=</span><span style="color:#E1E4E8"> curr.val;</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">      curr.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    res.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(sum </span><span style="color:#F97583">/</span><span style="color:#E1E4E8"> levelLen);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 94.02 % of javascript</span></span></code></pre>
+<h3 id="二叉树的坡度">二叉树的坡度</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>         1</span></span>
+<span class="line"><span>       /   \</span></span>
+<span class="line"><span>      2     3</span></span>
+<span class="line"><span>输出：1</span></span>
+<span class="line"><span>解释：</span></span>
+<span class="line"><span>结点 2 的坡度: 0</span></span>
+<span class="line"><span>结点 3 的坡度: 0</span></span>
+<span class="line"><span>结点 1 的坡度: |2-3| = 1</span></span>
+<span class="line"><span>树的坡度 : 0 + 0 + 1 = 1</span></span>
+<span class="line"><span></span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/binary-tree-tilt">leetcode</a>
+分析：节点坡度是<strong>左子树的结点之和和右子树结点之和的差的绝对值</strong>，所以要从最深开始遍历
+递归开始，设置一个值获取每个节点下面，左节点总和，右节点总和。然后去相减取绝对值
+注意每次递归前，要先判断节点是不是空</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> findTilt</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> recur</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> left</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> recur</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> right</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> recur</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">    res </span><span style="color:#F97583">+=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">abs</span><span style="color:#E1E4E8">(left </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> right);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> root.val </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> right;</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  recur</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 92 ms, faster than 61.49% of JavaScript</span></span></code></pre>
+<h3 id="二叉树中第二小的节点">二叉树中第二小的节点</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给出这样的一个二叉树，你需要输出所有节点中的第二小的值。如果第二小的值不存在的话，输出 -1 。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:                                         示例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入:                                           输入:</span></span>
+<span class="line"><span>    2                                               2</span></span>
+<span class="line"><span>   / \                                             / \</span></span>
+<span class="line"><span>  2   5                                           2   2</span></span>
+<span class="line"><span>     / \</span></span>
+<span class="line"><span>    5   7</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输出: 5                                         输出: -1</span></span>
+<span class="line"><span>说明: 最小的值是 2 ，第二小的值是 5 。            说明: 最小的值是 2, 但是不存在第二小的值。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/second-minimum-node-in-a-binary-tree">leetcode</a>
+分析 1：采用 dfs 递归，借助数组存储数据。如果 res 中不存在当前节点值，就放入数组中，从而达到去重的效果。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> findSecondMinimumValue</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> res</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> recur</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> root.val;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">res.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(curr)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      res.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#B392F0">    recur</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#B392F0">    recur</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  recur</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#E1E4E8">  res.</span><span style="color:#B392F0">sort</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">a</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">b</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> b);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> res[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">:</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms, faster than 61.46% of JavaScript</span></span></code></pre>
+<h3 id="求根到叶子节点数字之和">求根到叶子节点数字之和</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个二叉树，它的每个结点都存放一个 0-9 的数字，每条从根到叶子节点的路径都代表一个数字。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>例如，从根到叶子节点路径 1->2->3 代表数字 123。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>计算从根到叶子节点生成的所有数字之和。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>说明: 叶子节点是指没有子节点的节点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入: [1,2,3]</span></span>
+<span class="line"><span>    1</span></span>
+<span class="line"><span>   / \</span></span>
+<span class="line"><span>  2   3</span></span>
+<span class="line"><span>输出: 25</span></span>
+<span class="line"><span>解释:</span></span>
+<span class="line"><span>从根到叶子节点路径 1->2 代表数字 12.</span></span>
+<span class="line"><span>从根到叶子节点路径 1->3 代表数字 13.</span></span>
+<span class="line"><span>因此，数字总和 = 12 + 13 = 25.</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/sum-root-to-leaf-numbers">leetcode</a>
+分析：每个节点都代表一个数字，等同于其父节点对应的数字*10 再加上该节点的值。计算出每个叶子节点对应的数字，计算出所有的叶子节点对应的数字之和。
+分析 1：dfs，从根节点开始，遍历每个节点，如果遇到叶子节点就将数字加到数字之和。如果不是叶子节点，就计算当前节点的数字，然后对子节点递归遍历。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> sumNumbers</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> dfs</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">i</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">*</span><span style="color:#79B8FF"> 10</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> root.val;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">root.right) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root.left, temp) </span><span style="color:#F97583">+</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root.right, temp);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 84 ms, faster than 52.22% of JavaScript</span></span></code></pre>
+<p>分析 2：bfs，需要维护两个队列，节点队列和节点对应的数字。如果当前节点是叶子节点，将节点对应的数字加到数字之和；如果不是叶子节点，就把子节点和子节点计算出的对应数字分别加入两个队列中。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> sumNumbers</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> nodeQueue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [root];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> numQueue</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [root.val];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (nodeQueue.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> currNode</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> nodeQueue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> currNum</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> numQueue.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">currNode.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">currNode.right) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      res </span><span style="color:#F97583">+=</span><span style="color:#E1E4E8"> currNum;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (currNode.left) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      nodeQueue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(currNode.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">      numQueue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(currNum </span><span style="color:#F97583">*</span><span style="color:#79B8FF"> 10</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> currNode.left.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (currNode.right) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      nodeQueue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(currNode.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">      numQueue.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(currNum </span><span style="color:#F97583">*</span><span style="color:#79B8FF"> 10</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> currNode.right.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="二叉树的路径">二叉树的路径</h2>
+<h3 id="二叉树的所有路径">二叉树的所有路径</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>输入:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>   1</span></span>
+<span class="line"><span> /   \</span></span>
+<span class="line"><span>2     3</span></span>
+<span class="line"><span> \</span></span>
+<span class="line"><span>  5</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输出: ["1->2->5", "1->3"]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>解释: 所有根节点到叶子节点的路径为: 1->2->5, 1->3</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/binary-tree-paths">leetcode</a>
+分析：利用前序遍历，当某个节点的左右子树都为 null 的时候，说明已经走完该路径</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> binaryTreePaths</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> res</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> recur</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">str</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    str </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">root</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">val</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">root.right) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      res.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(str);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      str </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> '->'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">      recur</span><span style="color:#E1E4E8">(root.left, str);</span></span>
+<span class="line"><span style="color:#B392F0">      recur</span><span style="color:#E1E4E8">(root.right, str);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  recur</span><span style="color:#E1E4E8">(root, </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 76 ms,faster than 89.60 % of JavaScript</span></span></code></pre>
+<h3 id="路径总和">路径总和</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>说明: 叶子节点是指没有子节点的节点。</span></span>
+<span class="line"><span>示例：</span></span>
+<span class="line"><span>给定如下二叉树，以及目标和 sum = 22，</span></span>
+<span class="line"><span>              5</span></span>
+<span class="line"><span>             / \</span></span>
+<span class="line"><span>            4   8</span></span>
+<span class="line"><span>           /   / \</span></span>
+<span class="line"><span>          11  13  4</span></span>
+<span class="line"><span>         /  \      \</span></span>
+<span class="line"><span>        7    2      1</span></span>
+<span class="line"><span>返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/path-sum">leetcode</a></p>
+<p>分析:遍历树节点，当遍历完且遍历的所有结点和为 sum 返回 true，值得注意的一点<strong>根节点到叶子节点</strong>，所以条件中需要加入 root.left===null&#x26;&#x26;root.right===null</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> hasPathSum</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sum</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> dfs</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sum</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (root.val </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> sum </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">root.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">root.right) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> (res </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    root.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root.left, sum </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> root.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">    root.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#B392F0"> dfs</span><span style="color:#E1E4E8">(root.right, sum </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> root.val);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  dfs</span><span style="color:#E1E4E8">(root, sum);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 88 ms, faster than 65.75% of JavaScript</span></span></code></pre>
+<h3 id="最长同值路径">最长同值路径</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个二叉树，找到最长的路径，这个路径中的每个节点具有相同值。 这条路径可以经过也可以不经过根节点。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>注意：两个节点之间的路径长度由它们之间的边数表示。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>示例 1:                        示例 2:</span></span>
+<span class="line"><span>输入:                          输入:</span></span>
+<span class="line"><span>              5                              1</span></span>
+<span class="line"><span>             / \                            / \</span></span>
+<span class="line"><span>            4   5                          4   5</span></span>
+<span class="line"><span>           / \   \                        / \   \</span></span>
+<span class="line"><span>          1   1   5                      4   4   5</span></span>
+<span class="line"><span>输出: 2                        输出: 2</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/longest-univalue-path">leetcode</a></p>
+<p>分析：采用 DFS。对于当前节点，左子树能提供的长度为 left，如果当前节点值等于左子节点的值，则左链的长度等于 left+1，否则为 0(右子树也是如此)。当前子树对父节点提供的最大长度为左右链中较大的一个。当前子树的左右链之和，去和全局最大值比较</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> longestUnivaluePath</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> level </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> helper</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">parent</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">current</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (current </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">=</span><span style="color:#B392F0"> helper</span><span style="color:#E1E4E8">(current.val, current.left);</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">=</span><span style="color:#B392F0"> helper</span><span style="color:#E1E4E8">(current.val, current.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">    level </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(level, left </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> right);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> current.val </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> parent </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">max</span><span style="color:#E1E4E8">(left, right) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> :</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (root </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">helper</span><span style="color:#E1E4E8">(root.val, root);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> level;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 252 ms, faster than 46.37% of JavaScript</span></span></code></pre>
+<h2 id="二叉搜索树">二叉搜索树</h2>
+<h3 id="将有序数组转换为二叉搜索树">将有序数组转换为二叉搜索树</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定有序数组: [-10,-3,0,5,9],</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>一个可能的答案是：[0,-3,9,-10,null,5]，它可以表示下面这个高度平衡二叉搜索树：</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>      0</span></span>
+<span class="line"><span>     / \</span></span>
+<span class="line"><span>   -3   9</span></span>
+<span class="line"><span>   /   /</span></span>
+<span class="line"><span> -10  5</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree">leetcode</a>
+分析：为了达到平衡，每次都把数组二分，中间的值作为根节点，然后左右分别为左右子树，依次递归，直至数组为空。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> sortedArrayToBST</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">nums</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">nums.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> mid</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">ceil</span><span style="color:#E1E4E8">((nums.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TreeNode</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    nums[mid],</span></span>
+<span class="line"><span style="color:#B392F0">    sortedArrayToBST</span><span style="color:#E1E4E8">(nums.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, mid)),</span></span>
+<span class="line"><span style="color:#B392F0">    sortedArrayToBST</span><span style="color:#E1E4E8">(nums.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(mid </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)),</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 124 ms, faster than 17.83 % of javascript   待优化</span></span></code></pre>
+<h3 id="两数之和-iv---输入-bst">两数之和 IV - 输入 BST</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个二叉搜索树和一个目标结果，如果 BST 中存在两个元素且它们的和等于给定的目标结果，则返回 true。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>案例 1:                           案例 2:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输入:                             输入:</span></span>
+<span class="line"><span>    5                                 5</span></span>
+<span class="line"><span>   / \                               / \</span></span>
+<span class="line"><span>  3   6                             3   6</span></span>
+<span class="line"><span> / \   \                           / \   \</span></span>
+<span class="line"><span>2   4   7                         2   4   7</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Target = 9                        Target = 28</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>输出: True                        输出: False</span></span></code></pre>
+<p>分析 1：先把树转化为数组，将题目转换成为在数组中是否存在两个元素相加为目标结果</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> findTarget</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">k</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> nums </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> inOrder</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    inOrder</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">    nums.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(root.val);</span></span>
+<span class="line"><span style="color:#B392F0">    inOrder</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  inOrder</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> arrMap</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> nums.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> result</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> nums[i];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (arrMap.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(result)) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    arrMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(nums[i], i);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 100 ms, faster than 96.68% of JavaScript</span></span></code></pre>
+<p>分析 2：直接在树中，一个个值拿出来进行比较，采用 dfs 但先遍历右子树</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> findTarget</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">k</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> stack</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [root];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> map</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (stack.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(k </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> curr.val)) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(curr.val, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.left </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.left);</span></span>
+<span class="line"><span style="color:#E1E4E8">    curr.right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> stack.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 132 ms, faster than 28.32% of JavaScript</span></span></code></pre>
+<h3 id="二叉搜索树节点最小距离">二叉搜索树节点最小距离</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>输入: root = [4,2,6,1,3,null,null]</span></span>
+<span class="line"><span>输出: 1</span></span>
+<span class="line"><span>解释:</span></span>
+<span class="line"><span>注意，root是树节点对象(TreeNode object)，而不是数组。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>给定的树 [4,2,6,1,3,null,null] 可表示为下图:</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>          4</span></span>
+<span class="line"><span>        /   \</span></span>
+<span class="line"><span>      2      6</span></span>
+<span class="line"><span>     / \</span></span>
+<span class="line"><span>    1   3</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>最小的差值是 1, 它是节点1和节点2的差值, 也是节点3和节点2的差值。</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes">leetcode</a>
+分析：通过中序遍历，使用 last 存储上一个节点的 val 值，和当前节点的值做减法与 ans 做比较，获得最小的值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> minDiffInBST</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> last </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> ans </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> Infinity</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> inOrder</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    inOrder</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (last </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      ans </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">min</span><span style="color:#E1E4E8">(ans, Math.</span><span style="color:#B392F0">abs</span><span style="color:#E1E4E8">(root.val </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> last));</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    last </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> root.val;</span></span>
+<span class="line"><span style="color:#B392F0">    inOrder</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  inOrder</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> ans;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 68 ms, faster than 96.55% of JavaScript</span></span></code></pre>
+<h3 id="二叉搜索树中的众数">二叉搜索树中的众数</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>给定一个有相同值的二叉搜索树（BST），找出 BST 中的所有众数（出现频率最高的元素）。</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>给定 BST [1,null,2,2]</span></span>
+<span class="line"><span>   1</span></span>
+<span class="line"><span>    \</span></span>
+<span class="line"><span>     2</span></span>
+<span class="line"><span>    /</span></span>
+<span class="line"><span>   2</span></span>
+<span class="line"><span>返回[2]</span></span></code></pre>
+<p><a href="https://leetcode-cn.com/problems/find-mode-in-binary-search-tree/">leetcode</a>
+分析：采用 dfs 递归解法，当 maxCount 小于遍历结点值出现的次数，就更新 maxCount 并置空 res；相等就把节点值放入 res；小于不操作。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> findMode</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> map</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">//存储数字出现的次数</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> res</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> []; </span><span style="color:#6A737D">//存储出现次数最多的数</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> maxCount </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//当前最大出现次数</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> recur</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">root</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">root) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> curr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> root.val;</span></span>
+<span class="line"><span style="color:#E1E4E8">    map.</span><span style="color:#B392F0">has</span><span style="color:#E1E4E8">(curr) </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(curr, map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> map.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(curr, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr) </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> maxCount) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr) </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> maxCount </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> (res.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">); </span><span style="color:#6A737D">//如果比当前maxCount大，则重置res</span></span>
+<span class="line"><span style="color:#E1E4E8">      maxCount </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> map.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">      res.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(curr);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#B392F0">    recur</span><span style="color:#E1E4E8">(root.left);</span></span>
+<span class="line"><span style="color:#B392F0">    recur</span><span style="color:#E1E4E8">(root.right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  recur</span><span style="color:#E1E4E8">(root);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#6A737D">//Runtime: 92 ms, faster than 76.30% of JavaScript</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#解题技巧"> 解题技巧 </a><a class="depth-3" href="#前中后序"> 前/中/后序 </a><a class="depth-3" href="#层级遍历bfs"> 层级遍历(bfs) </a><a class="depth-3" href="#dfs"> dfs </a><a class="depth-2" href="#基本性质"> 基本性质 </a><a class="depth-3" href="#树的最大高度"> 树的最大高度 </a><a class="depth-3" href="#二叉树的最小深度"> 二叉树的最小深度 </a><a class="depth-3" href="#平衡树"> 平衡树 </a><a class="depth-3" href="#翻转二叉树"> 翻转二叉树 </a><a class="depth-3" href="#归并两棵树"> 归并两棵树 </a><a class="depth-2" href="#二叉树遍历"> 二叉树遍历 </a><a class="depth-3" href="#从前序与中序遍历序列构造二叉树"> 从前序与中序遍历序列构造二叉树 </a><a class="depth-3" href="#左叶子之和"> 左叶子之和 </a><a class="depth-3" href="#二叉树的层平均值"> 二叉树的层平均值 </a><a class="depth-3" href="#二叉树的坡度"> 二叉树的坡度 </a><a class="depth-3" href="#二叉树中第二小的节点"> 二叉树中第二小的节点 </a><a class="depth-3" href="#求根到叶子节点数字之和"> 求根到叶子节点数字之和 </a><a class="depth-2" href="#二叉树的路径"> 二叉树的路径 </a><a class="depth-3" href="#二叉树的所有路径"> 二叉树的所有路径 </a><a class="depth-3" href="#路径总和"> 路径总和 </a><a class="depth-3" href="#最长同值路径"> 最长同值路径 </a><a class="depth-2" href="#二叉搜索树"> 二叉搜索树 </a><a class="depth-3" href="#将有序数组转换为二叉搜索树"> 将有序数组转换为二叉搜索树 </a><a class="depth-3" href="#两数之和-iv---输入-bst"> 两数之和 IV - 输入 BST </a><a class="depth-3" href="#二叉搜索树节点最小距离"> 二叉搜索树节点最小距离 </a><a class="depth-3" href="#二叉搜索树中的众数"> 二叉搜索树中的众数 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/base/extends-of--type-script/">上一篇：TypeScript 之 extends</a> <a href="/blog/data-structure/array/">下一篇：数组</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

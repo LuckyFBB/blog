@@ -1,15 +1,352 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>如何做国际化文本提取 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>如何做国际化文本提取</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>在之前的文章 <a href="/blog/engineering/base-babel">babel 与 SWC</a> 中，主要是介绍了一些 babel 的基础配置，babel 的架构图如下:</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/0142bd87-57c9-46ee-bbe0-3bbc062e2a54" alt="image.png"></p>
+<h2 id="确定中文范围">确定中文范围</h2>
+<p>先需要明确项目中可能存在中文的情况有哪些?</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> a</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> '霜序'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> b</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `霜序`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> c</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">isBoolean</span><span style="color:#9ECBFF">} ? "霜序" : "FBB"`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> obj</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { a: </span><span style="color:#9ECBFF">'霜序'</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#6A737D">// enum Status {</span></span>
+<span class="line"><span style="color:#6A737D">//     Todo = "未完成",</span></span>
+<span class="line"><span style="color:#6A737D">//     Complete = "完成"</span></span>
+<span class="line"><span style="color:#6A737D">// }</span></span>
+<span class="line"><span style="color:#6A737D">// enum Status {</span></span>
+<span class="line"><span style="color:#6A737D">//     "未完成",</span></span>
+<span class="line"><span style="color:#6A737D">//     "完成"</span></span>
+<span class="line"><span style="color:#6A737D">// }</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> dom</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>霜序&#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> dom1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Customer</span><span style="color:#B392F0"> name</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"霜序"</span><span style="color:#E1E4E8"> />;</span></span></code></pre>
+<p>虽然有很多情况下会出现中文，在代码中存在的时候大部分是<code>string</code>或者模版字符串，在<code>react</code>中的时候一个是<code>dom</code>的子节点还是一种是<code>props</code>上的属性包含中文。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#6A737D">// const a = '霜序';</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"StringLiteral"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">14</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "extra"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "rawValue"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "raw"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"'霜序'"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "value"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>StringLiteral</strong></p>
+<p>对应的<code>AST</code>节点为<code>StringLiteral</code>，需要去遍历所有的<code>StringLiteral</code>节点，将当前的节点替换为我们需要的<code>I18N.key</code>这种节点。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#6A737D">// const b = `${finalRoles}(质量项目：${projects})`</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"TemplateLiteral"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">43</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "expressions"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Identifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">13</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">23</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"finalRoles"</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Identifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">32</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">40</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"projects"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ],</span></span>
+<span class="line"><span style="color:#79B8FF">  "quasis"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"TemplateElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">11</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">11</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "value"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "raw"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">""</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "cooked"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">""</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"TemplateElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">30</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "value"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "raw"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"(质量项目："</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "cooked"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"(质量项目："</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"TemplateElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">41</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">42</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "value"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "raw"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">")"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "cooked"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">")"</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>TemplateLiteral</strong></p>
+<p>相对于字符串情况会复杂一些，<code>TemplateLiteral</code>中会出现变量的情况，能够看到在<code>TemplateLiteral</code>节点中存在<code>expressions</code>和<code>quasis</code>两个字段分别表示变量和字符串</p>
+<p>其实可以发现对于字符串来说全部都在<code>TemplateElement</code>节点上，那么是否可以直接遍历所有的<code>TemplateElement</code>节点，和<code>StringLiteral</code>一样。</p>
+<p>直接遍历<code>TemplateElement</code>的时候，处理之后的效果如下:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> b</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">finalRoles</span><span style="color:#9ECBFF">}(质量项目：${</span><span style="color:#E1E4E8">projects</span><span style="color:#9ECBFF">})`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> b</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">finalRoles</span><span style="color:#9ECBFF">}${</span><span style="color:#79B8FF">I18N</span><span style="color:#9ECBFF">.</span><span style="color:#79B8FF">K</span><span style="color:#9ECBFF">}${</span><span style="color:#E1E4E8">projects</span><span style="color:#9ECBFF">})`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// I18N.K = "(质量项目："</span></span></code></pre>
+<p>那么这种只提取中文不管变量的情况，会导致翻译不到的问题，上下文很缺失。</p>
+<p>最后我们会处理成<code>{val1}(质量项目：{val2})</code>的情况，将对应<code>val1</code>和<code>val2</code>传入</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">I18N</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">I18N</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">K</span><span style="color:#E1E4E8">, {</span></span>
+<span class="line"><span style="color:#E1E4E8">  val1: finalRoles,</span></span>
+<span class="line"><span style="color:#E1E4E8">  val2: projects,</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p><strong>JSXText</strong></p>
+<p>对应的<code>AST</code>节点为<code>JSXText</code>，去遍历<code>JSXElement</code>节点，在遍历对应的<code>children</code>中的<code>JSXText</code>处理中文文本</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"JSXElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">12</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">25</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "children"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"JSXText"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">17</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">19</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "extra"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "rawValue"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "raw"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#79B8FF">      "value"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>JSXAttribute</strong></p>
+<p>对应的<code>AST</code>节点为<code>JSXAttribute</code>，中文存在的节点还是<code>StringLiteral</code>，但是在处理的时候还是特殊处理<code>JSXAttribute</code>中的<code>StringLiteral</code>，因为对于这种<code>JSX</code>中的数据来说我们需要包裹<code>{}</code>，不是直接做文本替换的</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"JSXOpeningElement"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">13</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">35</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "name"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"JSXIdentifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">14</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">22</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Customer"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "attributes"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#79B8FF">      "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"JSXAttribute"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">23</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">32</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">      "name"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"JSXIdentifier"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">23</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">27</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"name"</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#79B8FF">      "value"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">        "type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"StringLiteral"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "start"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">28</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "end"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">32</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "extra"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">          "rawValue"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">          "raw"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">\"</span><span style="color:#9ECBFF">霜序</span><span style="color:#79B8FF">\"</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#79B8FF">        "value"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"霜序"</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ],</span></span>
+<span class="line"><span style="color:#79B8FF">  "selfClosing"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="使用-babel-处理">使用 Babel 处理</h2>
+<p><img src="https://user-images.githubusercontent.com/38368040/167138103-b604db7f-63d5-4943-bde2-0785153d54b2.png" alt="image.png"></p>
+<h3 id="使用-babelparser-将源代码转译为-ast">使用 @babel/parser 将源代码转译为 AST</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> plugins</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ParserOptions</span><span style="color:#E1E4E8">[</span><span style="color:#9ECBFF">'plugins'</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">'decorators-legacy'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'typescript'</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (fileName.</span><span style="color:#B392F0">endsWith</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'text'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> fileName.</span><span style="color:#B392F0">endsWith</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'text'</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  plugins.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'text'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> ast</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> parse</span><span style="color:#E1E4E8">(sourceCode, {</span></span>
+<span class="line"><span style="color:#E1E4E8">  sourceType: </span><span style="color:#9ECBFF">'module'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  plugins,</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<h3 id="babeltraverse-特殊处理上述的节点转化-ast">@babel/traverse 特殊处理上述的节点，转化 AST</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">babelTraverse</span><span style="color:#E1E4E8">(ast, {</span></span>
+<span class="line"><span style="color:#B392F0">  StringLiteral</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">node</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> path;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">value</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> node;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#F97583">      !</span><span style="color:#E1E4E8">value.</span><span style="color:#B392F0">match</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">DOUBLE_BYTE_REGEX</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">      (path.parentPath.node.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'CallExpression'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">        path.parentPath.</span><span style="color:#B392F0">toString</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'console'</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    path.</span><span style="color:#B392F0">replaceWithMultiple</span><span style="color:#E1E4E8">(template.</span><span style="color:#B392F0">ast</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`I18N.${</span><span style="color:#E1E4E8">key</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#B392F0">  TemplateLiteral</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">node</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> path;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">start</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">end</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> node;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">start </span><span style="color:#F97583">||</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">end) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> templateContent </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> sourceCode.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(start </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, end </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#F97583">      !</span><span style="color:#E1E4E8">templateContent.</span><span style="color:#B392F0">match</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">DOUBLE_BYTE_REGEX</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">      (path.parentPath.node.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'CallExpression'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">        path.parentPath.</span><span style="color:#B392F0">toString</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'console'</span><span style="color:#E1E4E8">)) </span><span style="color:#F97583">||</span></span>
+<span class="line"><span style="color:#E1E4E8">      path.parentPath.node.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'TaggedTemplateExpression'</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">node.expressions.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      path.</span><span style="color:#B392F0">replaceWithMultiple</span><span style="color:#E1E4E8">(template.</span><span style="color:#B392F0">ast</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`I18N.${</span><span style="color:#E1E4E8">key</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">      path.</span><span style="color:#B392F0">skip</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> expressions</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> node.expressions.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">expression</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">start</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">end</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> expression;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">start </span><span style="color:#F97583">||</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">end) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> sourceCode.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(start, end);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> kvPair</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> expressions.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">expression</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      templateContent </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> templateContent.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">        `</span><span style="color:#79B8FF">\$</span><span style="color:#9ECBFF">{${</span><span style="color:#E1E4E8">expression</span><span style="color:#9ECBFF">}}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">        `{val${</span><span style="color:#E1E4E8">index</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 1</span><span style="color:#9ECBFF">}}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      );</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#9ECBFF"> `val${</span><span style="color:#E1E4E8">index</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 1</span><span style="color:#9ECBFF">}: ${</span><span style="color:#E1E4E8">expression</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">    path.</span><span style="color:#B392F0">replaceWithMultiple</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">      template.</span><span style="color:#B392F0">ast</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`I18N.get(I18N.${</span><span style="color:#E1E4E8">key</span><span style="color:#9ECBFF">},{${</span><span style="color:#E1E4E8">kvPair</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">join</span><span style="color:#9ECBFF">(</span><span style="color:#9ECBFF">',</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}})`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#B392F0">  JSXElement</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> children</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.node.children;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> newChild</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> children.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">child</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (babelTypes.</span><span style="color:#B392F0">isJSXText</span><span style="color:#E1E4E8">(child)) {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">value</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> child;</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (value.</span><span style="color:#B392F0">match</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">DOUBLE_BYTE_REGEX</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> newExpression</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> babelTypes.</span><span style="color:#B392F0">jsxExpressionContainer</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">            babelTypes.</span><span style="color:#B392F0">identifier</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`I18N.${</span><span style="color:#E1E4E8">key</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">          );</span></span>
+<span class="line"><span style="color:#F97583">          return</span><span style="color:#E1E4E8"> newExpression;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> child;</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">    path.node.children </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> newChild;</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#B392F0">  JSXAttribute</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">node</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> path;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      babelTypes.</span><span style="color:#B392F0">isStringLiteral</span><span style="color:#E1E4E8">(node.value) </span><span style="color:#F97583">&#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">      node.value.value.</span><span style="color:#B392F0">match</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">DOUBLE_BYTE_REGEX</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> expression</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> babelTypes.</span><span style="color:#B392F0">jsxExpressionContainer</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">        babelTypes.</span><span style="color:#B392F0">memberExpression</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">          babelTypes.</span><span style="color:#B392F0">identifier</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'I18N'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">          babelTypes.</span><span style="color:#B392F0">identifier</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">key</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">        ),</span></span>
+<span class="line"><span style="color:#E1E4E8">      );</span></span>
+<span class="line"><span style="color:#E1E4E8">      node.value </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> expression;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>对于<code>TemplateLiteral</code>来说需要处理<code>expression</code>，通过截取的方式获取到对应的模版字符串 <code>templateContent</code>，如果不存在<code>expressions</code>，直接类似<code>StringLiteral</code>处理；存在<code>expressions</code>的情况下，遍历<code>expressions</code>通过<code>${val(index)}</code>替换掉<code>templateContent</code>中的<code>expression</code>，最后使用<code>I18N.get</code>的方式获取对应的值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> name</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">a</span><span style="color:#9ECBFF">}霜序`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// const name = I18N.get(I18N.test.A, { val1: a });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> name1</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">a</span><span style="color:#F97583"> ?</span><span style="color:#9ECBFF"> '霜'</span><span style="color:#F97583"> :</span><span style="color:#9ECBFF"> '序'}霜序`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// const name1 = I18N.get(I18N.test.B, { val1: a ? I18N.test.C : I18N.test.D });</span></span></code></pre>
+<p>对于<code>TemplateLiteral</code>节点来说，如果是嵌套的情况，会出现问题。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> name1</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">a</span><span style="color:#F97583"> ?</span><span style="color:#9ECBFF"> `霜`</span><span style="color:#F97583"> :</span><span style="color:#9ECBFF"> `序`}霜序`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// const name1 = I18N.get(I18N.test.B, { val1: a ? `霜` : `序` });</span></span></code></pre>
+<blockquote>
+<p>🤔  为何对于<code>TemplateLiteral</code>中嵌套的<code>StringLiteral</code>会处理，而<code>TemplateLiteral</code>就不处理呢？
+💡  导致原因为<code>babel</code>不会自动递归处理<code>TemplateLiteral</code>的子级嵌套模板。
+上述的代码中通过遍历一些<code>AST</code>处理完了之后，我们需要统一引入当前<code>I18N</code>这个变量。那么没我们需要在当前文件的<code>AST</code>顶部的<code>import</code>语句后插入当前的<code>importStatement</code></p>
+</blockquote>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">Program</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#B392F0">    exit</span><span style="color:#E1E4E8">(path) {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> importStatement</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> projectConfig.importStatement;</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> result</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> importStatement</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">^</span><span style="color:#DBEDFF">import</span><span style="color:#79B8FF">\s</span><span style="color:#F97583">+|</span><span style="color:#79B8FF">\s</span><span style="color:#F97583">+</span><span style="color:#DBEDFF">from</span><span style="color:#79B8FF">\s</span><span style="color:#F97583">+</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">','</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">','</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(Boolean);</span></span>
+<span class="line"><span style="color:#6A737D">        // 判断当前的文件中是否存在 importStatement 语句</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#79B8FF"> existingImport</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.node.body.</span><span style="color:#B392F0">find</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">node</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">                babelTypes.</span><span style="color:#B392F0">isImportDeclaration</span><span style="color:#E1E4E8">(node) </span><span style="color:#F97583">&#x26;&#x26;</span></span>
+<span class="line"><span style="color:#E1E4E8">                node.source.value </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> result[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">            );</span></span>
+<span class="line"><span style="color:#E1E4E8">        });</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">existingImport) {</span></span>
+<span class="line"><span style="color:#F97583">            const</span><span style="color:#79B8FF"> importDeclaration</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> babelTypes.</span><span style="color:#B392F0">importDeclaration</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">                [</span></span>
+<span class="line"><span style="color:#E1E4E8">                    babelTypes.</span><span style="color:#B392F0">importDefaultSpecifier</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">                        babelTypes.</span><span style="color:#B392F0">identifier</span><span style="color:#E1E4E8">(result[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]),</span></span>
+<span class="line"><span style="color:#E1E4E8">                    ),</span></span>
+<span class="line"><span style="color:#E1E4E8">                ],</span></span>
+<span class="line"><span style="color:#E1E4E8">                babelTypes.</span><span style="color:#B392F0">stringLiteral</span><span style="color:#E1E4E8">(result[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">]),</span></span>
+<span class="line"><span style="color:#E1E4E8">            );</span></span>
+<span class="line"><span style="color:#E1E4E8">            path.node.body.</span><span style="color:#B392F0">unshift</span><span style="color:#E1E4E8">(importDeclaration);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="转为代码">转为代码</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">code</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#B392F0"> generate</span><span style="color:#E1E4E8">(ast, {</span></span>
+<span class="line"><span style="color:#E1E4E8">  retainLines: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  comments: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>因为我们的场景不适合将该功能封装成<code>plugin</code>，但是整体和写<code>plugin</code>的思路差不多。在<code>.babelrc</code>中配置对应的<code>plugin</code>即可</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> i18nPlugin</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    visitor: {</span></span>
+<span class="line"><span style="color:#B392F0">      StringLiteral</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {},</span></span>
+<span class="line"><span style="color:#B392F0">      TemplateLiteral</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {},</span></span>
+<span class="line"><span style="color:#B392F0">      JSXElement</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {},</span></span>
+<span class="line"><span style="color:#B392F0">      JSXAttribute</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">path</span><span style="color:#E1E4E8">) {},</span></span>
+<span class="line"><span style="color:#E1E4E8">      Program: {},</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="其他处理">其他处理</h2>
+<p><strong>动态生成 key</strong></p>
+<p>每一个中文生成<code>key</code>的方式都是固定的，类似<code>excel</code>列名</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> getSortKey</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">n</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">extractMap</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {})</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#F97583"> =></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> label </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> num </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> n;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (num </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    num</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> String.</span><span style="color:#B392F0">fromCharCode</span><span style="color:#E1E4E8">((num </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 26</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 65</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> label;</span></span>
+<span class="line"><span style="color:#E1E4E8">    num </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">floor</span><span style="color:#E1E4E8">(num </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 26</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">label</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (_.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(extractMap, key)) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> getSortKey</span><span style="color:#E1E4E8">(n </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, extractMap);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> key;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>每一个文件的前缀都是一定的，按着路径生成的，不会包含<code>extractDir</code>之前的内容</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> getFileKey</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">filePath</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> extractDir</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getProjectConfig</span><span style="color:#E1E4E8">().extractDir;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> basePath</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(process.</span><span style="color:#B392F0">cwd</span><span style="color:#E1E4E8">(), extractDir);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> relativePath</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">relative</span><span style="color:#E1E4E8">(basePath, filePath);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> names</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> slash</span><span style="color:#E1E4E8">(relativePath).</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'/'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> fileName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> _.</span><span style="color:#B392F0">last</span><span style="color:#E1E4E8">(names) </span><span style="color:#F97583">as</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> fileKey </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fileName.</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> dir</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> names.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (dir) fileKey </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> names.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(fileKey).</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'.'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> fileKey.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#DBEDFF">-</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'_'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="脚手架命令">脚手架命令</h2>
+<p><a href="https://github.com/LuckyFBB/i18n-extract">i18n-extract-cli</a></p>
+<p>目前支持两个命令<code>init</code>/<code>extract</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">npx</span><span style="color:#9ECBFF"> i18n-extract-cli</span><span style="color:#9ECBFF"> init</span></span></code></pre>
+<p>会初始化一份<code>i18n.config.json</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "localeDir"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"locales"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "extractDir"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"./"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "importStatement"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"import I18N from @/utils/i18n"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "excludeFile"</span><span style="color:#E1E4E8">: [],</span></span>
+<span class="line"><span style="color:#79B8FF">  "excludeDir"</span><span style="color:#E1E4E8">: []</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>执行如下命令，开始提取<code>extractDir</code>目录下的中文文本到<code>localeDir/zh-CN</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">npx</span><span style="color:#9ECBFF"> i18n-extract-cli</span><span style="color:#9ECBFF"> extract</span></span></code></pre> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#确定中文范围"> 确定中文范围 </a><a class="depth-2" href="#使用-babel-处理"> 使用 Babel 处理 </a><a class="depth-3" href="#使用-babelparser-将源代码转译为-ast"> 使用 @babel/parser 将源代码转译为 AST </a><a class="depth-3" href="#babeltraverse-特殊处理上述的节点转化-ast"> @babel/traverse 特殊处理上述的节点，转化 AST </a><a class="depth-3" href="#转为代码"> 转为代码 </a><a class="depth-2" href="#其他处理"> 其他处理 </a><a class="depth-2" href="#脚手架命令"> 脚手架命令 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/workflow-for-pnpm-based-monorepo/">上一篇：基于 pnpm 的 monorepo 的工作流</a> <a href="/blog/engineering/comparison-between-babel-plugin-and-eslint-plugin/">下一篇：babel 插件和 eslint 插件对比</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

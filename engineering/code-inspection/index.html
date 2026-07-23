@@ -1,15 +1,118 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>代码检查 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>代码检查</h1> </header> <div class="article-grid"> <div class="prose"> <p>在团队越来越庞大之后，每一个成员的代码风格也是不一样的，为了能够让仓库的代码风格统一，往往需要一些工具来帮我们完成这个事情，目前用的比较多的工程化方法就是<code>husky+lint-staged</code></p>
+<h2 id="git-hooks">git hooks</h2>
+<p><code>git hooks</code> 主要能够在某些特定行为发生时触发某些自定义程序。</p>
+<h3 id="常见的-git-hooks">常见的 git hooks</h3>
+<p><strong>客户端</strong></p>
+<ul>
+<li><code>pre-commit</code> hook 在运行 <code>git commit</code> 命令时且在 <code>commit</code> 完成前被触发</li>
+<li><code>commit-msg</code> hook 在编辑完 <code>commit-msg</code> 时被触发，并且接受一个参数，这个参数是存放当前 <code>commit-msg</code> 的临时文件的路径</li>
+<li><code>pre-push</code> hook 在运行 <code>git push</code> 命令时且在 <code>push</code> 命令完成前被触发</li>
+</ul>
+<p><strong>服务端 hook</strong></p>
+<ul>
+<li><code>pre-receive</code> 在服务端接受到推送时且在推送过程完成前被触发</li>
+<li><code>post-receive</code> 在服务端接收到推送且推送完成后被触发</li>
+</ul>
+<p>更多的 <code>git hooks</code> 可查阅 <a href="https://git-scm.com/docs/githooks">git 官方文档</a></p>
+<h3 id="设计缺陷">设计缺陷</h3>
+<p>但是由于原生的 <code>git hooks</code> 都是存放在 <code>.git/hooks</code> 文件中，由于 <code>.git</code> 文件夹是隐藏文件夹，不会被 <code>Git</code> 所追踪，那么就需要每一位团队成员分别维护一份，还要考虑同步问题，的确有些困难，所以有了新的解决方案——<code>husky</code></p>
+<h2 id="husky">husky</h2>
+<h3 id="什么是-husky">什么是 husky</h3>
+<p><a href="https://github.com/typicode/husky">husky</a> 是常见的 <code>git hook</code> 工具，能够解决原生 <code>git hook</code> 无法版本追踪的问题。</p>
+<p>使用 <code>husky</code> 可以挂载 <code>Git</code> 钩子，当我们本地进行 <code>git commit</code> 或 <code>git push</code> 等操作前，能够执行其它一些操作，比如进行 <code>ESLint</code> 检查，如果不通过，就不允许 <code>commit</code> 或 <code>push</code></p>
+<h3 id="使用">使用</h3>
+<ol>
+<li>
+<p>在项目中安装 husky</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> install</span><span style="color:#9ECBFF"> husky</span><span style="color:#79B8FF"> -D</span></span></code></pre>
+</li>
+<li>
+<p>启用 Git 挂钩</p>
+<p><code>husky install</code> 命令告诉 <code>Git</code> 改为使用 <code>.husky</code> 目录</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">//</span><span style="color:#9ECBFF"> v8</span></span>
+<span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> husky</span><span style="color:#9ECBFF"> install</span></span>
+<span class="line"><span style="color:#B392F0">npm</span><span style="color:#9ECBFF"> set-script</span><span style="color:#9ECBFF"> prepare</span><span style="color:#9ECBFF"> "husky install"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">//</span><span style="color:#9ECBFF"> v9，将上述两条命令合并为一条</span></span>
+<span class="line"><span style="color:#B392F0">npx</span><span style="color:#9ECBFF"> husky</span><span style="color:#9ECBFF"> init</span></span></code></pre>
+<p>要在安装后自动启用 <code>Git</code> 挂钩，编辑 <code>package.json</code> ，确保 <code>husky</code> 可以正常使用</p>
+<p>此时的 package.json 会增加一行 script</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "scripts"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#6A737D">	  // ...</span></span>
+<span class="line"><span style="color:#6A737D">	  // v8</span></span>
+<span class="line"><span style="color:#79B8FF">    "prepare"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"husky install"</span></span>
+<span class="line"><span style="color:#6A737D">    // v9</span></span>
+<span class="line"><span style="color:#9ECBFF">    "prepare"</span><span style="color:#FDAEB7;font-style:italic">:</span><span style="color:#9ECBFF"> "husky"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://github.com/typicode/husky/releases/tag/v9.0.1">v9.0.1 changelog</a></p>
+</li>
+</ol>
+<h3 id="husky-install-干了什么">husky install 干了什么?</h3>
+<ol>
+<li>
+<p>检查项目的根目录中是否存在 <code>.git</code> 目录，以确保你正在运行该命令的是一个 Git 仓库。</p>
+</li>
+<li>
+<p>检查项目的根目录中是否存在 <code>.husky</code> 目录，该目录用于存储 Husky 的配置和钩子脚本。如果 <code>.husky</code> 目录不存在，它会自动创建该目录。</p>
+</li>
+<li>
+<p>将 Husky 的 Git 钩子脚本复制到 <code>.husky</code> 目录中。这些脚本包括 <code>pre-commit</code>、<code>pre-push</code> 等钩子，它们在相应的 Git 操作之前执行。</p>
+<p>并且会更改 <code>.git/config</code> 文件中的 <code>core.hooksPath</code> 内容，更改为对应的 <code>.husky/_</code>，那么执行对应 <code>git hook</code> 的时候就会找到对应 <code>hooksPath</code> 的内容</p>
+</li>
+</ol>
+<h3 id="husky-add-干了什么">husky add 干了什么?</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">//</span><span style="color:#9ECBFF"> v8</span></span>
+<span class="line"><span style="color:#B392F0">npx</span><span style="color:#9ECBFF"> husky</span><span style="color:#9ECBFF"> add</span><span style="color:#9ECBFF">  .husky/pre-commit</span><span style="color:#9ECBFF"> "npm test"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">//</span><span style="color:#9ECBFF"> v9</span></span>
+<span class="line"><span style="color:#79B8FF">echo</span><span style="color:#9ECBFF"> "npm test"</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> .husky/pre-commit</span></span></code></pre>
+<p>执行完毕之后在 <code>.husky</code> 文件夹会多一个 pre-commit 的文件脚本，当执行 <code>git commit -m "xxx"</code> 就会触发对应的命令</p>
+<h3 id="husky-是如何解决原生的-git-hooks-的问题的">husky 是如何解决原生的 git hooks 的问题的</h3>
+<ul>
+<li>原生 <code>git hooks</code> 主要的问题是 git 无法跟踪 <code>.git/hooks</code> 下的文件，这个问题已经通过 <code>git core.hooksPath</code> 解决了</li>
+<li>开发者需要手动设置 <code>git core.hooksPath</code>，<code>husky init</code> 命令中帮助我们设置了 <code>git core.hooksPath</code>，然后在 <code>package.json</code> 的 <code>scripts</code> 中添加 <code>"prepare": "husky"</code>，这样每次安装依赖的时候就会执行 <code>husky</code>，因此就可以保证设置的 <code>git hooks</code> 可以被触发了</li>
+</ul>
+<h2 id="lint-staged">Lint-staged</h2>
+<h3 id="什么是-lint-staged">什么是 Lint-staged?</h3>
+<p>在 <code>pre-commit</code> hook 中均为对当前 <code>commit</code> 的文件进行校验、格式化等，而不是对全局的文件进行校验，因此在脚本中我们需要知道当前在 <code>Git</code> 暂存区的文件有哪些，而 <code>Git</code> 本身也没有向 <code>pre-commit</code> 脚本传递相关参数，<a href="https://github.com/okonet/lint-staged">Lint-staged</a> 这个包为我们解决了这个问题。</p>
+<p>简单说就是当我们触发 <code>pre-commit</code> hook 中的脚本命令后，配合 <code>Lint-staged</code> 的配置可以只检查暂存区的文件从而避免我们每次检查都把整个项目的代码都检查一遍的尴尬情况。其次，<code>Lint-staged</code> 允许指定不同类型后缀文件执行不同指令的操作，并且可以按步骤再额外执行一些其它 <code>shell</code> 指令。</p>
+<p><strong>Lint-staged 是如何知道当前暂存区有哪些文件的？</strong></p>
+<p>Lint-staged 内部也没有什么高级操作，它在内部运行了 <code>git diff --staged --diff-filter=ACMR --name-only -z</code> 命令，这个命令会返回暂存区的文件信息，类似如下所示的代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">execSync</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> lines</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> execSync</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  'git diff --staged --diff-filter=ACMR --name-only -z'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">).</span><span style="color:#B392F0">toString</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> stagedFiles</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> lines.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#79B8FF">\u0000</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">''</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">split</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'</span><span style="color:#79B8FF">\u0000</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<h3 id="使用-1">使用</h3>
+<ol>
+<li>
+<p>安装 <code>lint-staged</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">pnpm</span><span style="color:#9ECBFF"> install</span><span style="color:#9ECBFF"> lint-staged</span></span></code></pre>
+</li>
+<li>
+<p>配置 <code>lint-staged</code></p>
+<p><code>lint-staged</code> 只是做文件过滤的，不会做任何的格式化操作，均需要搭配对应的 <code>eslint/prettier/stylelint</code> 等等。</p>
+<p>可以将 <code>lint-staged</code> 的配置写在 <code>package.json</code> 中或者 <code>.lintstagedrc.js</code> 中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// .lintstagedrc.js</span></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#9ECBFF">  '*.{ts,tsx,js,jsx}'</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">'eslint --fix'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'prettier --write'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+</li>
+<li>
+<p>添加命令</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">echo </span><span style="color:#9ECBFF">"pnpm exec lint-staged"</span><span style="color:#F97583"> ></span><span style="color:#E1E4E8"> .husky</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">pre</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">commit</span></span></code></pre>
+</li>
+</ol>
+<p>当上诉步骤都配置好了之后，执行 <code>git commit -m ""</code> ，就会执行对应的 <code>lint-staged</code> 校验</p>
+<p><img src="/blog/imgs/code-inspection/Untitled.png" alt="Untitled"></p>
+<h3 id="工作流程">工作流程</h3>
+<p><img src="/blog/imgs/code-inspection/Untitled%201.png" alt="Untitled"></p>
+<h2 id="总结">总结</h2>
+<p>本文主要讲解了 husky 出现的原因解决了什么问题，以及如何使用 lint-staged 对我们的代码进行校验</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#git-hooks"> git hooks </a><a class="depth-3" href="#常见的-git-hooks"> 常见的 git hooks </a><a class="depth-3" href="#设计缺陷"> 设计缺陷 </a><a class="depth-2" href="#husky"> husky </a><a class="depth-3" href="#什么是-husky"> 什么是 husky </a><a class="depth-3" href="#使用"> 使用 </a><a class="depth-3" href="#husky-install-干了什么"> husky install 干了什么? </a><a class="depth-3" href="#husky-add-干了什么"> husky add 干了什么? </a><a class="depth-3" href="#husky-是如何解决原生的-git-hooks-的问题的"> husky 是如何解决原生的 git hooks 的问题的 </a><a class="depth-2" href="#lint-staged"> Lint-staged </a><a class="depth-3" href="#什么是-lint-staged"> 什么是 Lint-staged? </a><a class="depth-3" href="#使用-1"> 使用 </a><a class="depth-3" href="#工作流程"> 工作流程 </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/node/inter-process-communication-in-nodejs/">上一篇：Nodejs 中的进程间通信</a> <a href="/blog/engineering/intl-messageformat/">下一篇：国际化利器 Intl Messageformat</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

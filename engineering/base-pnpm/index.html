@@ -1,15 +1,160 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>pnpm 是为何吊打 npm/yarn 的 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>pnpm 是为何吊打 npm/yarn 的</h1> </header> <div class="article-grid"> <div class="prose"> <p><a href="/blog/engineering/base-npm">前文</a>剖析了 npm/yarn 这两种包管理工具，这篇文章要介绍吊打它们的 pnpm!</p>
+<!-- more -->
+<h1 id="pnpm">pnpm</h1>
+<h2 id="什么是-pnpm">什么是 pnpm</h2>
+<p>其官网这样说：</p>
+<blockquote>
+<p>Fast, disk space efficient package manager 快速的，节省磁盘空间的包管理工具</p>
+</blockquote>
+<p>pnpm 本质上就是一个包管理器，在这一点和 npm/yarn 没有区别，但是其两个优势在于：</p>
+<ol>
+<li>
+<p>包安装数度极快<br>
+官方  <a href="https://link.juejin.cn/?target=https%3A%2F%2Fpnpm.io%2Fzh%2Fbenchmarks">benchmarks</a> 对 npm、pnpm、yarn、yarnPnP 对多个情景下的性能基准测试，涵盖了很多使用场景</p>
+</li>
+<li>
+<p>磁盘空间利用非常高效<br>
+使用 yarn 安装依赖时的 node_modules</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164898512-47ed7c1a-7f8c-4449-a8ca-154d73768576.png" alt="20"></p>
+<p>使用 pnpm 安装依赖时的 node_modules</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164898607-6e1dfa2d-c517-417b-9abe-a88a7984b2af.png" alt="21"></p>
+<p>pnpm 内部使用<strong>基于内容寻址</strong>的文件系统来存储磁盘上所有的文件，该文件系统出色的地方在于</p>
+<ul>
+<li>不会重复安装同一个包。在 npm/yarn 中，我们所有的项目(10 个)有依赖了 dt-common，dt-common 会被安装 10 次，dt-common 这个包在磁盘中就会有 10 个地方写入该代码。但是在 pnpm 中只会被安装一次，磁盘中只有一个地方会写入，后面再次使用都直接使用<strong>硬连接 hardlink</strong></li>
+</ul>
+</li>
+<li>
+<p>支持 monorepo</p>
+</li>
+<li>
+<p>相对安全</p>
+</li>
+</ol>
+<h2 id="前置知识-软链接和硬链接">前置知识-软链接和硬链接</h2>
+<p>在 Linux 中有两种链接方式：</p>
+<ul>
+<li>硬连接 hard link</li>
+<li>软链接 soft link，又称为符号链接 symbolic link
+不论是硬链接或软链接都不会将原本的源文件复制一份，只会占用非常少量的磁盘空间</li>
+</ul>
+<h3 id="inode">inode</h3>
+<p>每个文件都有<strong>唯一一个</strong> inode，它包含了文件元信息，在访问文件时，对应的元信息会被 copy 到内存去实现文件的访问<br>
+使用<code>stat xxx</code>能够查到对应的 inode</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164908971-ba03c7f2-1db8-4ccb-bc2f-aa7e1753a46c.png" alt="22"></p>
+<h3 id="hard-link">hard link</h3>
+<p>硬链接可以理解成为一个相互的指针，<strong>创建的 hardlink 指向源文件的 inode</strong>，系统并不为会其分配新的 inode<br>
+硬链接不管有多少个，都会指向用一个 inode 节点，这等同于修改源文件或者链接文件时都会被同步修改(感觉和 JS 对象引用地址略微相似<br>
+每新建一个 hardlink 会把节点连接数增加，只要节点的链接数非零，文件就一直存在，不管你删除的是源文件还是 hradlink。只要有一个存在，文件就存在</p>
+<h3 id="soft-link">soft link</h3>
+<p>软链接可以理解为单向指针，<strong>一个独立的文件且拥有独立的 inode</strong>，永远指向源文件<br>
+修改源文件内容，软链接内容也会改变。当删除源文件时，访问软链接会报错<code>No such file or directory</code></p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164908983-8be27c07-20a4-4cbc-8202-e26c656a864f.png" alt="23"></p>
+<h3 id="软硬链接对-node-寻包的影响">软硬链接对 node 寻包的影响</h3>
+<p>可以使用<code>ln</code>命令对文件和目录在另一个位置建立一个同步的链接
+语法： <code>ln [参数][源文件或目录][目标文件或目录]</code></p>
+<p>在某个项目中新建两个文件夹 one/two，目录结构如下：</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909006-6d388849-36f5-46e6-9873-188271c69b6f.png" alt="24"></p>
+<p>one/index.js 中内容如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> base64</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'base64-js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(base64);</span></span></code></pre>
+<p>现在运行当前 one/index.js 一定会报错，因为我们的 one 文件下不存在 base64-js 依赖<br>
+分别在 two 文件下创建 one/index.js 的硬链接/软链接文件</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909017-d59640bf-4008-4a8f-a429-261d70d56d24.png" alt="27"></p>
+<p>hard.js 是一个硬链接，soft.js 是一个软链接<br>
+我们分别执行 node hard.js/node soft.js</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909023-6ddef2cf-8be3-4bb9-8b7c-8608a0403867.png" alt="28"></p>
+<p>发现硬链接是可以正常运行的，但是软链接不行。这是因为<strong>硬链接会从链接到的位置开始查找依赖，而软链接会从文件原始位置开始查找依赖。</strong></p>
+<h3 id="软链依赖目录">软链依赖目录</h3>
+<p>上述的例子讲清楚了 node 处理软硬链接的不同之处，那我们将 two/node_modules 软链接到 one 的目录下，one/index.js 和 two/soft.js 能否正常运行呢 🤔</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">ln</span><span style="color:#79B8FF"> -s</span><span style="color:#9ECBFF">  ../two/node_modules</span><span style="color:#9ECBFF"> ./one</span></span></code></pre>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909061-5432ba91-059a-4d57-835f-e8d7fd053244.png" alt="25"></p>
+<p>对应执行 one/index.js 和 two/soft.js。哇哦，work well</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909068-2271bac5-718b-44cd-8e79-e952143ad95b.png" alt="26"></p>
+<p>通过上面的示例，我们发现即使当前 node_modules 是一个软链接也能够作为依赖被查找到，说明<strong>软链可以将其他地方的目录增加到依赖查找路径中。</strong></p>
+<h2 id="依赖管理">依赖管理</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"npm-test"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "dependencies"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "buffer"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^5.4.3"</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在我们的 npm-test 项目中执行<code>pnpm i</code>控制台会有如下输出：</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909075-9bb71282-686f-4cfe-8874-19024fd2a3e5.png" alt="30"></p>
+<p>能够发现在 Progress 中，能够明确有多少包被复用和重新下载了多少包<br>
+并且当我们运行<code>pnpm install</code>进行 node_modules 安装的时候，会使用<strong>软链接 &#x26; 硬链接</strong>的方式来节省磁盘空间 &#x26; 提升安装效率</p>
+<h3 id="pnpm-的-node_modules-目录结构软链接的使用">pnpm 的 node_modules 目录结构(软链接的使用)</h3>
+<p>上述安装得到如图的 node_modules：.pnpm 文件 &#x26; package.json 描述的其他文件</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909081-a7d48958-46b2-400f-9add-592b314d65bd.png" alt="29"></p>
+<ul>
+<li>.pnpm 目录：存放了所有实际安装的包，它里面全部都是我们项目所需要的依赖，<strong>唯一不同的它们是来自 store 目录的硬链接</strong></li>
+<li>其他文件：package.json 中声明的包，<strong>只是生成一个软链接，实际指向.pnpm 中安装的包</strong>
+因为我们只依赖项中直定义了<code>buffer</code>，所以它是唯一一个你的应用必须拥有访问权限的包(想了解为什么要对依赖项做严格控制，<a href="https://medium.com/pnpm/pnpms-strictness-helps-to-avoid-silly-bugs-9a15fb306308">点击查看</a>)<br>
+pnpm 这种依赖管理的方式也很巧妙地规避了<code>非法访问依赖</code>的问题，也就是只要一个包未在 package.json 中声明依赖，那么在项目中是无法访问的<br>
+但是在 yarn/npm 中因为存在依赖提升问题，buffer 依赖 base64-js，因此 node_modules 中存在 base64-js 的包，我们在项目中可以直接引用。这就是为什么 pnpm 的包管理更为安全的原因</li>
+</ul>
+<p>那 buffer 目录下都有些啥呢？发现 buffer 下根本没有 node_modules，它的依赖项都放在哪里了？目录结构第一个诀窍，<strong>buffer 是一个软链接，在 node 解析依赖的时候，它使用这些依赖的真实位置，因此在 buffer 下不用保留依赖</strong>。</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909086-2a38b0d5-20d4-4f53-9cf8-d3b429b375b8.png" alt="31"></p>
+<p>那你又会问 buffer 的真实地址在哪里?🧐<br>
+嚯，真实地址在这里: <code>node_modules/.pnpm/buffer@ 5.7.1/node_modules/buffer</code><br>
+所以我们现在知道了<code>.pnpm/</code>文件夹的用途。<code>.pnpm/</code>以平铺的形式储存着所有的包，所以每个包都可以在这种命名模式的文件夹中被找到：<code>node_modules/.pnpm/&#x3C;name>@ &#x3C;version>/node_modules/&#x3C;name></code></p>
+<p>使用这种平铺的结构避免 npm2 嵌套结构引起的长路径问题，和 npm3/yarn 的扁平化结构不同的是它保留了包之间的相互隔离<br>
+点开 buffer 的真实地址，再一次发现自己又被骗了，真实地址下面还是没有 node_modules</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909092-2d56c967-1be6-47dc-82ca-3488aad1255d.png" alt="32"></p>
+<p>目录结构第二个诀窍来了，<strong>包的依赖项与依赖包的实际位置位于同一目录级别</strong>，buffer 的依赖不在<code>.pnpm/buffer@ 5.7.1/node_modules/buffer/node_modules</code>，而是在<code>.pnpm/buffer@ 5.7.1/node_modules/</code>。buffer 的所有依赖都被软链接到了<code>node_modules/.pnpm</code>的对应目录<br>
+到了这里你可能会问，为什么要把子依赖放在统一层级 🤔</p>
+<p>假如我们有两个包，foo 和 bar 相互依赖，使用同一层级安装的目录如下，这时 foo 和 bar 的软链接不是一个循环</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>.pnpm</span></span>
+<span class="line"><span>  bar@1.0.0</span></span>
+<span class="line"><span>    node_modules</span></span>
+<span class="line"><span>      bar</span></span>
+<span class="line"><span>      foo --> ../../foo@1.0.0/node_modules/foo</span></span>
+<span class="line"><span>  foo@1.0.0</span></span>
+<span class="line"><span>    node_modules</span></span>
+<span class="line"><span>      foo</span></span>
+<span class="line"><span>      bar --> ../../bar@1.0.0/node_modules/bar</span></span></code></pre>
+<p>假设 bar/foo 的依赖放在它的子文件中，如下，这时 foo/bar 的软链接就是一个循环</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>.pnpm</span></span>
+<span class="line"><span>  bar@1.0.0</span></span>
+<span class="line"><span>    node_modules</span></span>
+<span class="line"><span>      bar</span></span>
+<span class="line"><span>        node_modules</span></span>
+<span class="line"><span>          foo --> ../../foo@1.0.0/node_modules/foo</span></span>
+<span class="line"><span>  foo@1.0.0</span></span>
+<span class="line"><span>    node_modules</span></span>
+<span class="line"><span>      foo</span></span>
+<span class="line"><span>        node_modules</span></span>
+<span class="line"><span>          bar --> ../../bar@1.0.0/node_modules/bar</span></span></code></pre>
+<h4 id="pnpm-下-node_modules-存在的意义">pnpm 下 node_modules 存在的意义</h4>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909100-c8ed6ecb-5e10-4597-a09b-369c3cae3c4e.png" alt="35"></p>
+<p>buffer 中有 base64/ieee754 两个包，假设在 base64 的 dependencies 没有声明 ieee754，那我们在 base64/index 使用<code>requie('ieee754')</code>时，他就是一个幽灵依赖。会先寻找 base64 上级的 node_modules，若找到直接使用；否则直接往上级寻找 node_modules，如果上级也没有的话，当前的使用就会有问题</p>
+<p>所以 pnpm 会将所有的依赖都提升到.pnpm/node_modules 下，保证幽灵依赖可以被找到，作为兜底方案<a href="https://github.com/pnpm/pnpm/discussions/4224">discussions</a></p>
+<h3 id="硬链接使用">硬链接使用</h3>
+<p>在使用 pnpm 安装时，pnpm 会将依赖存储在<code>~/.pnpm-store/v3</code>目录下。在同一台电脑下，下一次安装的时候 pnpm 会先检查 store 目录，如果有找到所需的依赖，则会通过硬链接放到我们的项目中去，而不是重新安装依赖<br>
+因为 pnpm 安装依赖时会将依赖存储在 store 目录下，<strong>该目录能够使不同的项目之间共享依赖</strong>。例如 dt-data-api 项目中中安装了 dt-common/dt-react-component 等依赖，当我们在 dt-easy-index 项目中也用了该两个依赖时，会重复使用 store 下的依赖。而 yarn/npm 每次都会重新安装依赖</p>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909107-149bba74-e213-4321-88c0-1c4e5bb55b5e.png" alt="33"></p>
+<p>🤔 那么问题来了，为什么在这里要使用硬链接，而不是直接创建到全局存储的符号链接<br>
+通过上文我们知道 node 对软硬链接查询位置的处理不同。假设我们有如下的两个项目：</p>
+<p>foo</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#9ECBFF">"react"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"16.8.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">"dt-react-component"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"1.0.0"</span></span></code></pre>
+<p>bar</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#9ECBFF">"react"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"17.0.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">"dt-react-component"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"1.0.0"</span></span></code></pre>
+<p>在<code>dt-react-component</code>里面，会使用<code>import React from 'react'</code>，假设<code>foo/node_modules/dt-react-component</code>和<code>bar/node_modules/dt-react-component</code>都使用软链接到<code>./pnpm-store/v3</code>，那他们都会使用同一个版本的 react，这不是我们所期望的。所以使用硬链接，在<code>dt-react-component</code>中在使用<code>import React from 'react'</code>时，会根据当前的位置去寻找依赖，这样使得 foo 和 bar 可以依赖不同的 react 的版本</p>
+<h3 id="pnpm-的依赖管理图">pnpm 的依赖管理图</h3>
+<p><img src="https://user-images.githubusercontent.com/38368040/164909110-2ed224d5-91ae-4f9b-b753-b9873af42199.png" alt="34"></p>
+<div class="link">参考链接</div>
+<ul>
+<li><a href="https://www.zoo.team/article/npm-details">npm 依赖管理中被忽略的那些细节</a></li>
+<li><a href="http://www.conardli.top/blog/article/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96-%E5%89%96%E6%9E%90npm%E7%9A%84%E5%8C%85%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6%EF%BC%88%E5%AE%8C%E6%95%B4%E7%89%88%EF%BC%89.html">剖析 npm 的包管理机制</a></li>
+<li><a href="https://bramble-river.gitbooks.io/npm/content/%E4%BD%BF%E7%94%A8npm.html">npm 工作机制</a></li>
+<li><a href="https://www.kancloud.cn/cyyspring/webpack/2306952">npm — install 安装流程</a></li>
+<li><a href="https://juejin.cn/post/6917105300084359182">yarn install 工作流程解析</a></li>
+<li><a href="https://juejin.cn/post/7036319707590295565">实践：pnpm 解决了我的哪些痛点？</a></li>
+<li><a href="https://juejin.cn/post/6932046455733485575">关于现代包管理器的深度思考——为什么现在我更推荐 pnpm 而不是 npm/yarn?</a></li>
+<li><a href="https://mp.weixin.qq.com/s/o0eN8gBSqVMHykFXrTnikg">软链接&#x26;硬链接在前端中的应用</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-1" href="#pnpm"> pnpm </a><a class="depth-2" href="#什么是-pnpm"> 什么是 pnpm </a><a class="depth-2" href="#前置知识-软链接和硬链接"> 前置知识-软链接和硬链接 </a><a class="depth-3" href="#inode"> inode </a><a class="depth-3" href="#hard-link"> hard link </a><a class="depth-3" href="#soft-link"> soft link </a><a class="depth-3" href="#软硬链接对-node-寻包的影响"> 软硬链接对 node 寻包的影响 </a><a class="depth-3" href="#软链依赖目录"> 软链依赖目录 </a><a class="depth-2" href="#依赖管理"> 依赖管理 </a><a class="depth-3" href="#pnpm-的-node_modules-目录结构软链接的使用"> pnpm 的 node_modules 目录结构(软链接的使用) </a><a class="depth-3" href="#硬链接使用"> 硬链接使用 </a><a class="depth-3" href="#pnpm-的依赖管理图"> pnpm 的依赖管理图 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/webpack-plugin/">上一篇：webpack plugin</a> <a href="/blog/engineering/webpack-hmr/">下一篇：Webpack 模块热替换</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

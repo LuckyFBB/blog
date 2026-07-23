@@ -1,15 +1,166 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Node 运行时、Buffer、进程通信与服务端基础能力。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>NodeJS 的中间件 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link is-active" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">Node</a> <h1>NodeJS 的中间件</h1> </header> <div class="article-grid"> <div class="prose"> <p>在很早之前我们讲过 <a href="/blog/react/redux#redux-middleware">Redux 的中间件</a>的概念以及实现，其实中间件都是大同小异的，那我们接下来讲讲 Node 中的中间件。</p>
+<h2 id="是什么">是什么</h2>
+<p>中间件(Middleware)是介于各个应用系统和系统软件之间的一类软件，它是使用系统软件所提供的基础功能，衔接应用的各个部分或者是不同的应用。</p>
+<p>在 NodeJS 中，所谓的中间件是对封装 http 请求细节的方法。</p>
+<ul>
+<li>请求体的解析</li>
+<li>Cookie 信息的处理</li>
+<li>日志记录等</li>
+</ul>
+<p>我们在开发 Web 应用的时候，不希望了解每一个中间的细节处理，而是集中在业务的开发中，所以引入 Node 中间件来简化和封装这些基础逻辑处理细节。</p>
+<p>Node 中间件的本质是，进入具体的业务处理之前，先让特定过滤器处理，流程如下图：</p>
+<p><img src="/blog/imgs/middlewareForNodeJS/Untitled.png" alt="Untitled"></p>
+<p>目前主流的 NodeJS 框架都是离不开中间件这个概念。</p>
+<p>在 Koa 中，中间件的本质是作为一个回调函数，参数包含了请求对象、响应对象和执行下一个中间件的函数。</p>
+<h2 id="怎么做">怎么做</h2>
+<h3 id="中间件实现的原理">中间件实现的原理</h3>
+<p>通过上述图片我们发现，当我们接受到一个请求的时候，会先执行中间件 1 → 中间件 2 → 主逻辑 → 中间件 2 → 中间件 1。每个中间件都有两次处理时机。</p>
+<p><strong>简易的中间件实现</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware1 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware1 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware2 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware2 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware3 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware3 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware3 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middlewares </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [middleware1, middleware2, middleware3];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> runMiddlewares </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#E1E4E8"> middleware </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> middlewares.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        middleware</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">.(next);</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#B392F0">    next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">runMiddlewares</span><span style="color:#E1E4E8">();</span></span></code></pre>
+<p>其实 next 方法就是不断去调用下一个中间件，是实现自动调用中间件的关键函数。</p>
+<p>在我们的实际使用过程中可能更多的使用是异步的中间件，因此需要做出相关的改变。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> async</span><span style="color:#E1E4E8"> (next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware1 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    await </span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware1 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware2 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> async</span><span style="color:#E1E4E8"> (next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware2 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    await </span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware2 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware3 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> async</span><span style="color:#E1E4E8"> (next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware3 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    await </span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware3 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middlewares </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [middleware1, middleware2, middleware3];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> runMiddlewares </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> next </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        const</span><span style="color:#E1E4E8"> middleware </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> middlewares.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (middleware) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            Promise.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(middleware</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">.(next));</span></span>
+<span class="line"><span style="color:#E1E4E8">        } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">            Promise.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#B392F0">    next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">runMiddlewares</span><span style="color:#E1E4E8">();</span></span></code></pre>
+<p><img src="/blog/imgs/middlewareForNodeJS/Untitled%201.png" alt="Untitled"></p>
+<h3 id="koa-中间件实现方式">koa 中间件实现方式</h3>
+<p>先看一下上述代码如果使用 Koa 来实现，应该如何写？</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware1 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> async</span><span style="color:#E1E4E8"> (ctx, next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware1 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    await </span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware1 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware2 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> async</span><span style="color:#E1E4E8"> (ctx, next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware2 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    await </span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware2 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> middleware3 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> async</span><span style="color:#E1E4E8"> (ctx, next) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware3 start"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    await </span><span style="color:#B392F0">next</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"middleware3 end"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> app </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Koa</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">app.</span><span style="color:#B392F0">use</span><span style="color:#E1E4E8">(middleware1);</span></span>
+<span class="line"><span style="color:#E1E4E8">app.</span><span style="color:#B392F0">use</span><span style="color:#E1E4E8">(middleware2);</span></span>
+<span class="line"><span style="color:#E1E4E8">app.</span><span style="color:#B392F0">use</span><span style="color:#E1E4E8">(middleware3);</span></span></code></pre>
+<p><strong>use</strong></p>
+<p><a href="https://github.com/koajs/koa/blob/master/lib/application.js#L140">use</a> 函数做的事情很简单，只是把对应的参数放到放到 middleware 数组里面</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#B392F0">use</span><span style="color:#E1E4E8"> (fn) {</span></span>
+<span class="line"><span style="color:#F97583">	if</span><span style="color:#E1E4E8"> (typeof fn </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'middleware must be a function!'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#79B8FF">	this</span><span style="color:#E1E4E8">.middleware.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(fn)</span></span>
+<span class="line"><span style="color:#F97583">	return</span><span style="color:#79B8FF"> this</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>listen 和 callBack</strong></p>
+<p>当我们使用 app.<a href="https://github.com/koajs/koa/blob/master/lib/application.js#L97">listen</a> 方法的时候，其实采用的是 http 模块 createServer 创建一个 server 服务，其中会使用回调函数 <a href="https://github.com/koajs/koa/blob/master/lib/application.js#L155C4">callback</a>，其中就有对中间件的相关处理</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#B392F0">listen</span><span style="color:#E1E4E8"> (...args) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> server </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> http.</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">callback</span><span style="color:#E1E4E8">())</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> server.</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(...args)</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">callback</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> fn </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">compose</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.middleware)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">listenerCount</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'error'</span><span style="color:#E1E4E8">)) </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'error'</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.onerror)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> handleRequest </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (req, res) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> ctx </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">createContext</span><span style="color:#E1E4E8">(req, res)</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.ctxStorage) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">handleRequest</span><span style="color:#E1E4E8">(ctx, fn)</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.ctxStorage.</span><span style="color:#B392F0">run</span><span style="color:#E1E4E8">(ctx, </span><span style="color:#B392F0">async</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> await </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">handleRequest</span><span style="color:#E1E4E8">(ctx, fn)</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> handleRequest</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>我们在 callback 中发现了 compose 函数的身影，它就是实现洋葱模型的关键了！</p>
+<p><strong>koa-compose</strong></p>
+<p>compose 函数的来源为 koa-compose</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#B392F0">function</span><span style="color:#B392F0"> compose</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">middleware</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">Array.</span><span style="color:#B392F0">isArray</span><span style="color:#E1E4E8">(middleware)) </span><span style="color:#F97583">throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Middleware stack must be an array!'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">const</span><span style="color:#E1E4E8"> fn of middleware) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (typeof fn </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'function'</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Middleware must be composed of functions!'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> function</span><span style="color:#E1E4E8"> (context, next) {</span></span>
+<span class="line"><span style="color:#6A737D">    // last called middleware #</span></span>
+<span class="line"><span style="color:#E1E4E8">    let index </span><span style="color:#F97583">=</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> dispatch</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    function </span><span style="color:#B392F0">dispatch</span><span style="color:#E1E4E8"> (i) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (i </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> index) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> Promise.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'next() called multiple times'</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">      index </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i</span></span>
+<span class="line"><span style="color:#E1E4E8">      let fn </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> middleware[i]</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (i </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> middleware.length) fn </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> next</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">fn) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> Promise.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#F97583">      try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> Promise.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">fn</span><span style="color:#E1E4E8">(context, dispatch.</span><span style="color:#B392F0">bind</span><span style="color:#E1E4E8">(null, i </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)))</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (err) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> Promise.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(err)</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><code>Promise.resolve(fn(context, dispatch.bind(null, i + 1)))</code>这行代码其实就能够解释，为什么我们在使用的时候调用 next 参数就能够执行下一个中间件了。</p>
+<p>当开始执行<code>dispatch(0)</code>的时候，fn 其实就是上述代码中的 middleware1，执行 middleware1 时，调用的<code>next()</code>方法其实是为<code>dispatch.bind(null, i + 1)</code>，也就是 middleware2，以此类推执行完所有的中间件。</p>
+<p>当全部中间件执行完毕之后，通过<code>if (!fn) return Promise.resolve()</code>，开始往回执行每个中间件中<code>next()</code>后面的代码。</p>
+<p><img src="/blog/imgs/middlewareForNodeJS/Untitled%202.png" alt="Untitled"></p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#是什么"> 是什么 </a><a class="depth-2" href="#怎么做"> 怎么做 </a><a class="depth-3" href="#中间件实现的原理"> 中间件实现的原理 </a><a class="depth-3" href="#koa-中间件实现方式"> koa 中间件实现方式 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/node/stream/">上一篇：浅谈一下 NodeJS 中的 Stream</a> <a href="/blog/node/process-and-thread-in--node-js/">下一篇：NodeJS 中的线程和进程</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

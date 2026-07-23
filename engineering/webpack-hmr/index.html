@@ -1,15 +1,309 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Webpack 模块热替换 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>Webpack 模块热替换</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="何为-hmr">何为 HMR?</h2>
+<p>模块热替换(HMR - Hot Module Replacement)功能会在应用程序运行过程中替换、添加或删除模块，而无需重新加载整个页面</p>
+<p>当我们对代码进行修改并保存后，webpack 将对代码重新打包，并将改动的模块发送到浏览器，浏览器通过新的模块替换老的模块，从而实现局部更新且不需要刷新页面</p>
+<h2 id="为何需要-hmr">为何需要 HMR?</h2>
+<p>在 HMR 出现之后，程序的加载都是页面级别的，即使是单个文件的发生改变，都需要刷新整个页面才能够获得最新的代码，且在此之前的数据都会丢失。</p>
+<p>当我们遇到如下情况的时候</p>
+<ul>
+<li>分步表单，意味着一次更改我们需要填写很多的数据</li>
+<li>弹窗信息，意味着必须重新执行弹窗交互</li>
+</ul>
+<p>再细小的操作，更新样式文件、备注信息等等操作都需要刷新页面重新加载执行，极大的影响了开发效率。引入 HMR 能够将这些细小的更改通过模块热替换的方式更新到页面上，从而提升开发的效率。</p>
+<h2 id="如何使用-hmr">如何使用 HMR?</h2>
+<p>在 webpack 的配置中，针对于 devServer 配置<code>hot:true</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>// webpack.config.js</span></span>
+<span class="line"><span>module.exports = {</span></span>
+<span class="line"><span>  // ...</span></span>
+<span class="line"><span>  devServer: {</span></span>
+<span class="line"><span>    // 必须设置 devServer.hot = true，启动 HMR 功能</span></span>
+<span class="line"><span>    hot: true</span></span>
+<span class="line"><span>  }</span></span>
+<span class="line"><span>};</span></span></code></pre>
+<p>在代码里面需要配置<code>module.hot.accept</code>接口，声明如何将模块安全地替换为最新代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.hot) {</span></span>
+<span class="line"><span style="color:#79B8FF">  module</span><span style="color:#E1E4E8">.hot.</span><span style="color:#B392F0">accept</span><span style="color:#E1E4E8">([</span><span style="color:#9ECBFF">'./hello.js'</span><span style="color:#E1E4E8">], () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    render</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#6A737D">// 注册后的效果</span></span>
+<span class="line"><span style="color:#6A737D">// hot._acceptedDependencies['./src/title.js'] = render</span></span></code></pre>
+<h2 id="webpack-编译构建流程">webpack 编译构建流程</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 项目目录</span></span>
+<span class="line"><span style="color:#F97583">-</span><span style="color:#E1E4E8">hello.js </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> index.js </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> package.json </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> webpack.config.js;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> config</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  entry: </span><span style="color:#9ECBFF">'./index.js'</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 入口文件</span></span>
+<span class="line"><span style="color:#E1E4E8">  output: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    filename: </span><span style="color:#9ECBFF">'bundle.js'</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 输出文件名</span></span>
+<span class="line"><span style="color:#E1E4E8">    path: path.</span><span style="color:#B392F0">resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'dist'</span><span style="color:#E1E4E8">), </span><span style="color:#6A737D">// 输出目录</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  plugins: [</span><span style="color:#F97583">new</span><span style="color:#B392F0"> HtmlWebpackPlugin</span><span style="color:#E1E4E8">()],</span></span>
+<span class="line"><span style="color:#E1E4E8">  mode: </span><span style="color:#9ECBFF">'development'</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 设置为开发模式</span></span>
+<span class="line"><span style="color:#E1E4E8">  stats: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    modules: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 不输出模块信息</span></span>
+<span class="line"><span style="color:#E1E4E8">    hash: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 输出编译的 hash 值</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>做好相关的配置之后，我们启动项目后，能够通过控制台发现生成了一个 hash 值，且通过浏览器打开网站之后，能够发现 websocket 中也传递了<code>{type: "hash", data: "d76e2c3053202b29bf20"}</code>对应的 hash 值</p>
+<p><img src="/blog/imgs/webpackHmr/image.png" alt="image.png"></p>
+<p><img src="/blog/imgs/webpackHmr/image%201.png" alt="image.png"></p>
+<p>我们更新文件，触发新的编译，控制台中也会更新对应的数据</p>
+<p><img src="/blog/imgs/webpackHmr/image%202.png" alt="image.png"></p>
+<p>能够发现生成了新的<code>hash</code>值，且生成了<code>[hash].hot-update.json</code>/<code>[hash].hot-update.js</code>新的文件，文件上的<code>hash</code>值是上一次生成的<code>hash</code>值。</p>
+<p>根据新生成文件名可以发现，上次输出的<code>hash</code>值会作为本次编译新生成的文件标识。依次类推，本次输出的<code>hash</code>值会被作为下次热更新的标识。</p>
+<p><img src="/blog/imgs/webpackHmr/image%203.png" alt="image.png"></p>
+<p>通过浏览器可以看到一次更新之后，会请求对应的<code>[hash].hot-update.json</code>/<code>[hash].hot-update.js</code>文件</p>
+<p><img src="/blog/imgs/webpackHmr/image%204.png" alt="image.png"></p>
+<ul>
+<li><code>c</code>: 描述哪些 chunk 包含在此次更新中</li>
+<li><code>r</code>: 指示是否需要重新加载 Webpack runtime 代码</li>
+<li><code>m</code>: 列出本次更新中被修改的模块及其对应的新代码</li>
+</ul>
+<p><img src="/blog/imgs/webpackHmr/image%205.png" alt="image.png"></p>
+<h2 id="热更新实现的原理">热更新实现的原理</h2>
+<h3 id="webpack-dev-server-启动本地服务">webpack-dev-server 启动本地服务</h3>
+<p>上述的 webpack 配置代码，我们通过<code>webpack-dev-server</code>启动代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#6A737D">// package.json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "scripts"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "dev"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"webpack-dev-server"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "build"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"webpack"</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>所有的命令行可以在对应项目的<code>package.json</code>的<code>bin</code>命令中找到对应的入口文件</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"webpack-dev-server"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "bin"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"bin/webpack-dev-server.js"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>执行 pnpm dev 之后大致的流程(简易版本)</p>
+<p><img src="/blog/imgs/webpackHmr/image%206.png" alt="image.png"></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">setupApp</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">	// 依赖了express</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.app </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">memoize</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"express"</span><span style="color:#E1E4E8">)))();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">	this</span><span style="color:#E1E4E8">.server </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">((type)).</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">(options, </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.app);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">createWebSocketServer</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">	// 启动express服务后，启动websocket服务</span></span>
+<span class="line"><span style="color:#79B8FF">	this</span><span style="color:#E1E4E8">.webSocketServer </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"./servers/WebsocketServer"</span><span style="color:#E1E4E8">))(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在整个启动本地服务时，涉及到的仓库很多，重点都在<code>new Server()</code>之后的操作</p>
+<ul>
+<li>在<code>new Server</code>之前会先启动<code>webpack</code>，生成<code>compiler</code>实例。<code>compiler</code>上有很多方法，比如可以启动<code>webpack</code>所有<strong>编译</strong>工作，以及<strong>监听</strong>本地文件的变化</li>
+<li>使用<code>express</code>启动本地服务，使得浏览器可以访问本地的静态资源</li>
+<li>本地<code>server</code>启动成功之后再去创建<code>websocket</code>服务，建立本地服务和浏览器的双向通信</li>
+</ul>
+<h3 id="修改-entry-配置">修改 entry 配置</h3>
+<p>在我们启动本地服务之前，代码中修改了<code>entry</code>入口，自动注入了<code>websocket</code>客户端代码和热更新替换的代码</p>
+<p>在进入<code>start</code>阶段的时候会调用<code>initialize</code>方法</p>
+<p><img src="/blog/imgs/webpackHmr/image%207.png" alt="image.png"></p>
+<p><code>client/index.js</code>为<code>websocket</code>客户端的代码，因为<code>websocket</code>是双向通信，上一步通过<code>createServer</code>是创建的本地服务端的<code>websocket</code>代码，还需要客户端代码，因此需要把客户端<code>websocket</code>代码塞到代码中</p>
+<p><code>hot/dev-server.js</code>主要用于检查更新逻辑</p>
+<h3 id="监听-webpack-编译结束">监听 webpack 编译结束</h3>
+<p>当修改完<code>entry</code>入口之后，会执行<code>setupHooks</code>方法，注册监听事件，监听<code>webpack</code>编译完成</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">setupHooks</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">	// 监听 webpack 的done hook，tapable 实现</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.compiler.hooks.done.</span><span style="color:#B392F0">tap</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    "webpack-dev-server"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">stats</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.webSocketServer) {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">sendStats</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.webSocketServer.clients, </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getStats</span><span style="color:#E1E4E8">(stats));</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.stats </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stats;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">sendStats</span><span style="color:#E1E4E8">(clients, stats, force) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.currentHash </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> stats.hash;</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">sendMessage</span><span style="color:#E1E4E8">(clients, </span><span style="color:#9ECBFF">"hash"</span><span style="color:#E1E4E8">, stats.hash);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> ((stats.errors).</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> ||</span><span style="color:#E1E4E8">(stats.warnings).</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> hasErrors</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (stats.errors).</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> ((stats.warnings).</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> params;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (hasErrors) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        params </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { preventReloading: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">sendMessage</span><span style="color:#E1E4E8">(clients, </span><span style="color:#9ECBFF">"warnings"</span><span style="color:#E1E4E8">, stats.warnings, params);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> ((stats.errors).</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">sendMessage</span><span style="color:#E1E4E8">(clients, </span><span style="color:#9ECBFF">"errors"</span><span style="color:#E1E4E8">, stats.errors);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">sendMessage</span><span style="color:#E1E4E8">(clients, </span><span style="color:#9ECBFF">"ok"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>每当<code>webpack</code>编译完成就会出发<code>done</code>hook，从而调用<code>sendStats</code>方法通过<code>websocket</code>给浏览器发送消息，<code>hash</code>/<code>ok</code>事件，浏览器能够拿到最新的<code>hash</code>值，检查更新逻辑</p>
+<h3 id="监听文件变化">监听文件变化</h3>
+<p>每次文件发生变化之后，都需要触发文件编译，那么久还需要监听文件发生改变。该操作主要是通过<code>webpack-dev-middleware</code>库实现的。</p>
+<p>在<code>start</code>函数中，会执行<code>setupDevMiddleware</code>方法，该方法主要是执行<code>webpack-dev-middleware</code>库的。</p>
+<aside>
+1. webpack-dev-middleware: 该库主要做文件相关的操作，本地文件输出以及监听
+<ol start="2">
+<li>webpack-dev-server: 该库主要只负责启动服务和前置准备工作
+:::</li>
+</ol>
+<p>在<code>webpack-dev-middleware</code>中主要实现</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">compiler.</span><span style="color:#B392F0">watch</span><span style="color:#E1E4E8">(watchOptions, errorHandler);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">compiler.outputFileSystem </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> memfs.</span><span style="color:#B392F0">createFsFromVolume</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#E1E4E8"> memfs.</span><span style="color:#B392F0">Volume</span><span style="color:#E1E4E8">());</span></span></code></pre>
+<p>调用了<code>compiler.watch</code>方法开启对文件的编译，文件变化的时候重新编译文件。</p>
+<p>更改<code>outputFileSystem</code>，使用<code>memory-fs</code>将所有的 output 存储在内存中，减少对文件系统的操作</p>
+<h3 id="浏览器接收热更新的通知">浏览器接收热更新的通知</h3>
+<p>在上面讲到每一次<code>webpack</code>编译结束之后，都会通过<code>done</code>hook 调用<code>sendStats</code>方法通过<code>websocket</code>传递相关的数据。</p>
+<p>客户端中会被注入<code>webpack-dev-server/client/index.js</code>代码，主要用于接收相关数据</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> onSocketMessage </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  hash</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> hash</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">_hash</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    status.previousHash </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> status.currentHash;</span></span>
+<span class="line"><span style="color:#E1E4E8">    status.currentHash </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> _hash;</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#B392F0">  ok</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> ok</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#B392F0">    sendMessage</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"Ok"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (options.overlay) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      overlay.</span><span style="color:#B392F0">send</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        type: </span><span style="color:#9ECBFF">"DISMISS"</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#B392F0">    reloadApp</span><span style="color:#E1E4E8">(options, status);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 连接服务地址 socketUrl，?http://localhost:8080，本地服务地址</span></span>
+<span class="line"><span style="color:#B392F0">socket</span><span style="color:#E1E4E8">(socketURL, onSocketMessage, options.reconnect);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// import hotEmitter from "webpack/hot/emitter.js";</span></span>
+<span class="line"><span style="color:#B392F0">reloadApp</span><span style="color:#E1E4E8">(){</span></span>
+<span class="line"><span style="color:#F97583">	if</span><span style="color:#E1E4E8"> (hot </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> allowToHot) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    log.</span><span style="color:#B392F0">info</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"App hot update..."</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    hotEmitter.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"webpackHotUpdate"</span><span style="color:#E1E4E8">, status.currentHash);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> self </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> "undefined"</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> self.window) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      self.</span><span style="color:#B392F0">postMessage</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"webpackHotUpdate"</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(status.currentHash), </span><span style="color:#9ECBFF">"*"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>注入的客户端代码职责</p>
+<ul>
+<li><code>socket</code>方法建立了<code>websocket</code>和服务端的连接，并注册了一系列的监听事件
+<ul>
+<li><code>hash</code>事件，更新最新一次打包后的<code>hash</code>值</li>
+<li><code>ok</code>事件，进行热更新检查</li>
+</ul>
+</li>
+<li><code>ok</code>事件中执行<code>reloadApp</code>方法，通过<code>eventEmitter</code>发出<code>webpackHotUpdate</code>事件，通知<code>webpack</code>该干活了</li>
+</ul>
+<p>那么，webpack 肯定是需要监听<code>webpackHotUpdate</code>事件的，没错，就在之前放入<code>webpack/hot/dev-server.js</code>代码中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> check</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> check</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">  module</span><span style="color:#E1E4E8">.hot</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">check</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">then</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">updatedModules</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">updatedModules) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        window.location.</span><span style="color:#B392F0">reload</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">upToDate</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#B392F0">        log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'info'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'[HMR] App is up to date.'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">catch</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">) {});</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> hotEmitter </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./emitter'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">hotEmitter.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'webpackHotUpdate'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">currentHash</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  lastHash </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> currentHash;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#B392F0">upToDate</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> module</span><span style="color:#E1E4E8">.hot.</span><span style="color:#B392F0">status</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'idle'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">    log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'info'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'[HMR] Checking for updates on the server...'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    check</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>能够看到<code>hot/dev-server.js</code>监听了<code>webpackHotUpdate</code>事件，并且会去执行<code>module.hot.check</code>方法</p>
+<h3 id="hotmodulereplacementplugin"><strong>HotModuleReplacementPlugin</strong></h3>
+<p><img src="/blog/imgs/webpackHmr/image%208.png" alt="image.png"></p>
+<p>我们能够浏览器的<code>Sources</code>的<code>bundle.js</code>中找到上述代码，创建对应<code>hot</code>对象，里面就能够对应的<code>check</code>方法。注入的代码可以在<a href="https://github.com/webpack/webpack/blob/main/lib/hmr/HotModuleReplacement.runtime.js#L104">HotModuleReplacement.runtime.js</a>找到</p>
+<p>当我们配置<code>hot</code>属性的时候<code>webpack-dev-server</code>会自动转成<code>HotModuleReplacementPlugin</code></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.options.hot) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> HMRPluginExists</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> compiler.options.plugins.</span><span style="color:#B392F0">find</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">p</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> p.</span><span style="color:#79B8FF">constructor</span><span style="color:#F97583"> ===</span><span style="color:#E1E4E8"> webpack.HotModuleReplacementPlugin,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (HMRPluginExists) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.logger.</span><span style="color:#B392F0">warn</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">      `"hot: true" automatically applies HMR plugin, you don't have to add it manually to your webpack configuration.`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // Apply the HMR plugin</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> plugin</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> webpack.</span><span style="color:#B392F0">HotModuleReplacementPlugin</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    plugin.</span><span style="color:#B392F0">apply</span><span style="color:#E1E4E8">(compiler);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><code>HotModuleReplacementPlugin</code>会悄悄的加一些代码到产物中</p>
+<h3 id="modulehotcheck">module.hot.check</h3>
+<p>上述知道了 module.hot.check 的来源，现在看看该<a href="https://github.com/webpack/webpack/blob/main/lib/hmr/HotModuleReplacement.runtime.js#L258"><code>check</code></a>函数具体做了什么事情</p>
+<h4 id="调用hmrdownloadmanifest获取当前的hashhot-updatejson">调用<code>$hmrDownloadManifest$</code>获取当前的<code>hash.hot-update.json</code></h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// $hmrDownloadManifest$ 都是动态注入的代码</span></span>
+<span class="line"><span style="color:#E1E4E8">__webpack_require__.</span><span style="color:#B392F0">hmrM</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8"> fetch </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'undefined'</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'No browser support: need fetch API'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> fetch</span><span style="color:#E1E4E8">(__webpack_require__.p </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> __webpack_require__.</span><span style="color:#B392F0">hmrF</span><span style="color:#E1E4E8">()).</span><span style="color:#B392F0">then</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">response</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (response.status </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> 404</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">response.ok)</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">          'Failed to fetch update manifest '</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> response.statusText,</span></span>
+<span class="line"><span style="color:#E1E4E8">        );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> response.</span><span style="color:#B392F0">json</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"><span style="color:#E1E4E8">__webpack_require__.</span><span style="color:#B392F0">hmrF</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#9ECBFF">  'main.'</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> __webpack_require__.</span><span style="color:#B392F0">h</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '.hot-update.json'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<h4 id="再调用hmrdownloadupdatehandlersjsonp请求js文件">再调用<code>$hmrDownloadUpdateHandlers$["jsonp"]</code>请求<code>js</code>文件</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 执行 loadUpdateChunk</span></span>
+<span class="line"><span style="color:#E1E4E8">__webpack_require__.</span><span style="color:#B392F0">hu</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">chunkId</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#9ECBFF"> ''</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> chunkId </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '.'</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> __webpack_require__.</span><span style="color:#B392F0">h</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> '.hot-update.js'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// __webpack_require__.l 中创建 script 标签下载 hash.hot-update.js</span></span></code></pre>
+<h3 id="apply">apply</h3>
+<p>终于到了最后一步热更新的操作，所有的代码逻辑都在<a href="https://github.com/webpack/webpack/blob/main/lib/hmr/HotModuleReplacement.runtime.js#L319"><code>internalApply</code></a>中</p>
+<h4 id="删除过期的模块">删除过期的模块</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> queue </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> outdatedModules.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (queue.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  moduleId </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> queue.</span><span style="color:#B392F0">pop</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#6A737D">  // 从缓存中删除过期的模块</span></span>
+<span class="line"><span style="color:#79B8FF">  module</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> installedModules[moduleId];</span></span>
+<span class="line"><span style="color:#6A737D">  // 删除过期的依赖</span></span>
+<span class="line"><span style="color:#F97583">  delete</span><span style="color:#E1E4E8"> outdatedDependencies[moduleId];</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="将新的模块添加到更新列表webpack_require执行相关模块的代码">将新的模块添加到更新列表，<strong>webpack_require</strong>执行相关模块的代码</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">appliedUpdate[moduleId] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> newModuleFactory;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> updateModuleId </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> appliedUpdate) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (__webpack_require__.</span><span style="color:#B392F0">o</span><span style="color:#E1E4E8">(appliedUpdate, updateModuleId)) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    __webpack_require__.m[updateModuleId] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> appliedUpdate[updateModuleId];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="执行hot_accepteddependencies的callback">执行<code>hot._acceptedDependencies</code>的<code>callback</code></h4>
+<p><img src="/blog/imgs/webpackHmr/image%209.png" alt="image.png"></p>
+<h2 id="总结">总结</h2>
+<p>上述我们通过八个步骤大致讲解了<code>HMR</code>的实现原理</p>
+<ul>
+<li>通过<code>webpack-dev-server</code>创建本地服务，修改<code>entry</code>入口，注入<code>websocket</code>客户端代码和热更新替换代码<code>hot-server</code>到<code>bundle</code>中</li>
+<li>在<code>webpack</code>创建的时候会通过<code>HotModuleReplacementPlugin</code>向<code>bundle</code>中注入热更新代码</li>
+<li>通过<code>compiler.watch</code>开启文件监听，每一次编译完成触发<code>compiler.hooks.done</code>；监听<code>compiler.hooks.done</code>每次完成编译之后给客户端发送<code>hash/ok</code>事件</li>
+<li><code>webpack/client</code>接收到<code>ok</code>事件之后，通过<code>eventEmitter</code>佛那个送<code>webpackHotUpdate</code>事件</li>
+<li>在<code>webpack/hot-server</code>中会监听<code>webpackHotUpdate</code>事件，从而执行<code>module.hot.check</code>(<code>HotModuleReplacementPlugin</code>注入的代码)完成热更新操作</li>
+</ul>
+<p><img src="/blog/imgs/webpackHmr/image%2010.png" alt="image.png"></p></aside> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#何为-hmr"> 何为 HMR? </a><a class="depth-2" href="#为何需要-hmr"> 为何需要 HMR? </a><a class="depth-2" href="#如何使用-hmr"> 如何使用 HMR? </a><a class="depth-2" href="#webpack-编译构建流程"> webpack 编译构建流程 </a><a class="depth-2" href="#热更新实现的原理"> 热更新实现的原理 </a><a class="depth-3" href="#webpack-dev-server-启动本地服务"> webpack-dev-server 启动本地服务 </a><a class="depth-3" href="#修改-entry-配置"> 修改 entry 配置 </a><a class="depth-3" href="#监听-webpack-编译结束"> 监听 webpack 编译结束 </a><a class="depth-3" href="#监听文件变化"> 监听文件变化 </a><a class="depth-3" href="#浏览器接收热更新的通知"> 浏览器接收热更新的通知 </a><a class="depth-3" href="#hotmodulereplacementplugin"> HotModuleReplacementPlugin </a><a class="depth-3" href="#modulehotcheck"> module.hot.check </a><a class="depth-3" href="#apply"> apply </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/base-pnpm/">上一篇：pnpm 是为何吊打 npm/yarn 的</a> <a href="/blog/engineering/webpack-split-chunk/">下一篇：Webpack SplitChunk 分包</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

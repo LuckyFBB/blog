@@ -1,15 +1,253 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>Redux-Toolkit 使用及原理实现 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>Redux-Toolkit 使用及原理实现</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="背景">背景</h2>
+<p>Redux-Toolkit 是 基于 Redux 的二次封装，开箱即用的 Redux 工具，比 Redux 更加简单方便。</p>
+<aside>
+🚧 Why to use Redux-toolkit?
+<ol>
+<li>Configuring a Redux store is too complicated</li>
+<li>I have to add a lot of packages to get Redux to do anything useful</li>
+<li>Redux requires too much boilerplate code
+:::</li>
+</ol>
+<h2 id="toolkit-使用">Toolkit 使用</h2>
+<p>Redux 该有的概念的 Toolkit 其实都是有拥有的，只是他们使用的方式不同，例如 reducer/actions 等等在 Toolkit 中都是随处可见的。</p>
+<h3 id="configurestore">configureStore</h3>
+<p>创建 store，代码内部还是调用的 Redux 的 createStore 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> store</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> configureStore</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  reducer: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    counter: counterReducer,</span></span>
+<span class="line"><span style="color:#E1E4E8">    user: userReducer,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<h3 id="createaction--createreducer">createAction + createReducer</h3>
+<h4 id="createaction">createAction</h4>
+<p>创建 Redux 中的 action 创建函数</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> createAction</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">type</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">prepareAction</span><span style="color:#F97583">?</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<p>redux 中 action 的创建以及使用</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> updateName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({ type: </span><span style="color:#9ECBFF">'user/UPDATE_NAME'</span><span style="color:#E1E4E8">, name });</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> updateAge</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">age</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({ type: </span><span style="color:#9ECBFF">'user/UPDATE_AGE'</span><span style="color:#E1E4E8">, age });</span></span></code></pre>
+<p>Toolkit 中 action 的创建以及使用</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 第一种</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> updateName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> createAction </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> { name: string } </span><span style="color:#F97583">></span><span style="color:#9ECBFF"> 'user/UPDATE_NAME'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> updateAge</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> createAction </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> { age: number } </span><span style="color:#F97583">></span><span style="color:#9ECBFF"> 'user/UPDATE_AGE'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">updateName</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// { type: 'user/UPDATE_NAME', payload: undefined }</span></span>
+<span class="line"><span style="color:#B392F0">updateName</span><span style="color:#E1E4E8">({ name: </span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8"> }); </span><span style="color:#6A737D">// { type: 'user/UPDATE_NAME', payload: { name: 'FBB' } }</span></span>
+<span class="line"><span style="color:#B392F0">updateAge</span><span style="color:#E1E4E8">({ age: </span><span style="color:#79B8FF">18</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 第二种</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> updateName</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createAction</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'user/UPDATE_NAME'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({</span></span>
+<span class="line"><span style="color:#E1E4E8">  payload: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    name,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">}));</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> updateAge</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createAction</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'user/UPDATE_AGE'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">age</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({</span></span>
+<span class="line"><span style="color:#E1E4E8">  payload: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    age,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">}));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">updateName</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">updateAge</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">18</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<h4 id="createreducer">createReducer</h4>
+<p>创建 Redux reducer 的函数</p>
+<p>:::info{title=” ”}
+💡 createReducer 使用 Immer 库，可以在 reducer 中直接对状态进行修改，而不需要手动编写不可变性的逻辑
+:::</p>
+<p>Redux 中 reducer 的创建</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> userReducer</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">  state </span><span style="color:#F97583">=</span><span style="color:#FFAB70"> initialUserState</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">  action</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">type</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">, [</span><span style="color:#FFAB70">propName</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">]</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  switch</span><span style="color:#E1E4E8"> (action.type) {</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> 'user/UPDATE_NAME'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> { </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">state, name: action.name };</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#9ECBFF"> 'user/UPDATE_AGE'</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> { </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">state, age: action.age };</span></span>
+<span class="line"><span style="color:#F97583">    default</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> state;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>Toolkit 中 reducer 的创建</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#79B8FF"> userReducer</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createReducer</span><span style="color:#E1E4E8">(initialUserState, (</span><span style="color:#FFAB70">builder</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  builder.</span><span style="color:#B392F0">addCase</span><span style="color:#E1E4E8">(updateAge, (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    state.age </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> action.payload.age;</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">  builder.</span><span style="color:#B392F0">addCase</span><span style="color:#E1E4E8">(updateName, (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    state.name </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> action.payload.name;</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>toolkit 提供的 createAction 和 createReducer 能够帮我们简化 Redux 中一些模版语法，但是整体的使用还是差不多的，我们依旧需要 action 文件和 reducer 文件，做了改善但是不多。</p>
+<p><a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/mini-redux/example/example.ts">redux demo</a> <a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/mini-redux-toolkit/examples/example_reducer/example.ts">toolkit createReducer demo</a></p>
+<h3 id="createslice">createSlice</h3>
+<p>接受初始状态、reducer 函数对象和 slice name 的函数，并自动生成与 reducer 和 state 对应的动作创建者和动作类型</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> userSlice</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createSlice</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  name: </span><span style="color:#9ECBFF">'user'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  initialState: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    age: </span><span style="color:#79B8FF">22</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    name: </span><span style="color:#9ECBFF">'shuangxu'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  reducers: {</span></span>
+<span class="line"><span style="color:#B392F0">    updateName</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#F97583">:</span><span style="color:#B392F0"> PayloadAction</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">string</span><span style="color:#E1E4E8">>) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      state.name </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> action.payload;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#B392F0">    updateAge</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#F97583">:</span><span style="color:#B392F0"> PayloadAction</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">number</span><span style="color:#E1E4E8">>) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      state.age </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> action.payload;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>使用 createSlice 创建一个分片，每一个分片代表某一个业务的数据状态处理。在其中可以完成 action 和 reducer 的创建。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#79B8FF"> userSliceName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> userSlice.name;</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">updateAge</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">updateName</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> userSlice.actions;</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#79B8FF"> userReducer</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> userSlice.reducer;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> store</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> configureStore</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  reducer: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    [counterSliceName]: counterReducer,</span></span>
+<span class="line"><span style="color:#E1E4E8">    [userSliceName]: userReducer,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p><a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/mini-redux-toolkit/examples/example_slice/example.ts">toolkit slice demo</a></p>
+<p>在 Toolkit 中直接使用 createSlice 更加方便，能够直接导出 reducer 和 action，直接在一个方法中能够获取到对应内容不在需要多处定义。</p>
+<h2 id="源码实现">源码实现</h2>
+<h3 id="configurestore-1">configureStore</h3>
+<p>接受一个含有 reducer 的对象作为参数，内部调用 redux 的 createStore 创建出 store</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { combineReducers, createStore } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'redux'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> configureStore</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">reducer</span><span style="color:#E1E4E8"> }</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> rootReducer</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> combineReducers</span><span style="color:#E1E4E8">(reducer);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> store</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createStore</span><span style="color:#E1E4E8">(rootReducer);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> store;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="createaction-1">createAction</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> updateName</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createAction</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">string</span><span style="color:#E1E4E8">>(</span><span style="color:#9ECBFF">'user/UPDATE_NAME'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> updateName</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createAction</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'user/UPDATE_NAME'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">name</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({</span></span>
+<span class="line"><span style="color:#E1E4E8">  payload: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    name,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">}));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">updateName</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p>通过上面的示例，能够分析出来 createAction 返回的是一个函数，接受第一个参数 type 返回<code>{ type: 'user/UPDATE_NAME', payload: undefined }</code>；对于具体的 payload 值需要传入第二个参数来改变</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> createAction</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">type</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">preAction</span><span style="color:#F97583">?:</span><span style="color:#B392F0"> Function</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> actionCreator</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#FFAB70">args</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">[]) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">preAction)</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        type,</span></span>
+<span class="line"><span style="color:#E1E4E8">        payload: args[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> prepared</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> preAction</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">args);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">prepared) {</span></span>
+<span class="line"><span style="color:#F97583">      throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'prepareAction did not return an object'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      type,</span></span>
+<span class="line"><span style="color:#E1E4E8">      payload: prepared.payload,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  actionCreator.type </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> type;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> actionCreator;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="createreducer-1">createReducer</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#79B8FF"> userReducer</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createReducer</span><span style="color:#E1E4E8">(initialUserState, (</span><span style="color:#FFAB70">builder</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  builder</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">addCase</span><span style="color:#E1E4E8">(updateAge, (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      state.age </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> action.payload.age;</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">addCase</span><span style="color:#E1E4E8">(updateName, (</span><span style="color:#FFAB70">state</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      state.name </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> action.payload.name;</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>每一个 reducer 都是一个函数<code>(state = initialState, action) => {}</code>，因此 createReducer 返回值为函数</p>
+<p>通过一个 createReducer 函数，内部还需要知道每一个 action 对应的操作</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { produce </span><span style="color:#F97583">as</span><span style="color:#E1E4E8"> createNextState } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> 'immer'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> createReducer</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">  initialState</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">  builderCallback</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">builder</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> actionsMap</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> executeReducerBuilderCallback</span><span style="color:#E1E4E8">(builderCallback);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> reducer</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">state</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> initialState, </span><span style="color:#FFAB70">action</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> caseReducer</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> actionsMap[action.type];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">caseReducer) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> state;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> createNextState</span><span style="color:#E1E4E8">(state, (</span><span style="color:#FFAB70">draft</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> caseReducer</span><span style="color:#E1E4E8">(draft, action));</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 通过 createReducer 的第二个参数，构建出 action 对应的操作方法</span></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> executeReducerBuilderCallback</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#B392F0">  builderCallback</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">builder</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> actionsMap</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> builder</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    addCase</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">typeOrActionCreator</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reducer</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> type</span><span style="color:#F97583"> =</span></span>
+<span class="line"><span style="color:#F97583">        typeof</span><span style="color:#E1E4E8"> typeOrActionCreator </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'string'</span></span>
+<span class="line"><span style="color:#F97583">          ?</span><span style="color:#E1E4E8"> typeOrActionCreator</span></span>
+<span class="line"><span style="color:#F97583">          :</span><span style="color:#E1E4E8"> typeOrActionCreator.type;</span></span>
+<span class="line"><span style="color:#E1E4E8">      actionsMap[type] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> reducer;</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> builder;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  builderCallback</span><span style="color:#E1E4E8">(builder);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> actionsMap;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="createslice-1">createSlice</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> counterSlice</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> createSlice</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  name: </span><span style="color:#9ECBFF">'counter'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  initialState: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    count: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  reducers: {</span></span>
+<span class="line"><span style="color:#B392F0">    increment</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">state</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      state.count </span><span style="color:#F97583">+=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#B392F0">    decrement</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">state</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      state.count </span><span style="color:#F97583">-=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> counterSliceName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> counterSlice.name;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">increment</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">decrement</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> counterSlice.actions;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> counterReducer</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> counterSlice.reducer;</span></span></code></pre>
+<p>createSlice 返回的是一个对象<code>{ name, actions, reducer }</code>，接受<code>{ name, initialState, reducers }</code>三个参数。通过 reducers 中相关参数得到对应的 actions 和 reducer。</p>
+<p>在 createSlice 中主要还是靠 createAction 和 createReducer 方法。通过 name 和 reducers 的每一个属性拼接成为 action.type，调用 createReducer 遍历 reducers 的属性添加 case</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { createAction } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './createAction'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> { createReducer } </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> './createReducer'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> createSlice</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">name</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">initialState</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reducers</span><span style="color:#E1E4E8"> }</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> reducerNames</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(reducers);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> actionCreators</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> sliceCaseReducersByType</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  reducerNames.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">reducerName</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> type</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}/${</span><span style="color:#E1E4E8">reducerName</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> reducerWithPrepare</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> reducers[reducerName];</span></span>
+<span class="line"><span style="color:#E1E4E8">    actionCreators[reducerName] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> createAction</span><span style="color:#E1E4E8">(type);</span></span>
+<span class="line"><span style="color:#E1E4E8">    sliceCaseReducersByType[type] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> reducerWithPrepare;</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> buildReducer</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> createReducer</span><span style="color:#E1E4E8">(initialState, (</span><span style="color:#FFAB70">builder</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> key </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> sliceCaseReducersByType) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        builder.</span><span style="color:#B392F0">addCase</span><span style="color:#E1E4E8">(key, sliceCaseReducersByType[key]);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    name,</span></span>
+<span class="line"><span style="color:#E1E4E8">    actions: actionCreators,</span></span>
+<span class="line"><span style="color:#B392F0">    reducer</span><span style="color:#E1E4E8">: (</span><span style="color:#FFAB70">state</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">action</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> _reducer</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> buildReducer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#B392F0"> _reducer</span><span style="color:#E1E4E8">(state, action);</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="总结">总结</h2>
+<p>本文讲了 toolkit 的使用和源码实现，toolkit 是基于 redux 实现的，相对于 redux 来说少了很多的模版语言更加的方便快捷。从 redux 升级到 redux-toolkit 也是没有破坏性变更的。</p></aside> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#背景"> 背景 </a><a class="depth-2" href="#toolkit-使用"> Toolkit 使用 </a><a class="depth-3" href="#configurestore"> configureStore </a><a class="depth-3" href="#createaction--createreducer"> createAction + createReducer </a><a class="depth-3" href="#createslice"> createSlice </a><a class="depth-2" href="#源码实现"> 源码实现 </a><a class="depth-3" href="#configurestore-1"> configureStore </a><a class="depth-3" href="#createaction-1"> createAction </a><a class="depth-3" href="#createreducer-1"> createReducer </a><a class="depth-3" href="#createslice-1"> createSlice </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/mobx-principle-and-version-implementation/">上一篇：Mobx 原理及丐版实现</a> <a href="/blog/node/stream/">下一篇：浅谈一下 NodeJS 中的 Stream</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

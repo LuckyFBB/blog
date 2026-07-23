@@ -1,15 +1,221 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>React-Router6 简单分析实现 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>React-Router6 简单分析实现</h1> </header> <div class="article-grid"> <div class="prose"> <blockquote>
+<p><a href="/blog/react/react--router-principle-and-version-implementation">前文</a>讲述了前端路由的实现已经 react-router@4 一些组件的实现。最近笔者公司在升级 react-router@6 因此本文将对 react-router@6 的一些实现做分析。</p>
+</blockquote>
+<h2 id="react-router-的架构">React-Router 的架构</h2>
+<p><img src="/blog/imgs/react-router6/Untitled.png" alt="Untitled"></p>
+<ul>
+<li>history 库给 browser、hash 两种 history 提供了统一的 API，给到 react-router-dom 使用</li>
+<li>react-router 实现了路由的最核心能力。提供了<code>&#x3C;Router></code>、<code>&#x3C;Route></code>等组件，以及配套 hook</li>
+<li>react-router-dom 是对 react-router 更上一层封装。把 history 传入<code>&#x3C;Router></code>并初始化成<code>&#x3C;BrowserRouter></code>、<code>&#x3C;HashRouter></code>，补充了<code>&#x3C;Link></code>这样给浏览器直接用的组件。同时把 react-router 直接导出，减少依赖</li>
+</ul>
+<h2 id="history-实现">History 实现</h2>
+<p>实现查看<a href="/blog/react/react--router-principle-and-version-implementation#history">前文</a></p>
+<h2 id="react-router6-丐版实现">React-Router@6 丐版实现</h2>
+<p><img src="/blog/imgs/react-router6/Untitled%201.png" alt="Untitled"></p>
+<h3 id="router">Router</h3>
+<aside>
+💡 基于 Context 的全局状态下发。Router 是一个 “Provider-Consumer” 模型
+</aside>
+<p><a href="https://github.com/remix-run/react-router/blob/react-router%406.11.1/packages/react-router/lib/components.tsx#L327">Router</a> 做的事情很简单，接收<code>navigator</code> 和<code>location</code>，使用 context 将数据传递下去，能够让子组件获取到相关的数据</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Router</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">navigator</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">children</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">location</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> props;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> navigationContext</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">useMemo</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({ navigator }), [navigator]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">pathname</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> location;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> locationContext</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">useMemo</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> ({ location: { pathname } }),</span></span>
+<span class="line"><span style="color:#E1E4E8">    [pathname],</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">NavigationContext.Provider</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{navigationContext}></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">LocationContext.Provider</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{locationContext} </span><span style="color:#B392F0">children</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{children} /></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#79B8FF">NavigationContext.Provider</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="hashrouter">HashRouter</h4>
+<p>基于不同的 history 调用 Router 组件。并且在 history 发生改变的时候，监听 history，能够在 location 发生改变的时候，执行回调改变 location。</p>
+<p>在下面的代码中，能够发现监听者为 <strong><code>setState</code></strong> 函数，在上述 hashHistory 中，如果我们的 location 发生了改变，会通知到所有的监听者执行回调，也就是我们这里的 <strong><code>setState</code></strong> 函数，即我们能够拿到最新的 location 信息通过 LocationContext 传递给子组件，再去做对应的路由匹配</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> HashRouter</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">children</span><span style="color:#E1E4E8"> }) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> historyRef </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">useRef</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (historyRef.current </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    historyRef.current </span><span style="color:#F97583">=</span><span style="color:#B392F0"> createHashHistory</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> history </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> historyRef.current;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> [state, setState] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">useState</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">    location: history.location,</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  React.</span><span style="color:#B392F0">useEffect</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> unListen</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> history.</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(setState);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> unListen;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }, [history]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">Router</span><span style="color:#B392F0"> children</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{children} </span><span style="color:#B392F0">location</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{state.location} </span><span style="color:#B392F0">navigator</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{history} /></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="routesroute">Routes/Route</h3>
+<p>我们能够发现在 v6.0 的版本 <a href="https://github.com/remix-run/react-router/blob/react-router%406.11.1/packages/react-router/lib/components.tsx#L301">Route</a> 组件只是一个工具人，并没有做任何事情。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Route</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">_props</span><span style="color:#F97583">:</span><span style="color:#B392F0"> RouteProps</span><span style="color:#E1E4E8">)</span><span style="color:#F97583">:</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">ReactElement</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  invariant</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#79B8FF">    false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    `A &#x3C;Route> is only ever to be used as the child of &#x3C;Routes> element, `</span><span style="color:#F97583"> +</span></span>
+<span class="line"><span style="color:#9ECBFF">      `never rendered directly. Please wrap your &#x3C;Route> in a &#x3C;Routes>.`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>实际上处理一切逻辑的组件是 <a href="https://github.com/remix-run/react-router/blob/react-router%406.11.1/packages/react-router/lib/components.tsx#L409">Routes</a>，它内部实现了根据路由的变化，匹配出一个正确的组件。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> Routes</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> ({ </span><span style="color:#FFAB70">children</span><span style="color:#E1E4E8"> }) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> useRoutes</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">createRoutesFromChildren</span><span style="color:#E1E4E8">(children));</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><a href="https://github.com/remix-run/react-router/blob/react-router%406.11.1/packages/react-router/lib/hooks.tsx#L326">useRoutes</a> 为整个 v6 版本的核心，分为路由上下文解析、路由匹配、路由渲染三个步骤</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">Routes</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"/home"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">Home</span><span style="color:#E1E4E8"> />}></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"1"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">Home1</span><span style="color:#E1E4E8"> />}></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"2"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">Home2</span><span style="color:#E1E4E8"> />}>&#x3C;/</span><span style="color:#79B8FF">Route</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#79B8FF">Route</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#79B8FF">Route</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"/about"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">About</span><span style="color:#E1E4E8"> />}>&#x3C;/</span><span style="color:#79B8FF">Route</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"/list"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">List</span><span style="color:#E1E4E8"> />}>&#x3C;/</span><span style="color:#79B8FF">Route</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"/notFound"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">NotFound</span><span style="color:#E1E4E8"> />} /></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Route</span><span style="color:#B392F0"> path</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"/navigate"</span><span style="color:#B392F0"> element</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{&#x3C;</span><span style="color:#79B8FF">Navigate</span><span style="color:#B392F0"> to</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"/notFound"</span><span style="color:#E1E4E8"> />} /></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#79B8FF">Routes</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>上述 Routes 代码中，通过 createRoutesFromChildren 函数将 Route 组件结构化。可以把 <code>&#x3C;Route></code> 类型的 react element 对象，变成了普通的 route 对象结构，如下图</p>
+<p><img src="/blog/imgs/react-router6/Untitled%202.png" alt="Untitled"></p>
+<h4 id="useroutes">useRoutes</h4>
+<p>useRoutes 才是真正处理渲染关系的，其代码如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 第一步：获取相关的 pathname</span></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> location </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useLocation</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">matches</span><span style="color:#E1E4E8">: parentMatches } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> React.</span><span style="color:#B392F0">useContext</span><span style="color:#E1E4E8">(RouteContext);</span></span>
+<span class="line"><span style="color:#6A737D">// 第二步：找到匹配的路由分支，将 pathname 和 Route 的 path 做匹配</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> matches</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> matchRoutes</span><span style="color:#E1E4E8">(routes, location);</span></span>
+<span class="line"><span style="color:#6A737D">// 第三步：渲染真正的路由组件</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> renderedMatches</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> _renderMatches</span><span style="color:#E1E4E8">(matches, parentMatches);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">return</span><span style="color:#E1E4E8"> renderedMatches;</span></span></code></pre>
+<h4 id="matchroutes">matchRoutes</h4>
+<p>matchRoutes 中通过 pathname 和路由的 path 进行匹配</p>
+<p>因为我们在 Route 中定义的 path 都是相对路径，所以我们在 matchRoutes 方法中，需要对 routes 对象遍历，对于 children 里面的 path 需要变成完整的路径，并且需要将 routes 扁平化，不在使用嵌套结构</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> flattenRoutes</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">  routes</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  branches </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [],</span></span>
+<span class="line"><span style="color:#E1E4E8">  parentsMeta </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [],</span></span>
+<span class="line"><span style="color:#E1E4E8">  parentPath </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> flattenRoute</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">route</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> meta</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      relativePath: route.path </span><span style="color:#F97583">||</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      route,</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> path</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> joinPaths</span><span style="color:#E1E4E8">([parentPath, meta.relativePath]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> routesMeta</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> parentsMeta.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(meta);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (route.children?.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">      flattenRoutes</span><span style="color:#E1E4E8">(route.children, branches, routesMeta, path);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (route.path </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    branches.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({ path, routesMeta });</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">  routes.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">route</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    flattenRoute</span><span style="color:#E1E4E8">(route);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> branches;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><img src="/blog/imgs/react-router6/Untitled%205.png" alt="Untitled"></p>
+<p>当我们访问<code>/#/home/1/2</code>的时候，获得的 matches 如下</p>
+<p><img src="/blog/imgs/react-router6/Untitled%203.png" alt="Untitled"></p>
+<p>我们得到的 match 顺序是从 Home → Home1 → Home2</p>
+<h5 id="_rendermatches">_renderMatches</h5>
+<p>_renderMatches 才会渲染所有的 matches 对象</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> _renderMatches</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">matches</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">parentMatches</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> []) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> renderedMatches </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> matches;</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> renderedMatches.</span><span style="color:#B392F0">reduceRight</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">outlet</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">match</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">index</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> matches </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> parentMatches.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(renderedMatches.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, index </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#B392F0"> getChildren</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> children;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (match.route.Component) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        children </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">match.route.Component</span><span style="color:#E1E4E8"> />;</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (match.route.element) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        children </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> match.route.element;</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        children </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> outlet;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#79B8FF">RouteContext.Provider</span></span>
+<span class="line"><span style="color:#B392F0">          value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{{</span></span>
+<span class="line"><span style="color:#E1E4E8">            outlet,</span></span>
+<span class="line"><span style="color:#E1E4E8">            matches,</span></span>
+<span class="line"><span style="color:#E1E4E8">          }}</span></span>
+<span class="line"><span style="color:#E1E4E8">        ></span></span>
+<span class="line"><span style="color:#E1E4E8">          {children}</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;/</span><span style="color:#79B8FF">RouteContext.Provider</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      );</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> getChildren</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">  }, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>_renderMatches 这段代码我们能够明白 outlet 作为子路由是如何传递给父路由渲染的。matches 采用从右往左的遍历顺序，将上一项的返回值作为后一项的 outlet，那么子路由就作为 outlet 传递给了父路由</p>
+<p><img src="/blog/imgs/react-router6/Untitled%204.png" alt="Untitled"></p>
+<h3 id="outlet">Outlet</h3>
+<p>实际上就是内部渲染 RouteContext 的 outlet 属性</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Outlet</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> useOutlet</span><span style="color:#E1E4E8">(props.context);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> useOutlet</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">context</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> unknown</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> outlet </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useContext</span><span style="color:#E1E4E8">(RouteContext).outlet; </span><span style="color:#6A737D">// 获取上一级 RouteContext 上面的 outlet</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (outlet) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">OutletContext.Provider</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{context}>{outlet}&#x3C;/</span><span style="color:#79B8FF">OutletContext.Provider</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> outlet;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="link">Link</h3>
+<p>在 Link 中，我们使用<code>&#x3C;a></code>标签来做跳转，但是 a 标签会使页面重新刷新，所以需要阻止 a 标签的默认行为，调用 useNavigate 方法进行跳转</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Link</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">to</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">children</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">onClick</span><span style="color:#E1E4E8"> }) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> navigate</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> useNavigate</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> handleClick</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> onClick</span></span>
+<span class="line"><span style="color:#F97583">    ?</span><span style="color:#E1E4E8"> onClick</span></span>
+<span class="line"><span style="color:#F97583">    :</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">event</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        event.</span><span style="color:#B392F0">preventDefault</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#B392F0">        navigate</span><span style="color:#E1E4E8">(to);</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">a</span><span style="color:#B392F0"> href</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{to} </span><span style="color:#B392F0">onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{handleClick}></span></span>
+<span class="line"><span style="color:#E1E4E8">      {children}</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;/</span><span style="color:#85E89D">a</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="hooks">Hooks</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> useLocation</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> useContext</span><span style="color:#E1E4E8">(LocationContext).location;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> useNavigate</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">navigator</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useContext</span><span style="color:#E1E4E8">(NavigationContext);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> navigate</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> useCallback</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">to</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      navigator.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(to);</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">    [navigator],</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> navigate;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://juejin.cn/post/7133599300919459871">react router v6 使用详解以及部分源码解析（新老版本对比） - 掘金</a></li>
+<li><a href="https://juejin.cn/post/7069555976717729805">「React 进阶」react-router v6 通关指南 - 掘金</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/596287905">一文读懂 react-router 原理</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#react-router-的架构"> React-Router 的架构 </a><a class="depth-2" href="#history-实现"> History 实现 </a><a class="depth-2" href="#react-router6-丐版实现"> React-Router@6 丐版实现 </a><a class="depth-3" href="#router"> Router </a><a class="depth-3" href="#routesroute"> Routes/Route </a><a class="depth-3" href="#outlet"> Outlet </a><a class="depth-3" href="#link"> Link </a><a class="depth-3" href="#hooks"> Hooks </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/react--router-principle-and-version-implementation/">上一篇：React-Router4 原理及丐版实现</a> <a href="/blog/react/rediscover-controlled-and-uncontrolled-components/">下一篇：重新认识受控和非受控组件</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

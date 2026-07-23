@@ -1,15 +1,295 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="阅读笔记、系统知识和一些暂时没归类的内容。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>进程间通信之信号量和信号 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link is-active" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">其他</a> <h1>进程间通信之信号量和信号</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="信号量">信号量</h2>
+<p>在<a href="/blog/more/msg-share-and-memory#%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98">上一篇文章</a>中，我们讲到了共享内存，也写了一个简单的事例来讲解了如何来实现内存通信，读写内存数据。当然我们的事例中只涉及写入一次，读取一次的过程。</p>
+<p>🤔️ 如果我们想一边写一边读内存中的数据，我们需要如何实现？</p>
+<p>那肯定逃不掉 while 循环，让进程一直处于运行状态，例如下面的代码：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D">// 往内存中写数据</span></span>
+<span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::string message;</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Please enter your message: "</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::</span><span style="color:#B392F0">getline</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">std</span><span style="color:#E1E4E8">::cin, message);</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::</span><span style="color:#B392F0">memcpy</span><span style="color:#E1E4E8">(shmaddr, message.</span><span style="color:#B392F0">c_str</span><span style="color:#E1E4E8">(), message.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 从内存中读数据</span></span>
+<span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">){</span></span>
+<span class="line"><span style="color:#B392F0">		std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Message from shared memory: "</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> shmaddr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上述伪代码存在一个问题，即使我们不往内存中写入数据，读数据进程也一直在输出。</p>
+<p>🤔️ 有没有一种方式能够实现，写进程写完数据通知到读进程，再让其去读取数据？</p>
+<p>这时候就要引入我们的<strong>信号量</strong>了！</p>
+<h3 id="什么是信号量"><strong>什么是信号量？</strong></h3>
+<p>本质是一个变量(整型/记录型)，表示系统中某种资源的数量。拥有两种原子操作，<a href="/blog/more/process-read-notes#%E4%BF%A1%E5%8F%B7%E9%87%8F%E6%9C%BA%E5%88%B6">查看更多</a></p>
+<ul>
+<li>P 操作(wait 语法)：该操作会把信号量减去 1，相减后如果信号量 &#x3C; 0 则表示资源已经被占用，进程需要阻塞；相减后如果信号量 ≥ 0，则表明还有资源可以使用，进程可以正常执行</li>
+<li>V 操作(signal 语法)：该操作会把信号量加上 1，相加后如果信号量 ≤ 0，则表明当前有阻塞中的进程，于是会把该进程唤醒；相加后如果信号量 > 0，则表明当前没有阻塞中的进程</li>
+</ul>
+<h3 id="相关-api">相关 API</h3>
+<ol>
+<li>
+<p>创建信号量</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> semget</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">key_t</span><span style="color:#FFAB70"> key</span><span style="color:#E1E4E8">,</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> nsems</span><span style="color:#E1E4E8">,</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> flags</span><span style="color:#E1E4E8">)</span></span></code></pre>
+</li>
+<li>
+<p>改变信号量</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> semop</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> semid</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">struct</span><span style="color:#B392F0"> sembuf</span><span style="color:#F97583"> *</span><span style="color:#FFAB70">sops</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">size_t</span><span style="color:#FFAB70"> nops</span><span style="color:#E1E4E8">)</span></span></code></pre>
+</li>
+<li>
+<p>删除和初始化信号量</p>
+</li>
+</ol>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> semctl</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> semid</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> semnum</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> cmd</span><span style="color:#E1E4E8">)</span></span></code></pre>
+<h3 id="实现信号量通信">实现信号量通信</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 初始化信号量</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> set_semvalue</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> semid</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">int</span><span style="color:#FFAB70"> value</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#E1E4E8">    semun arg;</span></span>
+<span class="line"><span style="color:#E1E4E8">    arg.val </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> semctl</span><span style="color:#E1E4E8">(semid, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, SETVAL, arg);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 进行 wait 操作，减少信号量</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> sem_wait</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> semid</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    struct</span><span style="color:#B392F0"> sembuf</span><span style="color:#E1E4E8"> sb;</span></span>
+<span class="line"><span style="color:#E1E4E8">    sb.sem_num </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    sb.sem_op </span><span style="color:#F97583">=</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    sb.sem_flg </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> SEM_UNDO;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> semop</span><span style="color:#E1E4E8">(semid, </span><span style="color:#F97583">&#x26;</span><span style="color:#E1E4E8">sb, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 进行 signal 操作，增加信号量</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> sem_signal</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> semid</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    struct</span><span style="color:#B392F0"> sembuf</span><span style="color:#E1E4E8"> sb;</span></span>
+<span class="line"><span style="color:#E1E4E8">    sb.sem_num </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    sb.sem_op </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    sb.sem_flg </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> SEM_UNDO;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> semop</span><span style="color:#E1E4E8">(semid, </span><span style="color:#F97583">&#x26;</span><span style="color:#E1E4E8">sb, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>写数据的进程</strong></p>
+<p>在我们的写进程中初始化 semid 标识往共享内存中写入的数据个数，调用<code>sem_signal(semid)</code>使得 semid 的值增加</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    key_t</span><span style="color:#E1E4E8"> memory_key </span><span style="color:#F97583">=</span><span style="color:#F97583"> 0x</span><span style="color:#79B8FF">202020</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    key_t</span><span style="color:#E1E4E8"> sem_key </span><span style="color:#F97583">=</span><span style="color:#F97583"> 0x</span><span style="color:#79B8FF">191919</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> shmid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> shmget</span><span style="color:#E1E4E8">(memory_key, SHM_SIZE, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmid </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">shmaddr </span><span style="color:#F97583">=</span><span style="color:#F97583"> static_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">shmat</span><span style="color:#E1E4E8">(shmid, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmaddr </span><span style="color:#F97583">==</span><span style="color:#F97583"> reinterpret_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to attach shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> semid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> semget</span><span style="color:#E1E4E8">(sem_key, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (semid </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create semaphore.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">    set_semvalue</span><span style="color:#E1E4E8">(semid, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span><span style="color:#6A737D"> // 初始化写信号量</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 写进程</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">fork</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#B392F0">            std</span><span style="color:#E1E4E8">::string message;</span></span>
+<span class="line"><span style="color:#B392F0">            std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Please enter your message: "</span></span>
+<span class="line"><span style="color:#F97583">                      &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">            std</span><span style="color:#E1E4E8">::</span><span style="color:#B392F0">getline</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">std</span><span style="color:#E1E4E8">::cin, message);</span></span>
+<span class="line"><span style="color:#B392F0">            std</span><span style="color:#E1E4E8">::</span><span style="color:#B392F0">memcpy</span><span style="color:#E1E4E8">(shmaddr, message.</span><span style="color:#B392F0">c_str</span><span style="color:#E1E4E8">(), message.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#B392F0">            sem_signal</span><span style="color:#E1E4E8">(semid);</span><span style="color:#6A737D"> // 发送写信号量</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 等待子进程结束</span></span>
+<span class="line"><span style="color:#B392F0">    wait</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 删除共享内存</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">shmctl</span><span style="color:#E1E4E8">(shmid, IPC_RMID, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to delete shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 删除信号量</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">semctl</span><span style="color:#E1E4E8">(semid, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, IPC_RMID) </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to delete semaphore.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong>读数据的进程</strong></p>
+<p>读进程中的先进行<code>sem_wait(semid)</code>的判断，如果这个值小于 0，表示当前没有资源，阻塞后续的操作</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    key_t</span><span style="color:#E1E4E8"> memory_key </span><span style="color:#F97583">=</span><span style="color:#F97583"> 0x</span><span style="color:#79B8FF">202020</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    key_t</span><span style="color:#E1E4E8"> sem_key </span><span style="color:#F97583">=</span><span style="color:#F97583"> 0x</span><span style="color:#79B8FF">191919</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> shmid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> shmget</span><span style="color:#E1E4E8">(memory_key, SHM_SIZE, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmid </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">shmaddr </span><span style="color:#F97583">=</span><span style="color:#F97583"> static_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">shmat</span><span style="color:#E1E4E8">(shmid, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmaddr </span><span style="color:#F97583">==</span><span style="color:#F97583"> reinterpret_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to attach shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> semid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> semget</span><span style="color:#E1E4E8">(sem_key, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (semid </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create semaphore.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 读进程</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">fork</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#F97583">        while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#B392F0">            sem_wait</span><span style="color:#E1E4E8">(semid);</span><span style="color:#6A737D"> // 等待写信号量</span></span>
+<span class="line"><span style="color:#B392F0">            std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Message from shared memory: "</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> shmaddr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 等待子进程结束</span></span>
+<span class="line"><span style="color:#B392F0">    wait</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 删除共享内存</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">shmctl</span><span style="color:#E1E4E8">(shmid, IPC_RMID, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to delete shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 删除信号量</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">semctl</span><span style="color:#E1E4E8">(semid </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, IPC_RMID) </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to delete semaphore.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="总结">总结</h3>
+<p>信号量是一个特殊的变量，程序对其访问都是原子操作，且只允许对它进行 P 操作和 V 操作。</p>
+<p>我们通常通过信号来解决多个进程对同一资源的访问竞争的问题，使在任一时刻只能有一个执行线程访问代码的临界区域，也可以说它是协调进程间的对同一资源的访问权，也就是用于同步进程的。</p>
+<h2 id="信号">信号</h2>
+<p>信号是在软件层次上对中断机制的一种模拟，是一种异步通信方式</p>
+<p>信号用于进程间互相通信或者操作的一种机制，信号可以在任何时候发给某一进程，而无需知道该进程的状态。只需要在进程中设置信号对应的处理函数，当信号到达时，由系统处理函数即可。</p>
+<h3 id="信号的处理方式"><strong>信号的处理方式</strong></h3>
+<ul>
+<li>执行默认行为</li>
+<li>捕捉信号，可以为信号定义处理函数</li>
+<li>忽略信号，当我们不希望处理某些信号的时候，就可以忽略该信号</li>
+</ul>
+<h3 id="常见的信号"><strong>常见的信号</strong></h3>
+<p><img src="/blog/imgs/semAndSignal/Untitled.png" alt="Untitled"></p>
+<h3 id="信号来源"><strong>信号来源</strong></h3>
+<ul>
+<li>硬件来源：用户按键输入 Ctrl+C 退出、硬件异常/故障</li>
+<li>软件终止：进程调用 kill 函数</li>
+</ul>
+<h3 id="处理流程"><strong>处理流程</strong></h3>
+<p><img src="/blog/imgs/semAndSignal/Untitled%201.png" alt="Untitled"></p>
+<ol>
+<li>
+<p>信号的接收</p>
+<p>接收信号的任务是由内核代理的，当内核接收到信号后会将其放入对应进程的信号队列中，同时向进程发起一个中断，使其进入内核态</p>
+</li>
+<li>
+<p>信号的检测</p>
+<ul>
+<li>进程从内核态返回用户态进行信号检测</li>
+<li>进程在内核态中，从睡眠模式被唤醒时进行信号检测</li>
+</ul>
+</li>
+<li>
+<p>信号的处理</p>
+<p>信号的处理函数是运行在用户态的，进程会返回用户态执行相应的处理函数。当信号的处理函数执行完成之后，还需要返回内核态，检测是否还有别的信号未处理。</p>
+</li>
+</ol>
+<p>一个完整信号的处理是这样，如果多个信号同时到达便会重复执行步骤 2/3</p>
+<h3 id="信号示例">信号示例</h3>
+<ol>
+<li>
+<p>更改默认的处理函数</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">void</span><span style="color:#B392F0"> myHandle</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> sig</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Catch a signal :"</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> sig</span></span>
+<span class="line"><span style="color:#F97583">              &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">void</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#6A737D">    // 设置信号处理函数</span></span>
+<span class="line"><span style="color:#B392F0">    signal</span><span style="color:#E1E4E8">(SIGINT, myHandle);</span><span style="color:#6A737D"> // 如果收到SIGINT信号，就执行myhandle,如果未设置信号处理函数，则进行默认处理——终止。</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "hello world"</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        sleep</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p>杀死子进程和自己</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#FFAB70"> argc</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">const</span><span style="color:#F97583"> char</span><span style="color:#F97583"> *</span><span style="color:#FFAB70">argv</span><span style="color:#E1E4E8">[])</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    pid_t</span><span style="color:#E1E4E8"> child_pid;</span></span>
+<span class="line"><span style="color:#F97583">    pid_t</span><span style="color:#E1E4E8"> parent_pid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> getpid</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    child_pid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (child_pid </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "fork fail :"</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (child_pid </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "child"</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    else</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "father pid"</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> parent_pid </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "    child pid    "</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> child_pid</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">        kill</span><span style="color:#E1E4E8">(child_pid, SIGKILL);</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "child killed"</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        sleep</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "father"</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        wait</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">NULL</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">        raise</span><span style="color:#E1E4E8">(SIGKILL);</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "father killed"</span></span>
+<span class="line"><span style="color:#F97583">                  &#x3C;&#x3C;</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+</ol> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#信号量"> 信号量 </a><a class="depth-3" href="#什么是信号量"> 什么是信号量？ </a><a class="depth-3" href="#相关-api"> 相关 API </a><a class="depth-3" href="#实现信号量通信"> 实现信号量通信 </a><a class="depth-3" href="#总结"> 总结 </a><a class="depth-2" href="#信号"> 信号 </a><a class="depth-3" href="#信号的处理方式"> 信号的处理方式 </a><a class="depth-3" href="#常见的信号"> 常见的信号 </a><a class="depth-3" href="#信号来源"> 信号来源 </a><a class="depth-3" href="#处理流程"> 处理流程 </a><a class="depth-3" href="#信号示例"> 信号示例 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/more/msg-share-and-memory/">上一篇：进程间通信之消息队列和内存共享</a> <a href="/blog/more/sse/">下一篇：SSE</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

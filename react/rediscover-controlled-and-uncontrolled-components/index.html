@@ -1,15 +1,250 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>重新认识受控和非受控组件 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>重新认识受控和非受控组件</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>在 HTML 中，表单元素(<code>&#x3C;input></code>/<code>&#x3C;textarea></code>/<code>&#x3C;select></code>)，通常自己会维护 state，并根据用户的输入进行更新</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="html"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">form</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">label</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    名字:</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> type</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"text"</span><span style="color:#B392F0"> name</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"name"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#85E89D">label</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> type</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"submit"</span><span style="color:#B392F0"> value</span><span style="color:#E1E4E8">=</span><span style="color:#9ECBFF">"提交"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#85E89D">form</span><span style="color:#E1E4E8">></span></span></code></pre>
+<p>在这个 HTML 中，我们可以在 input 中随意的输入值，如果我们需要获取到当前 input 所输入的内容，应该怎么做呢？</p>
+<!-- more -->
+<h2 id="受控与非受控组件">受控与非受控组件</h2>
+<h3 id="非受控组件uncontrolled-component">非受控组件(uncontrolled component)</h3>
+<p>使用非受控组件，不是为每个状态更新编写数据处理函数，而是将表单数据交给 DOM 节点来处理，可以使用 Ref 来获取数据</p>
+<p>在非受控组件中，希望能够赋予表单一个初始值，但是不去控制后续的更新。可以采用<code>defaultValue</code>指定一个默认值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Form</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  handleSubmitClick</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> name</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">._name.value;</span></span>
+<span class="line"><span style="color:#6A737D">    // do something with `name`</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">input</span></span>
+<span class="line"><span style="color:#B392F0">          type</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"text"</span></span>
+<span class="line"><span style="color:#B392F0">          defaultValue</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"Bob"</span></span>
+<span class="line"><span style="color:#B392F0">          ref</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">input</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">._name </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> input)}</span></span>
+<span class="line"><span style="color:#E1E4E8">        /></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">button</span><span style="color:#B392F0"> onClick</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.handleSubmitClick}>Sign up&#x3C;/</span><span style="color:#85E89D">button</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">div</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="受控组件controlled-component">受控组件(controlled component)</h3>
+<p>在 React 中，可变状态(mutable state)通常保存在组件的 state 属性中，并且只能够通过<code>setState</code> 来更新</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> NameForm</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    super</span><span style="color:#E1E4E8">(props);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.state </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { value: </span><span style="color:#9ECBFF">'shuangxu'</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#85E89D">form</span><span style="color:#B392F0"> onSubmit</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.handleSubmit}></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">label</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">          名字:</span></span>
+<span class="line"><span style="color:#E1E4E8">          &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> type</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"text"</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.state.value} /></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;/</span><span style="color:#85E89D">label</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> type</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"submit"</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"提交"</span><span style="color:#E1E4E8"> /></span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#85E89D">form</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在上述的代码中，在 input 设置了 value 属性值，因此显示的值始终为<code>this.state.value</code>，这使得 state 成为了唯一的数据源。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> handleChange</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">event</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({ value: event.target.value });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> type</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"text"</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.state.value} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.handleChange} />;</span></span></code></pre>
+<p>如果我们在上面的示例中写入<code>handleChange</code> 方法，那么每次按键都会执行该方法并且更新 React 的 state，因此表单的值将随着用户的输入而改变</p>
+<p>React 组件控制着用户输入过程中表单发生的操作并且 state 还是唯一数据源，被 React 以这种方式控制取值的表单输入元素叫做受控组件</p>
+<aside>
+📌 对于受控组件来说，输入的值始终由`React`的`state`驱动!!!
+</aside>
+<h2 id="受控和非受控组件边界">受控和非受控组件边界</h2>
+<h3 id="非受控组件">非受控组件</h3>
+<p>Input 组件只接收一个<code>defaultValue</code>默认值，调用 Input 组件的时候，只需要通过 props 传递一个<code>defaultValue</code> 即可</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">//组件</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Input</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">defaultValue</span><span style="color:#E1E4E8"> }) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> defaultValue</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{defaultValue} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//调用</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Demo</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Input</span><span style="color:#B392F0"> defaultValue</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"shuangxu"</span><span style="color:#E1E4E8"> />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="受控组件">受控组件</h3>
+<p>数值的展示和变更需要由<code>state</code>和<code>setState</code>，组件内部控制 state，并实现自己的 onChange 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">//组件</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Input</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">value</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setValue</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'shuangxu'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{value} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setValue</span><span style="color:#E1E4E8">(e.target.value)} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//调用</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Demo</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Input</span><span style="color:#E1E4E8"> />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>请问这时 Input 组件是受控还是非受控？如果我们采用之前的写法更改这个组件以及其调用</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">//组件</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Input</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">defaultValue</span><span style="color:#E1E4E8"> }) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">value</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setValue</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">(defaultValue);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{value} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setValue</span><span style="color:#E1E4E8">(e.target.value)} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//调用</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Demo</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Input</span><span style="color:#B392F0"> defaultValue</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"shuangxu"</span><span style="color:#E1E4E8"> />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>此时的 Input 组件本身是一个受控组件，它是由唯一的 state 数据驱动的。但是对于 Demo 来说，我们并没有 Input 组件的一个数据变更权利，那么对于 Demo 组件来说，Input 组件就是一个非受控组件。(‼️ 以非受控组件的方式去调用受控组件是一种反模式)</p>
+<p>如何修改当前的 Input 和 Demo 组件代码，才能够使得 Input 组件本身也是一个受控组件，并且对于 Demo 组件来说它也是受控的讷？</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Input</span><span style="color:#E1E4E8">({ </span><span style="color:#FFAB70">value</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">onChange</span><span style="color:#E1E4E8"> }) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{value} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{onChange} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> Demo</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">value</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setValue</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'shuangxu'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">Input</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{value} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setValue</span><span style="color:#E1E4E8">(e.target.value)} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<aside>
+📌 受控以及非受控组件的边界划分取决于`当前组件对于子组件值的变更是否拥有控制权`。如果拥有控制权利子组件对于当前组件来说是受控的；反之则是非受控。
+</aside>
+<h2 id="反模式-以非受控组件的方式去调用受控组件">反模式-以非受控组件的方式去调用受控组件</h2>
+<p>虽然受控和非受控通常用来指向表单的 inputs，也能用来描述数据频繁更新的组件。</p>
+<p>通过上一节受控与非受控组件的边界划分，我们可以简单的分类为：</p>
+<ul>
+<li>如果使用 props 传入数据，有对应的数据处理方法，组件对于父级来说认为是可控的</li>
+<li>数据只是保存在组件内部的 state 中，组件对于父级来说是非受控的</li>
+</ul>
+<p>⁉️ 什么是派生 state
+简单来说，如果一个组件的 state 中的某个数据来自外部，就将该数据称之为派生状态。
+大部分使用派生 state 导致的问题，不外乎两个原因：</p>
+<ul>
+<li>直接复制 props 到 state</li>
+<li>如果 props 和 state 不一致就更新 state</li>
+</ul>
+<h3 id="直接复制-prop-到-state">直接复制 prop 到 state</h3>
+<p>⁉️<code>getDerivedStateFromProps</code>和<code>componentWillReceiveProps</code>的执行时期</p>
+<ul>
+<li>在父级重新渲染时，不管 props 是否有变化，这两个生命周期都会执行</li>
+<li>所以在两个方法里面直接复制 props 到 state 是不安全的，会导致 state 没有正确渲染</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> EmailInput</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    super</span><span style="color:#E1E4E8">(props);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.state </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      email: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.email, </span><span style="color:#6A737D">//初始值为props中email</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  componentWillReceiveProps</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nextProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({ email: nextProps.email }); </span><span style="color:#6A737D">//更新时，重新给state赋值</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  handleChange</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    his.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({ email: e.target.value });</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  render</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">email</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.state;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{email} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.handleChange} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://codesandbox.io/s/condescending-jasper-mdewk?file=/src/App.js">点击查看示例</a></p>
+<p>给 input 设置 props 传来的初始值，在 input 输入时它会修改 state。但是如果父组件重新渲染时，输入框 input 的值就会丢失，变成 props 的默认值</p>
+<p>即使我们在重置前比较<code>nextProps.email!==this.state.email</code>仍然会导致更新</p>
+<p>针对于目前这个小 demo 来说，可以使用<code>shouldComponentUpdate</code>来比较 props 中的 email 是否修改再来决定是否需要重新渲染。但是对于实际应用来说，这种处理方式并不可行，一个组件会接收多个 prop，任何一个 prop 的改变都会导致重新渲染和不正确的状态重置。加上行内函数和对象 prop，创建一个完全可靠的<code>shouldComponentUpdate</code>会变得越来越难。<code>shouldComponentUpdate</code>这个生命周期更多是用于性能优化，而不是处理派生 state。</p>
+<p>截止这里，讲清<strong>为什么不能直接复制 prop 到 state</strong>。思考另一个问题，如果只使用 props 中的 email 属性更新组件讷？</p>
+<h3 id="在-props-变化后修改-state">在 props 变化后修改 state</h3>
+<p>接着上述示例，只使用<code>props.email</code>来更新组件，这样可以防止修改 state 导致的 bug</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> EmailInput</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    super</span><span style="color:#E1E4E8">(props);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.state </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      email: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.email, </span><span style="color:#6A737D">//初始值为props中email</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  componentWillReceiveProps</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nextProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (nextProps.email </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.props.email) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({ email: nextProps.email }); </span><span style="color:#6A737D">//email改变时，重新给state赋值</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  //...</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>通过这个改造，组件只有在 props.email 改变时才会重新给 state 赋值，那这样改造会有问题吗？</p>
+<p>在下列场景中，对拥有两个相同 email 的账号进行切换的时，这个输入框不会重置，因为父组件传来的 prop 值没有任何变化</p>
+<p><a href="https://codesandbox.io/s/prop-change-lvh32?file=/src/App.js">点击查看示例</a></p>
+<p>这个场景是构建出来的，可能设计奇怪，但是这样子的错误很常见。对于这种反模式来说，有两种方案可以解决这些问题。关键在于，<strong>任何数据，都要保证只有一个数据来源，而且避免直接复制它。</strong></p>
+<h2 id="解决方案">解决方案</h2>
+<h3 id="完全可控的组件">完全可控的组件</h3>
+<p>从 EmailInput 组件中删除 state，直接使用 props 来获取值，将受控组件的控制权交给父组件。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> EmailInput</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{props.onChange} </span><span style="color:#B392F0">value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{props.email} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>如果想要保存临时的值，需要父组件手动执行保存。</p>
+<h3 id="有-key-的非受控组件">有 key 的非受控组件</h3>
+<p>让组件存储临时的 email state，email 的初始值仍然是通过 prop 来接受的，但是更改之后的值就和 prop 没有关系了</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> EmailInput</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">email</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setEmail</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">(props.email);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#85E89D">input</span><span style="color:#B392F0"> value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{email} </span><span style="color:#B392F0">onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setEmail</span><span style="color:#E1E4E8">(e.target.value)} />;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在之前的<a href="https://www.notion.so/c5c2b0c6655c448aaf1686512c2f9328">切换账号的示例</a>中，为了在不同页面切换不同的值，可以使用<code>key</code>这个 React 特殊属性。当 key 变化时，React 会创建一个新的组件而不是简单的更新存在的组件(<a href="https://zh-hans.reactjs.org/docs/reconciliation.html#keys">获取更多</a>)。我们经常使用在渲染动态列表时使用 key 值，这里也可以使用。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">EmailInput</span><span style="color:#B392F0"> email</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{account.email} </span><span style="color:#B392F0">key</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{account.id} /></span></span></code></pre>
+<p><a href="https://codesandbox.io/s/use-key-9twve?file=/src/App.js">点击查看示例</a></p>
+<p>每次 id 改变的时候，都会重新创建<code>EmailInput</code>，并将其状态重置为最近 email 值。</p>
+<h3 id="可选方案">可选方案</h3>
+<h4 id="使用-key-属性">使用 key 属性</h4>
+<p>会使组件整个组件的 state 都重置。可以在<code>getDerivedStateFromProps</code>和<code>componentWillReceiveProps</code> 来观察 id 的变化，麻烦但是可行</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> EmailInput</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  state</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    email: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.email,</span></span>
+<span class="line"><span style="color:#E1E4E8">    prevId: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.id,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  componentWillReceiveProps</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">nextProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">prevId</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.state;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (nextProps.id </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> prevId) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        email: nextProps.email,</span></span>
+<span class="line"><span style="color:#E1E4E8">        prevId: nextProps.id,</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // ...</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://codesandbox.io/s/use-componentwillreceiveprops-wovjf?file=/src/App.js">点击查看示例</a></p>
+<h4 id="使用实例方法重置非受控组件">使用实例方法重置非受控组件</h4>
+<p>刚刚两种方式，均是再有唯一标识值的情况下。如果在没有合适的<code>key</code>值时，也想要重新创建组件。第一种方案就是生成随机值或者递增的值当作<code>key</code>值，另一种就是使用示例方法强制重置内部状态</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> EmailInput</span><span style="color:#F97583"> extends</span><span style="color:#B392F0"> Component</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  state</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    email: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.props.email,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  resetEmailForNewUser</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">newEmail</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">setState</span><span style="color:#E1E4E8">({ email: newEmail });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#6A737D">  // ...</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>父组件使用<a href="https://zh-hans.reactjs.org/docs/glossary.html#refs">ref</a>调用这个方法，<a href="https://codesandbox.io/s/use-ref-cmfw0?file=/src/App.js">点击查看示例</a></p>
+<h2 id="那我们如何选">那我们如何选？</h2>
+<p>在我们的业务开发中，尽量选择受控组件，减少使用派生 state，过量的使用 componentWillReceiveProps 可能导致 props 判断不够完善，倒是重复渲染死循环问题。</p>
+<p>在组件库开发中，例如 antd，将受控与非受控的调用方式都开放给用户，让用户自主选择对应的调用方式。比如 Form 组件，我们常使用 getFieldDecorator 和 initialValue 来定义表单项，但是我们根本不关心中间的输入过程，在最后提交的时候通过 getFieldsValue 或者 validateFields 拿到所有的表单值，这就是非受控的调用方式。或者是，我们在只有一个 Input 的时候，我们可以直接绑定 value 和 onChange 事件，这也就是受控的方式调用。</p>
+<h2 id="总结">总结</h2>
+<p>在本文中，首先介绍了非受控组件和受控组件的概念。对于受控组件来说，组件控制用户输入的过程以及 state 是受控组件唯一的数据来源。</p>
+<p>接着介绍了组件的调用问题，对于组件调用方而言，组件提供方是否为受控组件。对于调用方而言，组件受控以及非受控的边界划分取决于当前组件对于子组件值的变更是否拥有控制权。</p>
+<p>接着介绍了以非受控组件的方式调用受控组件这种反模式用法，以及相关示例。不要直接复制 props 到 state，而是使用受控组件。对于不受控的组件，当你想在 prop 变化时重置 state 的话，可以选择以下几种方式：</p>
+<ul>
+<li>建议: 使用<code>key</code>属性，重置内部所有的初始 state</li>
+<li>选项一：仅更改某些字段，观察特殊属性的变化(具有唯一性的属性)</li>
+<li>选项二：使用 ref 调用实例方法</li>
+</ul>
+<p>最后总结了一下，应当如何选择受控组件还是非受控组件。</p>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://zh-hans.reactjs.org/docs/forms.html#controlled-components">React 官网——受控组件</a></li>
+<li><a href="https://zh-hans.reactjs.org/docs/uncontrolled-components.html">React 官网——非受控组件</a></li>
+<li><a href="https://goshacmd.com/controlled-vs-uncontrolled-inputs-react/">controlled vs. uncontrolled form inputs</a></li>
+<li><a href="https://goshacmd.com/turn-uncontrolled-into-controlled/">Transitioning from uncontrolled inputs to controlled</a></li>
+<li><a href="http://muyunyun.cn/blog/56hn38ez/">重新认识受控非受控组件</a></li>
+<li><a href="https://zh-hans.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#when-to-use-derived-state">你可能不需要使用派生 state</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#受控与非受控组件"> 受控与非受控组件 </a><a class="depth-3" href="#非受控组件uncontrolled-component"> 非受控组件(uncontrolled component) </a><a class="depth-3" href="#受控组件controlled-component"> 受控组件(controlled component) </a><a class="depth-2" href="#受控和非受控组件边界"> 受控和非受控组件边界 </a><a class="depth-3" href="#非受控组件"> 非受控组件 </a><a class="depth-3" href="#受控组件"> 受控组件 </a><a class="depth-2" href="#反模式-以非受控组件的方式去调用受控组件"> 反模式-以非受控组件的方式去调用受控组件 </a><a class="depth-3" href="#直接复制-prop-到-state"> 直接复制 prop 到 state </a><a class="depth-3" href="#在-props-变化后修改-state"> 在 props 变化后修改 state </a><a class="depth-2" href="#解决方案"> 解决方案 </a><a class="depth-3" href="#完全可控的组件"> 完全可控的组件 </a><a class="depth-3" href="#有-key-的非受控组件"> 有 key 的非受控组件 </a><a class="depth-3" href="#可选方案"> 可选方案 </a><a class="depth-2" href="#那我们如何选"> 那我们如何选？ </a><a class="depth-2" href="#总结"> 总结 </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/react--router6/">上一篇：React-Router6 简单分析实现</a> <a href="/blog/react/redux-implementation/">下一篇：Redux 原理实现</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

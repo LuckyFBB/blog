@@ -1,15 +1,228 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Node 运行时、Buffer、进程通信与服务端基础能力。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>浅谈一下 NodeJS 中的 Stream | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link is-active" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">Node</a> <h1>浅谈一下 NodeJS 中的 Stream</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="流stream">流(Stream)</h2>
+<p>stream 是一个抽象的数据接口，它继承了 EventEmitter，它能够发送/接受数据，本质就是让数据流动起来，如下图：</p>
+<p><img src="/blog/imgs/stream/Untitled.png" alt="Untitled"></p>
+<p>流不是 Node 中独有的概念，是操作系统最基本的操作方式，在 Linux 中 | 就是 Stream，只是 Node 层面对齐做了封装，提供了对应的 API</p>
+<h2 id="为啥要一点一点">为啥要一点一点？</h2>
+<p>首先使用下面的代码创建一个文件，大概在 400MB 左右</p>
+<p><img src="/blog/imgs/stream/Untitled%201.png" alt="Untitled"></p>
+<p>当我们使用 readFile 去读取的时候，如下代码</p>
+<p><img src="/blog/imgs/stream/Untitled%202.png" alt="Untitled"></p>
+<p>正常启动服务时，占用 10MB 左右的内存</p>
+<p><img src="/blog/imgs/stream/Untitled%203.png" alt="Untitled"></p>
+<p>使用<code>curl http://127.0.0.1:8000</code>发起请求时，内存变为了 420MB 左右，和我们创建的文件大小差不多</p>
+<p><img src="/blog/imgs/stream/Untitled%204.png" alt="Untitled"></p>
+<p>改为使用使用 stream 的写法，代码如下</p>
+<p><img src="/blog/imgs/stream/Untitled%205.png" alt="Untitled"></p>
+<p>再次发起请求时，发现内存只占用了 35MB 左右，相比 readFile 大幅减少</p>
+<p><img src="/blog/imgs/stream/Untitled%206.png" alt="Untitled"></p>
+<p>如果我们不采用流的模式，等待大文件加载完成在操作，会有如下的问题：</p>
+<ul>
+<li>内存暂用过多，导致系统崩溃</li>
+<li>CPU 运算速度有限制，且服务于多个程序，大文件加载过大且时间久</li>
+</ul>
+<p>总结来说就是，一次性读取大文件，内存和网络都吃不消</p>
+<h2 id="如何才能一点一点">如何才能一点一点？</h2>
+<p>我们读取文件的时候，可以采用读取完成之后在输出数据</p>
+<p><img src="/blog/imgs/stream/Untitled%207.png" alt="Untitled"></p>
+<p>上述说到 stream 继承了 EventEmitter 可以是实现监听数据。首先将读取数据改为流式读取，使用 <code>on("data", ()⇒{})</code> 接收数据，最后通过 <code>on("end", ()⇒{})</code> 最后的结果</p>
+<p><img src="/blog/imgs/stream/Untitled%208.png" alt="Untitled"></p>
+<p>有数据传递过来的时候就会触发 data 事件，接收这段数据做处理，最后等待所有的数据全部传递完成之后触发 end 事件。</p>
+<h2 id="数据的流转过程">数据的流转过程</h2>
+<h3 id="数据从哪里来source">数据从哪里来—source</h3>
+<p>数据是从一个地方流向另一个地方，先看看数据的来源。</p>
+<ol>
+<li>
+<p>http 请求，请求接口来的数据</p>
+<p><img src="/blog/imgs/stream/Untitled%209.png" alt="Untitled"></p>
+</li>
+<li>
+<p>console 控制台，标准输入 stdin</p>
+<p><img src="/blog/imgs/stream/Untitled%2010.png" alt="Untitled"></p>
+</li>
+<li>
+<p>file 文件，读取文件内容，例如上面的例子</p>
+</li>
+</ol>
+<h3 id="连接的管道pipe">连接的管道—pipe</h3>
+<p>在 source 和 dest 中有一个连接的管道 pipe，基本语法为 <code>source.pipe(dest)</code> ，source 和 dest 通过 pipe 连接，让数据从 source 流向 dest</p>
+<p>我们不需要向上面的代码那样手动监听 data/end 事件.</p>
+<p>pipe 使用时有严格的要求，source 必须是一个可读流，dest 必须是一个可写流</p>
+<p>🤔🤔🤔 流动的数据到底是一个什么东西？代码中的 chunk 是什么？</p>
+<h3 id="到哪里去dest">到哪里去—dest</h3>
+<p>stream 常见的三种输出方式</p>
+<ol>
+<li>
+<p>console 控制台，标准输出 stdout</p>
+<p><img src="/blog/imgs/stream/Untitled%2011.png" alt="Untitled"></p>
+</li>
+<li>
+<p>http 请求，接口请求中的 response</p>
+<p><img src="/blog/imgs/stream/Untitled%2012.png" alt="Untitled"></p>
+</li>
+<li>
+<p>file 文件，写入文件</p>
+<p><img src="/blog/imgs/stream/Untitled%2013.png" alt="Untitled"></p>
+</li>
+</ol>
+<h2 id="流的种类">流的种类</h2>
+<p><img src="/blog/imgs/stream/Untitled%2014.png" alt="Untitled"></p>
+<h3 id="可读流-readable-streams">可读流 Readable Streams</h3>
+<p>可读流是对提供数据的源头(source)的抽象</p>
+<p>所有的 Readable 都实现了 stream.Readable 类定义的接口</p>
+<p><img src="/blog/imgs/stream/Untitled%2015.png" alt="Untitled"></p>
+<p>🌰 读取文件流创建</p>
+<p>fs.createReadStream 创建一个 Readable 对象</p>
+<p><img src="/blog/imgs/stream/Untitled%2016.png" alt="Untitled"></p>
+<p><strong>读取模式</strong></p>
+<p>可读流有两种模式，<strong>流动模式(flowing mode)<strong>和</strong>暂停模式(pause mode)</strong>，这个决定了 chunk 数据的流动方式：自动流动和手工流动</p>
+<p>在 ReadableStream 中有一个 _readableState 属性，在其中有一个 flowing 的一个属性来判断流的模式，他有三种状态值：</p>
+<ul>
+<li>ture：表示为流动模式</li>
+<li>false：表示为暂停模式</li>
+<li>null：初始状态</li>
+</ul>
+<p><img src="/blog/imgs/stream/Untitled%2017.png" alt="Untitled"></p>
+<p>可以使用热水器模型来模拟数据的流动。热水器水箱(buffer 缓存区)存储着热水(需要的数据)，当我们打开水龙头的时候，热水就会从水箱中不断流出来，并且自来水也会不断的流入水箱，这就是流动模式。当我们关闭水龙头时，水箱会暂停进水，水龙头则会暂停出水，这就是暂停模式。</p>
+<ul>
+<li><strong>流动模式</strong>
+数据自动地从底层读取，形成流动现象，并通过事件提供给应用程序。
+<ul>
+<li>监听 data 事件即可进入该模式
+当  data 事件被添加后，可写流中有数据后会将数据推到该事件回调函数中，需要自己去消费数据块，如果不处理则该数据会丢失</li>
+<li>调用  stream.pipe  方法将数据发送到 Writeable</li>
+<li>调用 stream.resume 方法
+<img src="/blog/imgs/stream/Untitled%2018.png" alt="Untitled"></li>
+</ul>
+</li>
+<li><strong>暂停模式</strong>
+数据会堆积在内部缓冲器中，必须显式调用  stream.read() 读取数据块
+<ul>
+<li>监听 readable 事件
+可写流在数据准备好后会触发该事件回调，此时需要在回调函数中使用  stream.read()
+来主动消费数据。readable  事件表明流有新的动态：要么有新的数据，要么流已经读取所有数据
+<img src="/blog/imgs/stream/Untitled%2019.png" alt="Untitled"></li>
+</ul>
+</li>
+<li><strong>两种模式之间如何进行转换呢？</strong>
+<ul>
+<li>可读流在创建完成之后处于初始状态 //TODO：和网上的分享不一致</li>
+<li>暂停模式切换到流动模式
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>- 监听 data 事件</span></span>
+<span class="line"><span>- 调用 stream.resume 方法</span></span>
+<span class="line"><span>- 调用 stream.pipe 方法将数据发送到 Writable</span></span></code></pre>
+<img src="/blog/imgs/stream/Untitled%2020.png" alt="Untitled"></li>
+<li>流动模式切换到暂停模式
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>- 移除 data 事件</span></span>
+<span class="line"><span>- 调用 stream.pause 方法</span></span>
+<span class="line"><span>- 调用 stream.unpipe 移除管道目标</span></span></code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>实现原理</strong></p>
+<p>创建可读流的时候，需要继承 Readable 对象，并且实现 _read 方法</p>
+<p><img src="/blog/imgs/stream/Untitled%2021.png" alt="Untitled"></p>
+<p>创建一个自定义可读流</p>
+<p><img src="/blog/imgs/stream/Untitled%2022.png" alt="Untitled"></p>
+<p>当我们调用 read 方法时，整体的流程如下：</p>
+<p><img src="/blog/imgs/stream/Untitled%2023.png" alt="Untitled"></p>
+<ul>
+<li>doRead
+流中维护了一个缓存，当调用 read 方法的时候来判断是否需要向底层请求数据
+当缓存区长度为 0 或者小于 highWaterMark 这个值得时候就会调用 _read 去底层获取数据
+<a href="https://github.com/nodejs/node/blob/main/lib/internal/streams/readable.js#L470">源码链接</a>
+<img src="/blog/imgs/stream/Untitled%2024.png" alt="Untitled"></li>
+</ul>
+<h3 id="可写流-writeable-stream">可写流 Writeable Stream</h3>
+<p>可写流 是对数据写入目的地的一种抽象，是用来消费上游流过来的数据，通过可写流把数据写入设备，常见的写入流就是本地磁盘的写入</p>
+<p><img src="/blog/imgs/stream/Untitled%2025.png" alt="Untitled"></p>
+<p><strong>可写流的特点</strong></p>
+<ul>
+<li>通过 write 写入数据
+<img src="/blog/imgs/stream/Untitled%2026.png" alt="Untitled"></li>
+<li>通过 end 写数据并且关闭流，end = write + close
+<img src="/blog/imgs/stream/Untitled%2027.png" alt="Untitled">
+<img src="/blog/imgs/stream/Untitled%2028.png" alt="Untitled"></li>
+<li>当写入数据达到 highWaterMark 的大小时，会触发 drain 事件
+<img src="/blog/imgs/stream/Untitled%2029.png" alt="Untitled">
+调用 ws.write(chunk) 返回 false，表示当前缓冲区数据大于或等于 highWaterMark 的值，就会触发 drain 事件。其实是起到一个警示作用，我们依旧可以写入数据，只是未处理的数据会一直积压在可写流的<strong>内部缓冲区</strong>中，直到积压沾满 Node.js 缓冲区后，才会被强行中断</li>
+</ul>
+<p><strong>自定义可写流</strong></p>
+<p>所有的 Writeable 都实现了 stream.Writeable 类定义的接口</p>
+<p>只需要实现 _write 方法就能够将数据写入底层</p>
+<p><img src="/blog/imgs/stream/Untitled%2030.png" alt="Untitled"></p>
+<ul>
+<li>通过调用调用 writable.write 方法将数据写入流中，会调用 _write 方法将数据写入底层</li>
+<li>当 _write 数据成功后，需要调用 next 方法去处理下一个数据</li>
+<li><strong>必须</strong>调用 writable.end(data) 来结束可写流，data 是可选的。此后，不能再调用 write 新增数据，否则会报错</li>
+<li>在 end 方法调用后，当所有底层的写操作均完成时，会触发 finish 事件</li>
+</ul>
+<h3 id="双工流-duplex-stream">双工流 Duplex Stream</h3>
+<p>双工流，既可读，也可写。实际上继承了 Readable 和 Writable 的一种流，那它既可以当做可读流来用又可以当做可写流来用</p>
+<p>自定义的双工流需要实现 Readable 的 _read 方法和 Writable 的 _write 方法</p>
+<p><img src="/blog/imgs/stream/Untitled%2031.png" alt="Untitled"></p>
+<p>net 模块可以用来创建 socket，socket 在 NodeJS 中是一个典型的 Duplex，看一个 TCP 客户端的例子</p>
+<p><img src="/blog/imgs/stream/Untitled%2032.png" alt="Untitled"></p>
+<p>client 就是一个 Duplex，可写流用于向服务器发送消息，可读流用于接受服务器消息，两个流内的数据并没有直接的关系</p>
+<h3 id="转换流-transform-stream">转换流 Transform Stream</h3>
+<p>上述的例子中，可读流中的数据(0/1)和可写流中的数据(’F’,’B’,’B’)是隔离的，两者并没有产生关系，但对于 Transform 来说在可写端写入的数据经过变换后会自动添加到可读端。</p>
+<p>Transform 继承于 Duplex，并且已经实现了 _write 和 _read 方法，只需要实现 _tranform 方法即可</p>
+<p><img src="/blog/imgs/stream/Untitled%2033.png" alt="Untitled"></p>
+<p>gulp 基于 Stream 的自动化构建工具，看一段官网的示例代码</p>
+<p><img src="/blog/imgs/stream/Untitled%2034.png" alt="Untitled"></p>
+<p>less → less 转为 css → 执行 css 压缩 → 压缩后的 css</p>
+<p>其实 less() 和 minifyCss() 都是对输入的数据做了一些处理，然后交给了输出数据</p>
+<blockquote>
+<p>Duplex 和 Transform 的选择</p>
+</blockquote>
+<p>和上面的示例对比起来，我们发现一个流同时面向生产者和消费者服务的时候我们会选择 Duplex，当只是对数据做一些转换工作的时候我们便会选择使用 Tranform</p>
+<h2 id="背压问题">背压问题</h2>
+<h3 id="什么是背压">什么是背压</h3>
+<p>背压问题来源于生产者消费者模式中，消费者处理速度过慢</p>
+<p>比如说，我们下载过程，处理速度为 3Mb/s，而压缩过程，处理速度为 1Mb/s，这样的话，很快缓冲区队列就会形成堆积</p>
+<p>要么导致整个过程内存消耗增加，要么导致整个缓冲区慢，部分数据丢失</p>
+<p><img src="/blog/imgs/stream/Untitled%2035.png" alt="Untitled"></p>
+<h3 id="什么是背压处理">什么是背压处理</h3>
+<p>背压处理可以理解为一个向上”喊话”的过程</p>
+<p>当压缩处理发现自己的缓冲区数据挤压超过阈值的时候，就对下载处理“喊话”，我忙不过来了，不要再发了</p>
+<p>下载处理收到消息就暂停向下发送数据</p>
+<p><img src="/blog/imgs/stream/Untitled%2036.png" alt="Untitled"></p>
+<h3 id="如何处理背压">如何处理背压</h3>
+<p>我们有不同的函数将数据从一个进程传入另外一个进程。在 Node.js 中，有一个内置函数称为  .pipe()，同样地最终，在这个进程的基本层面上我们有二个互不相关的组件：数据的<em>源头</em>，和<em>消费者</em></p>
+<p>当  .pipe()  被源调用之后，它通知消费者有数据需要传输。管道函数为事件触发建立了合适的积压封装</p>
+<p>在数据缓存超出了 highWaterMark 或者写入的列队处于繁忙状态，.write() 会返回  false</p>
+<p>当  false  返回之后，积压系统介入了。它将暂停从任何发送数据的数据流中进入的  Readable。一旦数据流清空了，drain  事件将被触发，消耗进来的数据流</p>
+<p>一旦队列全部处理完毕，积压机制将允许数据再次发送。在使用中的内存空间将自我释放，同时准备接收下一次的批量数据</p>
+<p><img src="/blog/imgs/stream/Untitled%2037.png" alt="Untitled"></p>
+<p>我们可以看到 pipe 的背压处理：</p>
+<ul>
+<li>将数据按照 chunk 进行划分，写入</li>
+<li>当 chunk 过大，或者队列忙碌时，暂停读取</li>
+<li>当队列为空时，继续读取数据</li>
+</ul>
+<h3 id="pipe-和-pipeline">pipe 和 pipeline</h3>
+<p>管道，指的是通过 a.pipe(b) 的形式连接起来的多个 Stream 对象的组合</p>
+<p>对于 less/scss/sass 来说我们常见的操作是</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">source.</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(lessTransform).</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(minifyCss).dest;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">source.</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(scssTransform).</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(minifyCss).dest;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">source.</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(sassTransform).</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(minifyCss).dest;</span></span></code></pre>
+<p>对于这种情况来说，我们更希望是如下的操作</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// source: 输入流</span></span>
+<span class="line"><span style="color:#6A737D">// dest: 输出目的地</span></span>
+<span class="line"><span style="color:#6A737D">// pipeline: 转为 css 并做压缩</span></span>
+<span class="line"><span style="color:#E1E4E8">source.</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(pipeline).</span><span style="color:#B392F0">pipe</span><span style="color:#E1E4E8">(dest);</span></span></code></pre>
+<p>将 lessTransform.pipe(minifyCss) 封装称为 pipeline</p>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://tsejx.github.io/node-guidebook/system/io/stream">Node Guidebook</a></li>
+<li><a href="https://juejin.cn/post/6844903891083984910">想学 Node.js，stream 先有必要搞清楚</a></li>
+<li><a href="https://juejin.cn/post/6934987500540657701">2021 Node.js Stream 漫游指南</a></li>
+<li><a href="https://tech.meituan.com/2016/07/08/stream-basics.html">Node.js Stream - 基础篇</a></li>
+<li><a href="https://www.cnblogs.com/dolphinX/p/6376615.html">NodeJS Stream 五：双工流</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#流stream"> 流(Stream) </a><a class="depth-2" href="#为啥要一点一点"> 为啥要一点一点？ </a><a class="depth-2" href="#如何才能一点一点"> 如何才能一点一点？ </a><a class="depth-2" href="#数据的流转过程"> 数据的流转过程 </a><a class="depth-3" href="#数据从哪里来source"> 数据从哪里来—source </a><a class="depth-3" href="#连接的管道pipe"> 连接的管道—pipe </a><a class="depth-3" href="#到哪里去dest"> 到哪里去—dest </a><a class="depth-2" href="#流的种类"> 流的种类 </a><a class="depth-3" href="#可读流-readable-streams"> 可读流 Readable Streams </a><a class="depth-3" href="#可写流-writeable-stream"> 可写流 Writeable Stream </a><a class="depth-3" href="#双工流-duplex-stream"> 双工流 Duplex Stream </a><a class="depth-3" href="#转换流-transform-stream"> 转换流 Transform Stream </a><a class="depth-2" href="#背压问题"> 背压问题 </a><a class="depth-3" href="#什么是背压"> 什么是背压 </a><a class="depth-3" href="#什么是背压处理"> 什么是背压处理 </a><a class="depth-3" href="#如何处理背压"> 如何处理背压 </a><a class="depth-3" href="#pipe-和-pipeline"> pipe 和 pipeline </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/redux-toolkit/">上一篇：Redux-Toolkit 使用及原理实现</a> <a href="/blog/node/middleware-for--node-js/">下一篇：NodeJS 的中间件</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

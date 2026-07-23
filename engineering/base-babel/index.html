@@ -1,15 +1,432 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>babel 基础介绍 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>babel 基础介绍</h1> </header> <div class="article-grid"> <div class="prose"> <p>babel 的原名叫 6to5，简明扼要就是 es6 转 es5，但是没想到 es 标准推进的过快，短时间就有了 es7/8，所以它改名为 babel</p>
+<!-- more -->
+<h2 id="babel-的用途">babel 的用途</h2>
+<ul>
+<li>
+<p>转译 <a href="https://developer.aliyun.com/article/115855">esnext</a>/typescript 等到目标环境支持的 js</p>
+<p>用来把代码中的 esnext 的新的语法、typescript 和 <a href="https://zhuanlan.zhihu.com/p/26204569">flow</a> 的语法转成基于目标环境支持的语法的实现。并且还可以把目标环境不支持的 api 进行 polyfill。babel7 支持了 preset-env，可以指定 targets 来进行按需转换</p>
+</li>
+<li>
+<p>一些特定用途的代码转换</p>
+<p>babel 是一个转译器，暴露了很多 api，用这些 api 可以完成代码到 AST 的 parse，AST 的转换，以及目标代码的生成</p>
+</li>
+<li>
+<p>代码的静态分析</p>
+<p>对代码进行 parse 之后，能够进行转换，是因为通过 AST 的结构能够理解代码，也可以用于分析代码的信息，进行一些检查</p>
+</li>
+</ul>
+<h2 id="babel-的转译">babel 的转译</h2>
+<p><img src="https://user-images.githubusercontent.com/38368040/167138103-b604db7f-63d5-4943-bde2-0785153d54b2.png" alt="transform"></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// 源代码</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> sourceCode</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> `</span></span>
+<span class="line"><span style="color:#9ECBFF"> const a = 1</span></span>
+<span class="line"><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">// 调用parse，生成ast</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> ast</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> parser.</span><span style="color:#B392F0">parse</span><span style="color:#E1E4E8">(sourceCode, {});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 调用traverse执行自定义的逻辑，处理ast节点</span></span>
+<span class="line"><span style="color:#B392F0">traverse</span><span style="color:#E1E4E8">(ast, {});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 生成目标代码</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">code</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#B392F0"> generate</span><span style="color:#E1E4E8">(ast, {});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'result after deal with》〉》〉》'</span><span style="color:#E1E4E8">, code);</span></span></code></pre>
+<h2 id="babel-的架构">babel 的架构</h2>
+<img width="1302" alt="image" src="https://github.com/LuckyFBB/blog/assets/38368040/0142bd87-57c9-46ee-bbe0-3bbc062e2a54">
+<ol>
+<li>核心@babel/core
+<ul>
+<li>加载处理配置/加载插件</li>
+<li>调用<code>Parser</code>进行语法解析，生成 AST</li>
+<li>调用<code>Traverser</code>遍历 AST，并使用<code>访问者模式</code>应用插件对 AST 进行转换</li>
+<li>调用<code>Generator</code>生成代码，包括 SourceMap 转换和源代码生成</li>
+</ul>
+</li>
+<li>核心周边支撑
+<ul>
+<li>Parser: @babel/parser</li>
+<li>Traverser: @babel/traverser</li>
+<li>Generator: @babel/generator</li>
+</ul>
+</li>
+<li>插件
+<ul>
+<li>语法插件: 该类插件只允许 Babel 解析特定类型的语法</li>
+<li>转换插件: 用于对 AST 进行转换，实现转换为 ES5 代码、压缩、功能增强等目的</li>
+</ul>
+</li>
+<li>插件开发辅助
+<ul>
+<li>@babel/template: 可以将字符串转为 AST 节点</li>
+<li>@babel/types: 对 AST 节点的断言</li>
+</ul>
+</li>
+</ol>
+<h2 id="babel-的编译配置">babel 的编译配置</h2>
+<p>创建一个 babel 项目，在 src/index.js 中，写入如下代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> fn</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">111</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>如果我们什么都不配置，直接执行编译，会发现前后的代码完全一致。因为 babel 是基于插件的，所以当我们什么插件都不配置的时候，babel 什么都不会做。</p>
+<h3 id="插件plugins">插件(plugins)</h3>
+<p>我们想将箭头函数转为 ES5 函数，只需要提供一个转换箭头函数的插件。</p>
+<p>在项目目录下新建<code>.babelrc</code>文件，添加上如下配置</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "plugins"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"@babel/plugin-transform-arrow-functions"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>再一次执行编译，会发现上述代码中的箭头函数已经成功被编译，代码如下:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> fn</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">111</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ===== 编译后的结果 ===== //</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#B392F0"> fn</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> fn</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">111</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>如果我们还需要支持解构语法，那么我们需要给它配置<code>"@babel/plugin-transform-destructuring"</code>插件。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "plugins"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#9ECBFF">    "@babel/plugin-transform-arrow-functions"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    "@babel/plugin-transform-destructuring"</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>插件是有一个执行顺序的，插件是从上往下执行的，所以 Babel 在遍历 AST 时会先调用<code>@babel/plugin-transform-arrow-functions</code>定义的转换方法，然后再调用<code>@babel/plugin-transform-destructuring</code></p>
+<p>🤔 发现问题所在，如果我们需要转换的语法很多，那岂不是需要手动配置很多插件，实在繁琐。</p>
+<h3 id="预设preset">预设(preset)</h3>
+<p>preset 的出现就是为了解决上述问题。通过添加/创建一个 preset 就可以轻松的使用一组插件。官方也为我们提供了很多的 presets</p>
+<h4 id="preset-执行顺序">preset 执行顺序</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "presets"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#9ECBFF">    "@babel/preset-env"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    "@babel/preset-react"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    "@babel/preset-typescript"</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>前面提到 plugins 的执行顺序是从上往下，而 preset 的执行顺序恰恰相反，是从下往上执行的。并且 plugins 的执行先于 preset</p>
+<h4 id="一些过时的-preset">一些过时的 preset</h4>
+<ol>
+<li>
+<p>@babel/preset-stage-xxx</p>
+<p>stage-xxx 是不同阶段语法提案的转码规则而产生的预设，随着被批准为 ES 新版本的组成部分而进行相应的改变</p>
+<ul>
+<li><a href="https://link.juejin.cn/?target=https%3A%2F%2Fwww.babeljs.cn%2Fdocs%2Fbabel-preset-stage-0">stage-0</a> - 设想(Strawman): 只是一个想法，可能有 Babel 插件，stage-0 的功能范围最广大，包含 stage-1 , stage-2 以及 stage-3 的所有功能</li>
+<li><a href="https://link.juejin.cn/?target=https%3A%2F%2Fwww.babeljs.cn%2Fdocs%2Fbabel-preset-stage-1">stage-1</a> - 建议(Proposal): 这是值得跟进的</li>
+<li><a href="https://link.juejin.cn/?target=https%3A%2F%2Fwww.babeljs.cn%2Fdocs%2Fbabel-preset-stage-2">stage-2</a> - 草案(Draft): 初始规范</li>
+<li><a href="https://link.juejin.cn/?target=https%3A%2F%2Fwww.babeljs.cn%2Fdocs%2Fbabel-preset-stage-3">stage-3</a> - 候选(Candidate): 完成规范并在浏览器上初步实现</li>
+<li>stage-4 - 完成(Finished): 将添加到下一个年度版本发布中</li>
+</ul>
+</li>
+<li>
+<p>@babel/preset-es2015</p>
+<p>ES 的标准一年一个版本，意味着 babel 插件需要去实时跟进，es6 语法采用<code>@babel/preset-es2015</code>，es7 语法就需要引入<code>@babel/preset-es2016</code>，如果是一些还未加入标准的语法就需要用上述讲的 stage0/stage1 等</p>
+</li>
+</ol>
+<p>上述讲的 preset-stage-xxx/preset-es20xx 都是 babel6 的产物，依旧会发现一些问题，preset 难以维护，ES 的标准变化比较快，意味着 stage-xxx 变得也很快。如果目标环境已经支持了 ES6+ 特性，那我们就不用做转换了。</p>
+<h4 id="babelpreset-env">@babel/preset-env</h4>
+<p>babel7 中，淘汰了上述的 preset-es20xx，开始推行 preset/env</p>
+<p>preset-env 可以使用 es6+语法去写代码，并且只转换需要转换的代码。</p>
+<p>默认情况下，preset-env 什么都不需要配置，它会默认转换所有的 es6+的代码。提供了 targets 配置项制定运行环境。</p>
+<p>修改 .babelrc 文件，修改为如下配置</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "presets"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span></span>
+<span class="line"><span style="color:#9ECBFF">      "@babel/preset-env"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#79B8FF">        "targets"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ie >= 10"</span><span style="color:#6A737D"> // 表明只有在ie10以上版本浏览器不支持的语法才会被转换</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>修改 src/index.js</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">arr];</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> p</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ===== 编译后的结果 ===== //</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [].</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}); </span><span style="color:#6A737D">// includes/Promise竟然没有被转换？？？？</span></span></code></pre>
+<p>🤔 ES6 增加的内容可以分为语法和 api 两个部分。新语法比如箭头函数/解构/class 等，新的 api 比如 Set/Map/Promise/Array 原型链上等。</p>
+<p>语法转换只是将高版本语法转为低版本的，但是新的内置函数/实例方法等无法转换。所以这时 polyfill 出现了。</p>
+<h3 id="babelpolyfill">@babel/polyfill</h3>
+<p>polyfill 是垫片的意思，所谓垫片就是抹平不同浏览器或者不同环境下的差异，让新的内置函数、实例方法等在低版本浏览器中也可以使用</p>
+<p>为我们的代码添加 @babel/polyfill，直接在 src/index.js 前引入该包</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> '@babel/polyfill'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">arr];</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> p</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ===== 编译后的结果 ===== //</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/polyfill'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [].</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>经过 babel 编译后的内容，其实也是引入了 @babel/polyfill 的包，这个时候采用的是全量引入，不管有无使用的 API 都会被引入</p>
+<p>🤔 那其实我们代码只需要 Promise 和 includes 的 polyfill，那有没有一种按需加载的功能？当然有，babel 不会连这么蠢的问题都不解决。</p>
+<h4 id="usebuiltins">useBuiltIns</h4>
+<p>在回到上一节所讲的 @babel/preset-env，我们刚刚提到了 target 配置项是用于标识目标环境。useBuiltIns 该配置是用于做 polyfill 的，我们在 .babelrc 中加入该配置项，babel 编译时就会自动进行 polyfill，不需要我们在手动引入</p>
+<p>useBuiltIns 的参数:</p>
+<ul>
+<li>false: 不会对 polyfill 做操作，引入 @babel/polyfill 之后会全量引入</li>
+<li>usage: 会根据配置的目标环境的兼容性以及代码中使用的 API 来进行 polyfill，实现按需加载</li>
+<li>entry: 会根据配置的浏览器兼容，引入浏览器不兼容的  polyfill，需要在入口文件手动添加<code>import '@babel/polyfill'</code>。如果指定的<code>"corejs": "3"</code>，则需要引入<code>import 'core-js/stable'; import 'regenerator-runtime/runtime'</code></li>
+</ul>
+<aside>
+💡 <a href="https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fzloirock%2Fcore-js">core-js</a>是 JavaScript 的模块化标准库，包含  `Promise/Symbol/Iterator` 和许多其他的特性，它可以让你仅加载必需的功能。core-js@2.0的版本已经之冻结，所有的新特性只会添加到 3.0 的分支中
+</aside>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "presets"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span></span>
+<span class="line"><span style="color:#9ECBFF">      "@babel/preset-env"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#79B8FF">        "targets"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ie >= 10"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "useBuiltIns"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"usage"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "corejs"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"3"</span><span style="color:#6A737D"> // 声明 corejs 版本</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>源代码以及转换之后的代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">arr];</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> p</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ===== 编译后的结果 ===== //</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.array.concat.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.array.includes.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.object.to-string.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.promise.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [].</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>🤔 @babel/preset-env 是如何实现按需加载的呢？</p>
+<p>首先我们在 @babel/preset-env 的 target 配置项中，可以设置目标环境。在上面的示例中我们设置的环境是 ie10+，targets 是 <a href="https://github.com/browserslist/browserslist">browserlist</a> 的查询字符串，能够获得项目中的目标浏览器环境信息</p>
+<p>当我们拿到所有的浏览器信息之后，我们还需要知道每个特性在不同版本浏览器是否支持，<a href="https://github.com/babel/babel/tree/master/packages/babel-compat-data">babel-compat-data</a> 中就存放了该内容。</p>
+<p>有了浏览器版本，已经每个特性支持的浏览器版本，那我们就能够知道当前目标浏览器支持和不支持的特性。对于不支持的特性做转换和 polyfill。</p>
+<h3 id="babelplugin-transform-runtime">@babel/plugin-transform-runtime</h3>
+<p>上述讲完了按需引入，会有一个新的问题等待我们去解决，看如下代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">() {}</span></span>
+<span class="line"><span style="color:#B392F0">  say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ===== 编译后的结果 ===== //</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _classCallCheck</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">instance</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">Constructor</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">(instance </span><span style="color:#F97583">instanceof</span><span style="color:#B392F0"> Constructor</span><span style="color:#E1E4E8">)) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TypeError</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Cannot call a class as a function'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _defineProperties</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">target</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> props.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> descriptor </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> props[i];</span></span>
+<span class="line"><span style="color:#E1E4E8">    descriptor.enumerable </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> descriptor.enumerable </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    descriptor.configurable </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">'value'</span><span style="color:#F97583"> in</span><span style="color:#E1E4E8"> descriptor) descriptor.writable </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    Object.</span><span style="color:#B392F0">defineProperty</span><span style="color:#E1E4E8">(target, descriptor.key, descriptor);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> _createClass</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">Constructor</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">protoProps</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">staticProps</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (protoProps) </span><span style="color:#B392F0">_defineProperties</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">Constructor</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">, protoProps);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (staticProps) </span><span style="color:#B392F0">_defineProperties</span><span style="color:#E1E4E8">(Constructor, staticProps);</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object.</span><span style="color:#B392F0">defineProperty</span><span style="color:#E1E4E8">(Constructor, </span><span style="color:#9ECBFF">'prototype'</span><span style="color:#E1E4E8">, { writable: </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Constructor;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> Person </span><span style="color:#F97583">=</span><span style="color:#6A737D"> /*#__PURE__*/</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#B392F0">    _classCallCheck</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, Person);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  _createClass</span><span style="color:#E1E4E8">(Person, [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      key: </span><span style="color:#9ECBFF">'say'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">      value</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Person;</span></span>
+<span class="line"><span style="color:#E1E4E8">})();</span></span></code></pre>
+<p>其中有<code>_createClass</code>/<code>_defineProperties</code>/<code>_classCallCheck</code>三个辅助函数，假设我们有 10 个文件中都使用了 class 语法，那么这三个辅助函数会在注入十次。这会使得我们打包的代码变大，并且我们不需要这样的辅助函数被注入多次</p>
+<p>这时候<code>@babel/plugin-transform-runtime</code>就闪亮登场了。使用<code>@babel/plugin-transform-runtime</code>插件，所有帮助程序都将引用模块<code>@babel/runtime</code>，这样就可以避免编译后的代码中出现重复的帮助程序，有效减少包体积</p>
+<p>首先安装依赖，<code>@babel/plugin-transform-runtime</code>通常仅在开发时使用，但是运行时最终代码需要依赖<code>@babel/runtime</code>，所以<code>@babel/runtime</code>必须要作为生产依赖被安装</p>
+<p>修改 .babelrc 如下</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "presets"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span></span>
+<span class="line"><span style="color:#9ECBFF">      "@babel/preset-env"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#79B8FF">        "targets"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ie >= 10"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "useBuiltIns"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"usage"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">        "corejs"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">  ],</span></span>
+<span class="line"><span style="color:#79B8FF">  "plugins"</span><span style="color:#E1E4E8">: [[</span><span style="color:#9ECBFF">"@babel/plugin-transform-runtime"</span><span style="color:#E1E4E8">]]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>再次编译我们得到如下的代码，我们发<code>_createClass</code>/<code>_defineProperties</code>/<code>_classCallCheck</code>三个函数都是从 babel/runtime 中引入的了</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _interopRequireDefault </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime/helpers/interopRequireDefault'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _classCallCheck2 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _interopRequireDefault</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#B392F0">  require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime/helpers/classCallCheck'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _createClass2 </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _interopRequireDefault</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#B392F0">  require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime/helpers/createClass'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> Person </span><span style="color:#F97583">=</span><span style="color:#6A737D"> /*#__PURE__*/</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#F97583">  function</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, _classCallCheck2.default)(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, Person);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  (</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, _createClass2.default)(Person, [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      key: </span><span style="color:#9ECBFF">'say'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#B392F0">      value</span><span style="color:#E1E4E8">: </span><span style="color:#F97583">function</span><span style="color:#B392F0"> say</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">word</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">':::'</span><span style="color:#E1E4E8">, word);</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Person;</span></span>
+<span class="line"><span style="color:#E1E4E8">})();</span></span></code></pre>
+<p>这样的话就解决了代码冗余的问题，再回到我们刚刚使用 useBuiltIns 实现按需加载的例子中，经过编译我们发现会引入如下几个文件</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> arr1</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">arr];</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> p</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// ===== 编译后的结果 ===== //</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.array.concat.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.array.includes.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.object.to-string.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'core-js/modules/es.promise.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [].</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">arr.</span><span style="color:#B392F0">includes</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p><code>Array.prototype</code>上新增了<code>includes</code>方法，并且新增了全局的<code>Promise</code>方法，污染了全局环境。对于一个应用程序来说，这并不会有什么问题。但是如果我们的代码会做为一个库发布并提供给别人使用就会出现问题</p>
+<p>我们可以使用<code>@babel/plugin-transform-runtime</code>来帮我们解决这个问题</p>
+<p>修改我们 .babelrc 文件</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "presets"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span></span>
+<span class="line"><span style="color:#9ECBFF">      "@babel/preset-env"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#79B8FF">        "targets"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"ie >= 10"</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">  ],</span></span>
+<span class="line"><span style="color:#79B8FF">  "plugins"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span></span>
+<span class="line"><span style="color:#9ECBFF">      "@babel/plugin-transform-runtime"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#79B8FF">        "corejs"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"3.0"</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">  ]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>重新编译之后会得到如下结果，发现最终转换后的文件不会再出现 polyfill 的 require 方法了。可以看出，没有直接去修改<code>Array.prototype</code>，或者是新增<code>Promise</code>方法，而是将方法重写成为_promise/_includes，避免了全局污染</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#9ECBFF">'use strict'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _interopRequireDefault </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime-corejs3/helpers/interopRequireDefault'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _concat </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _interopRequireDefault</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#B392F0">  require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime-corejs3/core-js-stable/instance/concat'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _includes </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _interopRequireDefault</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#B392F0">  require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime-corejs3/core-js-stable/instance/includes'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _promise </span><span style="color:#F97583">=</span><span style="color:#B392F0"> _interopRequireDefault</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#B392F0">  require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'@babel/runtime-corejs3/core-js-stable/promise'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> _context;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> arr1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, _concat.default)((_context </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [])).</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(_context, arr);</span></span>
+<span class="line"><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, _includes.default)(arr).</span><span style="color:#B392F0">call</span><span style="color:#E1E4E8">(arr, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> p </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#E1E4E8"> _promise.</span><span style="color:#B392F0">default</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reject</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  resolve</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'FBB'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>plugin-transform-runtime 插件借助 babel-runtime 实现了下面两个重要的功能</p>
+<ul>
+<li>对辅助函数的复用，解决转译语法层时出现的代码冗余</li>
+<li>解决转译 api 层出现的全局变量污染</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>在本文中简单介绍了:</p>
+<ul>
+<li>Babel 的转译过程/基础架构，相关包的核心包的意义</li>
+<li>重点放到了 .babelrc 的配置上，从 plugins 的使用，到为什么产生了 presets</li>
+<li>@babel/preset-env 出现的原因和解决问题，以及通过 browserList 和 babel-compat-data 实现的按需加载</li>
+<li>使用 @babel/polyfill 解决 API 不能够被转译的，但是产生了全量引用的问题</li>
+<li>为了解决 @babel/polyfill 解决转译语法层时出现的代码冗余 以及全局变量污染问题，@babel/plugin-transform-runtime 出现了</li>
+</ul>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://juejin.cn/post/6844904008679686152#heading-7">不容错过的 Babel7 知识</a></li>
+<li><a href="https://mp.weixin.qq.com/s/E153XvbK16Y2r5FPwPX-3A">手把手带你走进 Babel 的编译世界</a></li>
+<li><a href="https://mp.weixin.qq.com/s/pnnjhfEIF3osRmgK_m-uxA">前端也要懂编译：Babel 最全上手指南</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#babel-的用途"> babel 的用途 </a><a class="depth-2" href="#babel-的转译"> babel 的转译 </a><a class="depth-2" href="#babel-的架构"> babel 的架构 </a><a class="depth-2" href="#babel-的编译配置"> babel 的编译配置 </a><a class="depth-3" href="#插件plugins"> 插件(plugins) </a><a class="depth-3" href="#预设preset"> 预设(preset) </a><a class="depth-3" href="#babelpolyfill"> @babel/polyfill </a><a class="depth-3" href="#babelplugin-transform-runtime"> @babel/plugin-transform-runtime </a><a class="depth-2" href="#总结"> 总结 </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/icon-freedom-with--figma-plugin/">上一篇：通过 Figma 插件实现 Icon 自由</a> <a href="/blog/engineering/webpack-core-process/">下一篇：webpack 核心流程</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

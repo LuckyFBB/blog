@@ -1,15 +1,387 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Node 运行时、Buffer、进程通信与服务端基础能力。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>多进程架构和 Cluster | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link is-active" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">Node</a> <h1>多进程架构和 Cluster</h1> </header> <div class="article-grid"> <div class="prose"> <p>在本文中主要会介绍多进程架构以及其问题，cluster 在多进程架构上解决了什么问题，以及其原理。</p>
+<h2 id="多进程架构">多进程架构</h2>
+<p>其实多进程的出现能够解决单进程、单线程无法充分利用多核 CPU 的问题。上述的父子进程事件监听中，我们能够通过 fork 创建 worker 子进程，并且通过 on/send 事件来进行事件监听。</p>
+<p>但是 worker 进程会因为某些异常情况退出，因此在 master 进程中需要监听子进程的存活状态，一旦子进程退出之后，master 进程需要重启新的子进程。子进程退出时，会在父进程触发 exit 事件，父进程只需要监听该事件。</p>
+<h3 id="主进程-master">主进程 master</h3>
+<ul>
+<li>创建 server 并监听 3000 端口</li>
+<li>根据系统的 <a href="http://nodejs.cn/api/os.html#oscpus">cpus</a> 开启多个进程</li>
+<li>通过子进程对象的 send 发送信息到子进程进行通信</li>
+<li>在主进程中监听子进程的变化，如果是自杀信号(suicide)重新启动一个工作进程</li>
+<li>主进程在监听到退出消息的时候，先退出子进程再退出主进程</li>
+</ul>
+<p><a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/more_process/master.js">对应代码</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> fork</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'child_process'</span><span style="color:#E1E4E8">).fork;</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> cpus</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'os'</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">cpus</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> server</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'net'</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">server.</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">process.title </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'FBB-Master'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> workers</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> createWorker</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> worker</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> fork</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'worker.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  worker.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'message'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (message.act </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'suicide'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">      createWorker</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">  worker.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'exit'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">code</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">signal</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">      `worker process ${</span><span style="color:#E1E4E8">worker</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">} exited, code: ${</span><span style="color:#E1E4E8">code</span><span style="color:#9ECBFF">}, signal: ${</span><span style="color:#E1E4E8">signal</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#F97583">    delete</span><span style="color:#E1E4E8"> workers[worker.pid];</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">  worker.</span><span style="color:#B392F0">send</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'server'</span><span style="color:#E1E4E8">, server);</span></span>
+<span class="line"><span style="color:#E1E4E8">  workers[worker.pid] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> worker;</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    `worker process created, pid: ${</span><span style="color:#E1E4E8">worker</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}, ppid: ${</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">} `</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> cpus.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#B392F0">  createWorker</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// SIGINT 程序终止(interrupt)信号 表示用户输入INTR字符(通常是Ctrl-C)时发出，用于通知前台进程组终止进程</span></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">once</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'SIGINT'</span><span style="color:#E1E4E8">, close.</span><span style="color:#B392F0">bind</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'SIGINT'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#6A737D">// SIGINT类似, 但由QUIT字符(通常是Ctrl-\)来控制</span></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">once</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'SIGQUIT'</span><span style="color:#E1E4E8">, close.</span><span style="color:#B392F0">bind</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'SIGQUIT'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#6A737D">// 程序结束(terminate)信号，通常用来要求程序自己正常退出</span></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">once</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'SIGTERM'</span><span style="color:#E1E4E8">, close.</span><span style="color:#B392F0">bind</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'SIGTERM'</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">once</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'exit'</span><span style="color:#E1E4E8">, close.</span><span style="color:#B392F0">bind</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> close</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">code</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'进程退出！'</span><span style="color:#E1E4E8">, code);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (code </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> pid </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> workers) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'master process exited, kill worker pid:'</span><span style="color:#E1E4E8">, pid);</span></span>
+<span class="line"><span style="color:#E1E4E8">      workers[pid].</span><span style="color:#B392F0">kill</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'SIGINT'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  process.</span><span style="color:#B392F0">exit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="工作进程-worker">工作进程 worker</h3>
+<ul>
+<li>创建一个 server 对象</li>
+<li>通过 message 事件接受主进程 send 方法发送的消息</li>
+<li>监听 uncaughtException 事件，捕获未处理的异常，发送自杀信息由主进程重建进程，子进程在连接关闭之后再退出</li>
+</ul>
+<p><a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/more_process/worker.js">对应代码</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> http</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> server</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> http.</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">  res.</span><span style="color:#B392F0">writeHead</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">, {</span></span>
+<span class="line"><span style="color:#9ECBFF">    'Content-Type'</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">'text/plain'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">  res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'I am worker, pid:'</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> process.pid </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> ', ppid:'</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> process.ppid);</span></span>
+<span class="line"><span style="color:#F97583">  throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'worker process exception!'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">let</span><span style="color:#E1E4E8"> netServer;</span></span>
+<span class="line"><span style="color:#E1E4E8">process.title </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> 'FBB-Worker'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'message'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">sendHandle</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (message </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'server'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    netServer </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> sendHandle;</span></span>
+<span class="line"><span style="color:#E1E4E8">    netServer.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'connection'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">socket</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`got a connection on worker, pid = ${</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      server.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'connection'</span><span style="color:#E1E4E8">, socket);</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">process.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'uncaughtException'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">  console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'catch error, send suicide massage'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  process.</span><span style="color:#B392F0">send</span><span style="color:#E1E4E8">({ act: </span><span style="color:#9ECBFF">'suicide'</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"><span style="color:#E1E4E8">  netServer.</span><span style="color:#B392F0">close</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">function</span><span style="color:#E1E4E8"> () {</span></span>
+<span class="line"><span style="color:#E1E4E8">    process.</span><span style="color:#B392F0">exit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>Nodejs 的多进程模型就是这样实现的，思考该模型是否有问题 🤔</p>
+<ul>
+<li>多个进程之间会竞争一个连接，产生惊群现象，效率比较低</li>
+<li>无法控制一个新的连接是由哪个进程来处理的，导致各个 worker 之间非常不均衡</li>
+</ul>
+<p>多线程/多进程等待同一个 socket 事件，当这个事件发生时，所有的线程/进程被同时唤醒，就是惊群。可以预见，这样的效率低下，许多进程被重新唤醒，同时去响应这一个事件，但只有一个进程能处理事件成功，其他的进程在处理该事件失败后重新休眠。这种性能浪费现象就是惊群</p>
+<h2 id="cluster">Cluster</h2>
+<p>cluster 模块可以被用来在多核 CPU 环境负载均衡，基于子进程的 fork 方法并且主要会根据 CPU 核数衍生很多次主应用进程。然后主进程接管并且通过主进程和子进程的交流实现负载均衡。</p>
+<h3 id="cluster-工作流程master-worker">Cluster 工作流程(Master-Worker)</h3>
+<p>cluster 中创建一个主进程(Master)，以及若干个子进程(worker)。由于主进程监听客户端连接请求，并根据特定的策略转发到对应的 worker。</p>
+<ul>
+<li>优点: 通常只占用一个端口，通信相对简单，转发策略更加灵活</li>
+<li>缺点: 需要主进程的稳定性较高</li>
+</ul>
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/170860079-7a5677a5-f3f2-489d-8086-1479090df9f2.png">
+<p>主进程的工作很简单，只是使用一个调度轮询算法去选择一个工作进程，通过所有的可用的进程让负载均匀地分布。</p>
+<h3 id="集群创建">集群创建</h3>
+<p>Cluster 是常见的 Nodejs 利用多核的方法，是基于上面讲的<code>child_process.fork</code>实现的，所以 cluster 产生的进程是通过 IPC 来通信的，是使用<code>cluster.isMaster</code>这个标识来区分子进程和父进程</p>
+<p>我们开启一个进程，监听 8080 端口，使用<a href="https://httpd.apache.org/docs/2.4/programs/ab.html">apache 基准测试工具</a>来模拟请求</p>
+<p><code>ab -c 10 -n 5000 -r http://localhost:8080</code>，发起 5000 个请求</p>
+<p><a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/cluster/worker.js">对应代码</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> http</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> pid</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> process.pid;</span></span>
+<span class="line"><span style="color:#E1E4E8">http</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">req</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 1e7</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {} </span><span style="color:#6A737D">// simulate CPU work</span></span>
+<span class="line"><span style="color:#E1E4E8">    res.</span><span style="color:#B392F0">end</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`handled by process.${</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  })</span></span>
+<span class="line"><span style="color:#E1E4E8">  .</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8080</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`started process`</span><span style="color:#E1E4E8">, pid);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span></code></pre>
+<p>当我们执行完 5000 条数据之后，我们能够得到如下的结果:</p>
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/170860082-325e6ae9-b1cd-490f-8e8c-e69d7544b838.png">
+<p>借助上述的示例，把它作为一个 worker，使用 cluster 模块来扩展当前示例，在主进程中根据电脑 cpu 的数量来创建对应的子进程</p>
+<p><a href="https://github.com/LuckyFBB/Front-End-Examples/blob/main/node-process/cluster/master.js">对应代码</a></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> http</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'http'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> cluster</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'cluster'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> cpus</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'os'</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">cpus</span><span style="color:#E1E4E8">().</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (cluster.isMaster) {</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> cpus; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    cluster.</span><span style="color:#B392F0">fork</span><span style="color:#E1E4E8">(); </span><span style="color:#6A737D">// 创建子进程</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  cluster.</span><span style="color:#B392F0">on</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'exit'</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">worker</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">worker</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">process</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">pid</span><span style="color:#9ECBFF">} died`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">} </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">  require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'./worker.js'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'hello all'</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p>依旧执行上述命令，得到如下的结果。当我们多次请求时，请求会被不同的子进程处理。子进程并不是完全按着顺序轮流执行的，cluster 模块采用的是 round-robin 方式，将负载分布到不同的子进程之间</p>
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/170860084-325a6afd-0564-4647-a4ee-d6f8a8620013.png">
+<h3 id="提出问题">提出问题</h3>
+<ol>
+<li>如果进了 if(cluster.isMaster)，如何进入 else 中的逻辑，并新建好几个子进程，进行通信？</li>
+<li>为什么子进程中创建多个 server 的时候，监听了同一个端口，尚未报错？</li>
+<li>主进程和子进程各自的作用是什么，分别负责了什么事情？</li>
+</ol>
+<h3 id="源码分析">源码分析</h3>
+<h4 id="进程初始化">进程初始化</h4>
+<p>master 进程通过 cluster.fork 创建了 worker 进程。cluster.fork 内部使用 child_process.fork 来创建进程的，所以 master 和 worker 之间也会有 IPC 通道进行通信</p>
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/185775772-c1b8550a-f29c-40fb-bdd3-d45686832d5b.png">
+<p>当我们使用 require(“cluster”) 的时候，会去执行</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> childOrPrimary</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> 'NODE_UNIQUE_ID'</span><span style="color:#F97583"> in</span><span style="color:#E1E4E8"> process.env </span><span style="color:#F97583">?</span><span style="color:#9ECBFF"> 'child'</span><span style="color:#F97583"> :</span><span style="color:#9ECBFF"> 'primary'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">module</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">exports</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`internal/cluster/${</span><span style="color:#E1E4E8">childOrPrimary</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p>当环境变量中没有 NODE_UNIQUE_ID 加载 primary.js</p>
+<p>cluster.fork 是 child_process.fork 的封装，调用时会将 NODE_UNIQUE_ID 写到环境变量中</p>
+<h4 id="端口共享">端口共享</h4>
+<h5 id="流程">流程</h5>
+<p>在该示例中我们创建了多个 worker 并且监听的是同一个端口。当我们多个进程监听一个端口的时会报错，但是我们的代码中却没有问题？</p>
+<p>上述代码中使用 http 模块创建了 http 服务，http 模块最终会调用 net.js 实现网络服务。net 中会根据当前是主进程还是子进程对 listen 方法做特殊处理</p>
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/172322934-8920ddc1-e23b-4026-8f07-ca5dafa45e0a.png">
+<p>向 master 进程发送 queryServer 消息，master 在收到这个消息之后，向 master 注册一个内部的 TCP 服务器。</p>
+<p>master 在接收到 queryServer 消息后进行服务启动：</p>
+<ul>
+<li>如果地址没有被监听过，通过 RoundRobinHandle 监听开启服务</li>
+<li>如果地址被监听过，直接绑定当已经监听的服务上，去消费请求</li>
+</ul>
+<p>实现端口共享的原理：</p>
+<ul>
+<li>端口只会在 master 进程中的内部 TCP 服务器监听一次</li>
+<li>net.js 模块中会判断当前的进程是 master 还是 worker 进程</li>
+<li>如果是 worker 进程并不会真正的去调用 listen 方法，所以不会报端口错误</li>
+</ul>
+<p>我们在子进程会通过 http.createServer().listen，会走到 Server.prototype.listen 方法中，根据判断之后会开始执行 listenInCluster 方法</p>
+<h5 id="源码">源码</h5>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#6A737D">// listenInCluster</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> listenInCluster</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (cluster </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">) cluster </span><span style="color:#F97583">=</span><span style="color:#B392F0"> require</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'cluster'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (cluster.isPrimary) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    server.</span><span style="color:#B392F0">_listen2</span><span style="color:#E1E4E8">(address, port, addressType, backlog, fd, flags);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // Get the primary's server handle, and listen on it</span></span>
+<span class="line"><span style="color:#E1E4E8">  cluster.</span><span style="color:#B392F0">_getServer</span><span style="color:#E1E4E8">(server, serverQuery, listenOnPrimaryHandle);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>这里的会对当前是在主进程还是子进程做出判断走不同的逻辑，目前还处于子进程中，调用 cluster._getServer 函数</p>
+<p>在 cluster._getServer 中会构建一个消息体，再发送给主进程，开始和主进程进行通信，主进程</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">cluster.</span><span style="color:#B392F0">_getServer</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">obj</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">options</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">cb</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    act: </span><span style="color:#9ECBFF">'queryServer'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    index,</span></span>
+<span class="line"><span style="color:#E1E4E8">    data: </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#F97583">    ...</span><span style="color:#E1E4E8">options,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  send</span><span style="color:#E1E4E8">(message, (</span><span style="color:#FFAB70">reply</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (handle) {</span></span>
+<span class="line"><span style="color:#6A737D">      // Shared listen socket</span></span>
+<span class="line"><span style="color:#B392F0">      shared</span><span style="color:#E1E4E8">(reply, { handle, indexesKey, index }, cb);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">      // Round-robin.</span></span>
+<span class="line"><span style="color:#B392F0">      rr</span><span style="color:#E1E4E8">(reply, { indexesKey, index }, cb);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>当主进程接收到 queryServer 消息之后，会去执行 queryServer 函数。**划重点：**当执行 queryServer 函数的时候会根据不同的调度策略选择不同的调用模式，默认选择 RoundRobinHandle 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> queryServer</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">worker</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span></span>
+<span class="line"><span style="color:#9ECBFF">    `${</span><span style="color:#E1E4E8">message</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">address</span><span style="color:#9ECBFF">}:${</span><span style="color:#E1E4E8">message</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">port</span><span style="color:#9ECBFF">}:${</span><span style="color:#E1E4E8">message</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">addressType</span><span style="color:#9ECBFF">}:`</span><span style="color:#F97583"> +</span></span>
+<span class="line"><span style="color:#9ECBFF">    `${</span><span style="color:#E1E4E8">message</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">fd</span><span style="color:#9ECBFF">}:${</span><span style="color:#E1E4E8">message</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">index</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> handle </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> handles.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#6A737D">  // 主进程会创建 server</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (handle </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      schedulingPolicy </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> SCHED_RR</span><span style="color:#F97583"> ||</span></span>
+<span class="line"><span style="color:#E1E4E8">      message.addressType </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'udp4'</span><span style="color:#F97583"> ||</span></span>
+<span class="line"><span style="color:#E1E4E8">      message.addressType </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'udp6'</span></span>
+<span class="line"><span style="color:#E1E4E8">    ) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      handle </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SharedHandle</span><span style="color:#E1E4E8">(key, address, message);</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">      // 走Round-Robin算法，负责处理请求时，主进程server选取哪个子进程server进行处理</span></span>
+<span class="line"><span style="color:#E1E4E8">      handle </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> RoundRobinHandle</span><span style="color:#E1E4E8">(key, address, message);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    handles.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(key, handle);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  handle.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(worker, (</span><span style="color:#FFAB70">errno</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reply</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {});</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>看看 RoundRobinHandle 调度做了什么事情？发现其中创建了一个新的 server 并且做了 listen 监听，那么就会进入到 Server.prototype.listen 进入到 listenInCluster 方法中，由于目前是在主进程中执行，那么会开始执行 server._listen2 方法</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> RoundRobinHandle</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">key</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">address</span><span style="color:#E1E4E8">, { </span><span style="color:#FFAB70">port</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">fd</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">flags</span><span style="color:#E1E4E8"> }) {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.key </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> key;</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.all </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SafeMap</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.free </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> SafeMap</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.handles </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.handle </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">  // 在这里创建了主进程中的server,并且监听在子进程中定义的端口</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.server </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> net.</span><span style="color:#B392F0">createServer</span><span style="color:#E1E4E8">(assert.fail);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.server.</span><span style="color:#B392F0">listen</span><span style="color:#E1E4E8">(address);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>到这里的时候，我们已经分析完了子进程创建 Server 监听端口的时候，并在在主进程中创建了一个 Server 监听相同的端口</p>
+<p>接下来将要分析的是，子进程是如何做到的不去监听端口的</p>
+<p>当我们主进程的 Server 创建成功之后，会执行 handle.add 方法，调用 handoff 当前的子进程放入到一个 this.free 中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E1E4E8">handle.</span><span style="color:#B392F0">add</span><span style="color:#E1E4E8">(worker, (</span><span style="color:#FFAB70">errno</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">reply</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">data</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> handles.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (errno) handles.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(key); </span><span style="color:#6A737D">// Gives other workers a chance to retry.</span></span>
+<span class="line"><span style="color:#B392F0">  send</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    worker,</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      errno,</span></span>
+<span class="line"><span style="color:#E1E4E8">      key,</span></span>
+<span class="line"><span style="color:#E1E4E8">      ack: message.seq,</span></span>
+<span class="line"><span style="color:#E1E4E8">      data,</span></span>
+<span class="line"><span style="color:#F97583">      ...</span><span style="color:#E1E4E8">reply,</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">    handle,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">RoundRobinHandle</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">add</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">worker</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">send</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> done</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // 将当前的子进程推入this.free中(现在只是推入，等客户端请求时，会取出子进程使用)</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">handoff</span><span style="color:#E1E4E8">(worker);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.server.</span><span style="color:#B392F0">once</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'listening'</span><span style="color:#E1E4E8">, done);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>执行完毕之后，会开始执行发送 queryServer 消息时的回调函数</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#B392F0">send</span><span style="color:#E1E4E8">(message, (</span><span style="color:#FFAB70">reply</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (handle) {</span></span>
+<span class="line"><span style="color:#6A737D">    // Shared listen socket</span></span>
+<span class="line"><span style="color:#B392F0">    shared</span><span style="color:#E1E4E8">(reply, { handle, indexesKey, index }, cb);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // Round-robin.</span></span>
+<span class="line"><span style="color:#B392F0">    rr</span><span style="color:#E1E4E8">(reply, { indexesKey, index }, cb);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>在 send 中的 cb 就是调用 clsuter._getServer 传入的 listenOnPrimaryHandle 方法，最终也会调用到 server._listen2(setupListenHandle)</p>
+<p>其实 server._listen2(setupListenHandle) 主进程做监听的时候也调用了这个方法，我们来看看其真实面目吧</p>
+<p>为主进程创建 TCP 句柄，实现子进程就不会再进行端口监听</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> setupListenHandle</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">address</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">port</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">addressType</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">backlog</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">fd</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">flags</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  // 当子进程在调用进这个方法的时候，已经有_handle了，所以不会再进行handle的创建</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">._handle) {</span></span>
+<span class="line"><span style="color:#B392F0">    debug</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'setupListenHandle: have a handle already'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // 主进程会调用</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> rval </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">    // Try to bind to the unspecified IPv6 address, see if IPv6 is available</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">address </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#F97583"> typeof</span><span style="color:#E1E4E8"> fd </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'number'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">      // 实际上是创建了主进程的handle句柄，创建好了tcp连接通路</span></span>
+<span class="line"><span style="color:#E1E4E8">      rval </span><span style="color:#F97583">=</span><span style="color:#B392F0"> createServerHandle</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">DEFAULT_IPV6_ADDR</span><span style="color:#E1E4E8">, port, </span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8">, fd, flags);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">._handle </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> rval;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="分发客户端服务">分发客户端服务</h4>
+<h5 id="流程-1">流程</h5>
+<p>master 进程主要负责请求的收集和分发，当一个请求进来之后会被 master 进程监听到，master 采用 RoundRobin 的调度方式去分配请求。每一次从空闲子进程队列中拿出第一个，将请求转发到该子进程做处理，处理完成之后再将子进程放回空闲队列</p>
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/38368040/185776187-4b9cd73f-643c-4270-b8ed-39945d2173de.png">
+<h5 id="源码-1">源码</h5>
+<p>当我们执行 curl http:127.0.0.1:3000 的时候，主进程会监听到有连接进程，能够触发主进程的 listening 事件</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.server.</span><span style="color:#B392F0">once</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'listening'</span><span style="color:#E1E4E8">, () </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">  this</span><span style="color:#E1E4E8">.handle.</span><span style="color:#B392F0">onconnection</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">distribute</span><span style="color:#E1E4E8">(err, handle);</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>触发 RoundRobinHandle 的 distribute 方法，取出空闲队列中的第一个进程，为它分配请求</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">RoundRobinHandle</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">distribute</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  // 把请求放入请求队列中</span></span>
+<span class="line"><span style="color:#B392F0">  append</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.handles, handle);</span></span>
+<span class="line"><span style="color:#6A737D">  // 空闲队列中取出第一个进程</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">workerEntry</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.free;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">ArrayIsArray</span><span style="color:#E1E4E8">(workerEntry)) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">workerId</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">worker</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> workerEntry;</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.free.</span><span style="color:#B392F0">delete</span><span style="color:#E1E4E8">(workerId);</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">handoff</span><span style="color:#E1E4E8">(worker);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>执行 handoff 开始为所选进程分配请求，构建消息体，向子进程发送对应的消息和请求</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#79B8FF">RoundRobinHandle</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">prototype</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">handoff</span><span style="color:#F97583"> =</span><span style="color:#F97583"> function</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">worker</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  // 取出队列中的第一个请求</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> handle</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> peek</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.handles);</span></span>
+<span class="line"><span style="color:#6A737D">  // 如果为空，说明没有请求，再次放回进程空闲队列中</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (handle </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.free.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(worker.id, worker);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  remove</span><span style="color:#E1E4E8">(handle);</span></span>
+<span class="line"><span style="color:#6A737D">  // 构建消息体</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> message</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> { act: </span><span style="color:#9ECBFF">'newconn'</span><span style="color:#E1E4E8">, key: </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.key };</span></span>
+<span class="line"><span style="color:#6A737D">  // 向子进程发送消息</span></span>
+<span class="line"><span style="color:#B392F0">  sendHelper</span><span style="color:#E1E4E8">(worker.process, message, handle, (</span><span style="color:#FFAB70">reply</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (reply.accepted) handle.</span><span style="color:#B392F0">close</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">distribute</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, handle); </span><span style="color:#6A737D">// Worker is shutting down. Send to another.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">handoff</span><span style="color:#E1E4E8">(worker);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>当子进程接收到消息之后，会触发 onconnection 方法，来触发 net 模块 onconnection 方法，将对应的 socket 传递给用户层</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onmessage</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (message.act </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'newconn'</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">onconnection</span><span style="color:#E1E4E8">(message, handle);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Round-robin connection.</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onconnection</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">message</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">handle</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> message.key;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> server</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> handles.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> accepted</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> server </span><span style="color:#F97583">!==</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  send</span><span style="color:#E1E4E8">({ ack: message.seq, accepted });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (accepted) server.</span><span style="color:#B392F0">onconnection</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, handle);</span></span>
+<span class="line"><span style="color:#F97583">  else</span><span style="color:#E1E4E8"> handle.</span><span style="color:#B392F0">close</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// server.onconnection</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onconnection</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">err</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">clientHandle</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> handle</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> self</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> handle[owner_symbol];</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> socket</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Socket</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">    handle: clientHandle,</span></span>
+<span class="line"><span style="color:#E1E4E8">    allowHalfOpen: self.allowHalfOpen,</span></span>
+<span class="line"><span style="color:#E1E4E8">    pauseOnCreate: self.pauseOnConnect,</span></span>
+<span class="line"><span style="color:#E1E4E8">    readable: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    writable: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#E1E4E8">  self.</span><span style="color:#B392F0">emit</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'connection'</span><span style="color:#E1E4E8">, socket);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://segmentfault.com/a/1190000014701988">详解 Node.Js 中实现端口重用原理</a></li>
+<li><a href="https://cnodejs.org/topic/56e84480833b7c8a0492e20c">通过源码解析 Node.js 中 cluster 模块的主要功能实现</a></li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#多进程架构"> 多进程架构 </a><a class="depth-3" href="#主进程-master"> 主进程 master </a><a class="depth-3" href="#工作进程-worker"> 工作进程 worker </a><a class="depth-2" href="#cluster"> Cluster </a><a class="depth-3" href="#cluster-工作流程master-worker"> Cluster 工作流程(Master-Worker) </a><a class="depth-3" href="#集群创建"> 集群创建 </a><a class="depth-3" href="#提出问题"> 提出问题 </a><a class="depth-3" href="#源码分析"> 源码分析 </a><a class="depth-2" href="#参考链接"> 参考链接 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/node/buffer/">上一篇：NodeJS 中的 Buffer 究竟是什么？</a> <a href="/blog/node/file/">下一篇：Node 中的文件模块</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

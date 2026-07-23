@@ -1,15 +1,81 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>了解 package.json | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>了解 package.json</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="npm-中的依赖包">npm 中的依赖包</h2>
+<h3 id="依赖包类型">依赖包类型</h3>
+<ol>
+<li>
+<p>dependencies</p>
+<p>应用依赖/业务依赖。应用发布上线后所需要的依赖，依赖的代码属于线上代码的一部分，例如<code>react</code>/<code>vue</code>等框架，<code>ant-design</code>/<code>element</code>等组件库</p>
+<p>使用<code>npm i ${packageName} -S</code> 来安装依赖</p>
+</li>
+<li>
+<p>devDependencies</p>
+<p>开发环境依赖。在项目开发时所需要的依赖，例如构建工具<code>webpack</code>/<code>gulp</code>，单元测试工具<code>jest</code>等</p>
+<p>使用<code>npm i ${packageName} -D</code>来安装依赖</p>
+</li>
+<li>
+<p>peerDependencies</p>
+<p>同等依赖。提示宿主环境去安装满足插件所指定的依赖包。例如<strong><a href="mailto:antd@3.x">antd@3.x</a></strong>，该 ui 组件库只是提供了一套 react 组件，它会要求宿主环境安装指定的 react 版本</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#9ECBFF">"peerDependencies"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">  "react"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">">=16.0.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "react-dom"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">">=16.0.0"</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>它要求宿主环境安装<code>react</code>/<code>react-dom</code>版本都大于 16.0.0</p>
+<p>:::info{title=” ”}
+📌 在插件 import 或者 require 所依赖的包的时候，永远都是引用宿主环境统一安装的 npm 包，最终解决插件与所依赖包不一致的问题
+:::</p>
+</li>
+<li>
+<p>optionalDependencies</p>
+<p>可选依赖。其中的依赖安装失败也不会影响安装过程。但是值得注意的是，<code>optionalDependencies</code>会覆盖<code>dependencies</code>中的同名依赖包，因此不要在两个地方都定义</p>
+</li>
+<li>
+<p>bundledDependencies / bundleDependencies</p>
+<p>打包依赖。打包发布时希望一些依赖包也出现在最终的包里</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"fbb-test"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "dependencies"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "mysql2"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"^2.1.0"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#6A737D">  // ...</span></span>
+<span class="line"><span style="color:#79B8FF">  "bundledDependencies"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"mysql2"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>执行打包时，<code>fbb-test.1.0.0</code>包中就会包含 mysql。值得注意的是，在<code>bundledDependencies</code>中指定的包，一定要在<code>dependencies</code>和<code>devDependencies</code>中声明</p>
+</li>
+</ol>
+<h3 id="语义化版本控制">语义化版本控制</h3>
+<p>依赖中的版本号反映了代码所做的修改，产生了语义化的版本号</p>
+<p>npm 包使用语义化版控制，我们可安装一定版本范围的 npm 包，npm 会选择和你指定的版本相匹配的(<code>latest</code>)最新版本安装</p>
+<p>npm 采用了<code>semver</code>规范作为依赖版本管理方案。由三个部分组成:<strong>主版本号</strong>.<strong>次版本号</strong>.<strong>补丁版本号</strong>。变更不同的版本号，代表着不一样的含义</p>
+<ul>
+<li>主版本号: 软件做了不兼容的变更，重大变更</li>
+<li>次版本号: 添加/废弃了某些功能，向下兼容</li>
+<li>补丁版本号: bug 修复，向下兼容</li>
+</ul>
+<p>常见的版本号</p>
+<ul>
+<li>react: 16.3.0
+表示精准的版本号，任何其他的版本号都不匹配</li>
+<li>react: ^16.3.6
+表示兼容补丁和小版本更新的版本号。<strong>兼容除了最左侧非 0 版本号之外的变化</strong>
+除了最左侧非 0 版本之外
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">^</span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> 等价于 >= </span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">17.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">，除了</span><span style="color:#79B8FF">16</span><span style="color:#E1E4E8">不能变之外，其他都可以改变</span></span>
+<span class="line"><span style="color:#E1E4E8">^</span><span style="color:#79B8FF">0.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> 等价于 >= </span><span style="color:#79B8FF">0.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">0.4</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">，因为左侧是</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">，</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">不变，其他都能兼容</span></span>
+<span class="line"><span style="color:#E1E4E8">^</span><span style="color:#79B8FF">0.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> 等价于 >= </span><span style="color:#79B8FF">0.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">0.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">7</span><span style="color:#E1E4E8">，等价于精确到</span><span style="color:#79B8FF">0.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span></span></code></pre>
+</li>
+<li>react: ~16.3.6
+表示兼容补丁更新的版本号。~的定义分为两部分，如果列出了小版本号(第二位)，则兼容补丁的修改；如果没有列出次版本号，则兼容次版本号和补丁号
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">~</span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> 兼容补丁号，等价于 >= </span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">16.4</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#E1E4E8">~</span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8"> 没有补丁号，和上面等价，>= </span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">16.4</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#E1E4E8">~</span><span style="color:#79B8FF">16</span><span style="color:#E1E4E8"> 没有列出小版本号，兼容小版本号和补丁号，等价于 >= </span><span style="color:#79B8FF">16.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">17.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#E1E4E8">~</span><span style="color:#79B8FF">0.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8">  >= </span><span style="color:#79B8FF">0.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">0.4</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span></span></code></pre>
+</li>
+<li>react: 16.x
+x/X/*/空，都表示通配符的版本号，可以匹配任何内容
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">* 表示匹配任何版本号</span></span>
+<span class="line"><span style="color:#79B8FF">16</span><span style="color:#E1E4E8">.x </span><span style="color:#79B8FF">16</span><span style="color:#E1E4E8">.* 匹配所有主版本号为</span><span style="color:#79B8FF">16</span><span style="color:#E1E4E8">的所有版本，等价于 >= </span><span style="color:#79B8FF">16.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">17.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span></span>
+<span class="line"><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.x </span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.* 匹配所有以</span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">开头的所有版本，等价于 >= </span><span style="color:#79B8FF">16.3</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8"> &#x3C; </span><span style="color:#79B8FF">16.4</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0</span></span></code></pre>
+</li>
+</ul> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#npm-中的依赖包"> npm 中的依赖包 </a><a class="depth-3" href="#依赖包类型"> 依赖包类型 </a><a class="depth-3" href="#语义化版本控制"> 语义化版本控制 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/base-swc/">上一篇：简单聊聊 SWC</a> <a href="/blog/engineering/icon-freedom-with--figma-plugin/">下一篇：通过 Figma 插件实现 Icon 自由</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

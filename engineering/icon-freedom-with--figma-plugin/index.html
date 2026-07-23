@@ -1,15 +1,413 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Babel、Webpack、SWC、npm 与项目效率工具链。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>通过 Figma 插件实现 Icon 自由 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link is-active" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">工程化</a> <h1>通过 Figma 插件实现 Icon 自由</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="创建与使用-plugin">创建与使用 Plugin</h2>
+<p>由于我们的 plugin 需要做一些交互的操作，选择使用 React 做为交互层的框架，通过 <a href="https://github.com/nirsky/figma-plugin-react-template">figma-plugin-react-template</a> 初始化一个 plugin；或者使用 Webpack + React + TypeScript 手动配置一个项目即可。</p>
+<p>如果是手动配置项目的话，需要创建 manifest.json 文件</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"My Figma Plugin"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "id"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"my-figma-plugin"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "api"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"1.0.0"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "main"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"dist/code.js"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "ui"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"dist/ui.html"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">  "editorType"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"figma"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>通过编译代码 <code>webpack --mode=development --watch</code> 之后</p>
+<ul>
+<li>选择 <code>Plugins</code> → <code>Development</code> → <code>Import plugin from manifest...</code></li>
+<li>选择 <code>manifest.json</code> 并运行插件</li>
+</ul>
+<p>可以实现实时更新</p>
+<h2 id="代码实现">代码实现</h2>
+<h3 id="需求分析">需求分析</h3>
+<p>UI 小姐姐说，我只想对一个手指头，这些 icon 都能用了！</p>
+<ul>
+<li>将 figma 上的 icon svg 全部提取出来，转换成为 React 代码</li>
+<li>创建 gitlab commit 提交代码</li>
+<li>gitlab ci 直接发包</li>
+</ul>
+<h3 id="需求规划">需求规划</h3>
+<ul>
+<li>Plugin 仓库，完成 Figma 上的操作</li>
+<li>Icon 仓库，Figma 上获取到的信息全部提交到该仓库，发包和网站部署都在该仓库</li>
+</ul>
+<h3 id="需求实现">需求实现</h3>
+<blockquote>
+<p>对于 Figma 来说必须满足以下条件，Page 以 Icon 命名，里面的 Frame 必须是 <code>outlined | filled | colored</code> 结尾，每一个 Frame 下的内容如果需要分类展示，Text+Icons 合集必须同属于一个 Frame</p>
+</blockquote>
+<blockquote>
+<p>对于 Figma 插件来说分为两个线程，一个主线程一个 UI 线程，两个线程之间需要使用 postMessage 通信，具体<a href="https://zhuanlan.zhihu.com/p/452003400">可点击查看</a></p>
+</blockquote>
+<h4 id="1-通过-figma-获取-svg-信息">1. 通过 Figma 获取 SVG 信息</h4>
+<p><strong>1.1 深度遍历 figma.root 找到我们需要 iconNode，组合相关信息</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> getAllIconsFromFigma</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">data</span><span style="color:#F97583">:</span><span style="color:#B392F0"> DocumentNode</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> components</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IComponentType</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // find icon pages</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> iconPages</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> data.children.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">d</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#9ECBFF"> /</span><span style="color:#DBEDFF">icon</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">i</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(d.name) </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> d.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'PAGE'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (iconPages.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'至少查看一个名称包含“icon”的页面'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // find icon frames</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> iconFrames</span><span style="color:#F97583">:</span><span style="color:#B392F0"> FrameNode</span><span style="color:#E1E4E8">[] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> iconPages</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">SceneNode</span><span style="color:#E1E4E8">[]>((</span><span style="color:#FFAB70">all</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">cur</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> all.</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(cur.children), [])</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">      (</span><span style="color:#FFAB70">d</span><span style="color:#E1E4E8">)</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> d</span><span style="color:#F97583"> is</span><span style="color:#B392F0"> FrameNode</span><span style="color:#F97583"> =></span></span>
+<span class="line"><span style="color:#9ECBFF">        /</span><span style="color:#DBEDFF">(outlined</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">filled</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">colored)</span><span style="color:#F97583">$</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">i</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(d.name) </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> d.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'FRAME'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (iconFrames.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"至少检查一个以 'outlined' | 'filled' | 'colored' 结尾"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> check</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">c</span><span style="color:#F97583">:</span><span style="color:#B392F0"> SceneNode</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">iconType</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (c.type </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'COMPONENT'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">name</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">id</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> c;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">      components[id] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        name,</span></span>
+<span class="line"><span style="color:#E1E4E8">        componentName: </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">}${</span><span style="color:#E1E4E8">iconType</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        id,</span></span>
+<span class="line"><span style="color:#E1E4E8">        origin: c,</span></span>
+<span class="line"><span style="color:#E1E4E8">        svg: </span><span style="color:#79B8FF">undefined</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#9ECBFF">'children'</span><span style="color:#F97583"> in</span><span style="color:#E1E4E8"> c) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      c.children.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> check</span><span style="color:#E1E4E8">(item, iconType));</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  iconFrames.</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> check</span><span style="color:#E1E4E8">(item, </span><span style="color:#B392F0">getIconType</span><span style="color:#E1E4E8">(item.name)));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (Object.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">(components).</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'没有组件!'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> components;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><strong>1.2 判断所有图标是否存在重复命名</strong></p>
+<p>所有图标的命名为 iconName+type</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> filterDuplicatedComponents</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">components</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IComponentType</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> componentMap</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Map</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">string</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">IComponent</span><span style="color:#E1E4E8">[]>();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // 按 componentName 分组</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">(components).</span><span style="color:#B392F0">forEach</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">component</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> component.componentName.</span><span style="color:#B392F0">toLowerCase</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    componentMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(key, [</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">(componentMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(key) </span><span style="color:#F97583">||</span><span style="color:#E1E4E8"> []), component]);</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  // 只返回重复的组件信息</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> Array.</span><span style="color:#B392F0">from</span><span style="color:#E1E4E8">(componentMap.</span><span style="color:#B392F0">entries</span><span style="color:#E1E4E8">())</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(([</span><span style="color:#FFAB70">_</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">components</span><span style="color:#E1E4E8">]) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> components.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">flatMap</span><span style="color:#E1E4E8">(([</span><span style="color:#FFAB70">_</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">components</span><span style="color:#E1E4E8">]) </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#E1E4E8">      components.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">c</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#9ECBFF"> `${</span><span style="color:#E1E4E8">c</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">name</span><span style="color:#9ECBFF">} in ${</span><span style="color:#E1E4E8">c</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">origin</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">type</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><strong>1.3 判断 icon 命名是否规范</strong></p>
+<p>必须以大写字母开头，后面必须至少有一个字母或数字，不能包含特殊字符、空格等</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> isComponentsNameStandard</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">components</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IComponentType</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> nonStandardComponents</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">values</span><span style="color:#E1E4E8">(components)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">d</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#F97583"> !</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">^</span><span style="color:#79B8FF">[A-Z][0-9a-zA-Z]</span><span style="color:#F97583">+$</span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">test</span><span style="color:#E1E4E8">(d.name))</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">d</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> d.name);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (nonStandardComponents.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#B392F0"> Error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'名字不符合规范:'</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">stringify</span><span style="color:#E1E4E8">(nonStandardComponents));</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> components;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><strong>1.4 获得 svg 的代码</strong></p>
+<p>使用 <code>node.origin.exportAsync</code> 导出矢量图</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> serialize</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">node</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IComponent</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> svg</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#E1E4E8"> node.origin.</span><span style="color:#B392F0">exportAsync</span><span style="color:#E1E4E8">({ format: </span><span style="color:#9ECBFF">'SVG'</span><span style="color:#E1E4E8"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    name: node.name,</span></span>
+<span class="line"><span style="color:#E1E4E8">    id: node.id,</span></span>
+<span class="line"><span style="color:#E1E4E8">    componentName: node.componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">    svg,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h4 id="2-整合-commit-创建-mr">2. 整合 commit 创建 MR</h4>
+<p><strong>2.1 diffCaches</strong></p>
+<p>每次提交的时候会创建 cache.json，存储</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#79B8FF">  "3009:8579"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "componentName"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"LeftCircleFilled"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "tag"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"5d2584f13a770ff6727ea82862f17aa0"</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#79B8FF">  "3009:8586"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#79B8FF">    "componentName"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"RightCircleFilled"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#79B8FF">    "tag"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"b982a63398d1f1e4d517ac3c441c8626"</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><code>key</code> 为每一个 <code>figma</code> 组件的唯一 ID，<code>tag</code> 是每一个 <code>svg</code> 生成的 <code>md5</code> 信息。</p>
+<p>将这次提交和之前的提交的 cache 做一个对比，获得更改的 svg</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> diffCaches</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">prev</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IDiffCaches</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">current</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IDiffCaches</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> results</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IDiffResult</span><span style="color:#E1E4E8">[] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(current).</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">svgId</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // 之前没有的为 新增</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">prev[svgId]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      results.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        id: svgId,</span></span>
+<span class="line"><span style="color:#E1E4E8">        action: </span><span style="color:#9ECBFF">'create'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        componentName: current[svgId].componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 唯一标识所代表的 svg 发生改变，删除再创建</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (prev[svgId].componentName </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> current[svgId].componentName) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      results.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        id: svgId,</span></span>
+<span class="line"><span style="color:#E1E4E8">        action: </span><span style="color:#9ECBFF">'delete'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        componentName: prev[svgId].componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">      results.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        id: svgId,</span></span>
+<span class="line"><span style="color:#E1E4E8">        action: </span><span style="color:#9ECBFF">'create'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        componentName: current[svgId].componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // tag 不一致，说明 svg 发生更改为 更新</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (prev[svgId].tag </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> current[svgId].tag) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      results.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        id: svgId,</span></span>
+<span class="line"><span style="color:#E1E4E8">        action: </span><span style="color:#9ECBFF">'update'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        componentName: current[svgId].componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"><span style="color:#6A737D">  // 遍历prev，prev 中有的，curr 没有为 删除</span></span>
+<span class="line"><span style="color:#E1E4E8">  Object.</span><span style="color:#B392F0">keys</span><span style="color:#E1E4E8">(prev).</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">svgId</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">current[svgId]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      results.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">        id: svgId,</span></span>
+<span class="line"><span style="color:#E1E4E8">        action: </span><span style="color:#9ECBFF">'delete'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        componentName: prev[svgId].componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">      });</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> results;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<blockquote>
+<p>🤔 为何要做 diff 操作<br>
+1.减少后续提交的文件<br>
+2.不用通过 delete commit 删除现有的 svg</p>
+</blockquote>
+<p><strong>2.2 创建新的分支</strong></p>
+<p>每次操作都创建一个临时分支，通过 gitlab 的 API 创建</p>
+<p>获取当前分支的 package.json 的 version 字段，做更新</p>
+<p><strong>2.3 整合 commit 信息</strong></p>
+<p>更新 <code>package.json/cache.json/website/src/constant/index.ts</code> 以及 diff 出来的内容</p>
+<p>通过 gitlab API 提交到新创建的分支</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> commits</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#E1E4E8">  {</span></span>
+<span class="line"><span style="color:#E1E4E8">    action: </span><span style="color:#9ECBFF">'update'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    file_path: </span><span style="color:#9ECBFF">`package.json`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    content: </span><span style="color:#79B8FF">JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">stringify</span><span style="color:#E1E4E8">(packageJson, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  {</span></span>
+<span class="line"><span style="color:#E1E4E8">    action: </span><span style="color:#9ECBFF">'update'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    file_path: </span><span style="color:#9ECBFF">'cache.json'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    content: </span><span style="color:#79B8FF">JSON</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">stringify</span><span style="color:#E1E4E8">(currentCaches, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">  {</span></span>
+<span class="line"><span style="color:#E1E4E8">    action: </span><span style="color:#9ECBFF">'update'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    file_path: </span><span style="color:#9ECBFF">'website/src/constant/index.ts'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    content: </span><span style="color:#9ECBFF">`export default ${</span><span style="color:#79B8FF">JSON</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">stringify</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">categoryHierarchy</span><span style="color:#9ECBFF">, </span><span style="color:#79B8FF">null</span><span style="color:#9ECBFF">, </span><span style="color:#79B8FF">4</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">].</span><span style="color:#B392F0">concat</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">  diffResults.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> component</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> components.</span><span style="color:#B392F0">find</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">component</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> component.id </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> item.id);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      action: item.action,</span></span>
+<span class="line"><span style="color:#E1E4E8">      file_path: </span><span style="color:#9ECBFF">`src/svg/${</span><span style="color:#E1E4E8">item</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">}.svg`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#6A737D">      //@ts-ignore</span></span>
+<span class="line"><span style="color:#E1E4E8">      content:</span></span>
+<span class="line"><span style="color:#E1E4E8">        item.action </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'delete'</span></span>
+<span class="line"><span style="color:#F97583">          ?</span><span style="color:#79B8FF"> undefined</span></span>
+<span class="line"><span style="color:#F97583">          :</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TextDecoder</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">decode</span><span style="color:#E1E4E8">(component.svg),</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#E1E4E8">  }),</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">await</span><span style="color:#B392F0"> createCommits</span><span style="color:#E1E4E8">(commits, branchName);</span></span></code></pre>
+<p><strong>2.4 创建 MR 等待合并</strong></p>
+<p>创建 MR 到 main 分支，等待 CI</p>
+<blockquote>
+<p>😢  创建完成 MR 之后，无法直接合并，所有的 MR 都会有一个 check 的操作，这个时候直接提交会报错 405</p>
+</blockquote>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">iid</span><span style="color:#E1E4E8"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> createMergeRequest</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">  `[figma]: update to ${</span><span style="color:#E1E4E8">packageJson</span><span style="color:#9ECBFF">.</span><span style="color:#E1E4E8">version</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  mrMessage,</span></span>
+<span class="line"><span style="color:#E1E4E8">  branchName,</span></span>
+<span class="line"><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">await</span><span style="color:#B392F0"> waitForMergeRequestReady</span><span style="color:#E1E4E8">(iid);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> async</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> waitForMergeRequestReady</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#FFAB70">  mergeRequestId</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">  maxAttempts</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 50</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> checkStatus</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">attempt</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span><span style="color:#F97583">:</span><span style="color:#B392F0"> Promise</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">void</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (attempt </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> maxAttempts) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'等待 MR 就绪超时'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> mrStatus</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> getMergeRequestStatus</span><span style="color:#E1E4E8">(mergeRequestId);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (mrStatus.has_conflicts) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'MR 存在冲突，请手动解决'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (mrStatus.merge_status </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'cannot_be_merged'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'MR 无法合并，请检查是否存在问题'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (mrStatus.head_pipeline </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> mrStatus.head_pipeline.status </span><span style="color:#F97583">!==</span><span style="color:#9ECBFF"> 'success'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (mrStatus.head_pipeline.status </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'failed'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">reject</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">'Pipeline 执行失败，请检查问题'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">      await</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setTimeout</span><span style="color:#E1E4E8">(resolve, </span><span style="color:#79B8FF">8000</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#B392F0"> checkStatus</span><span style="color:#E1E4E8">(attempt </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (mrStatus.merge_status </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'can_be_merged'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    await</span><span style="color:#F97583"> new</span><span style="color:#79B8FF"> Promise</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">resolve</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> setTimeout</span><span style="color:#E1E4E8">(resolve, </span><span style="color:#79B8FF">8000</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> checkStatus</span><span style="color:#E1E4E8">(attempt </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> checkStatus</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h4 id="3-mr-ci-执行">3. MR CI 执行</h4>
+<p><strong>3.1 执行 pnpm i 安装项目和 website 的依赖</strong></p>
+<p><strong>3.2 执行 pnpm generator 将 svg 转为 react 代码并提交到当前分支</strong></p>
+<p>使用 SVGO 优化 SVG，对于非 colored 的 svg，移除 fill 属性并且添加 <code>{ fill: 'currentColor' }</code> 属性</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> optimizeSvg</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">svgCode</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">iconType</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (iconType </span><span style="color:#F97583">===</span><span style="color:#9ECBFF"> 'colored'</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> svgCode;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> result</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> optimize</span><span style="color:#E1E4E8">(svgCode, {</span></span>
+<span class="line"><span style="color:#E1E4E8">    plugins: [</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#E1E4E8">        name: </span><span style="color:#9ECBFF">'removeAttrs'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        params: {</span></span>
+<span class="line"><span style="color:#E1E4E8">          attrs: [</span><span style="color:#9ECBFF">'fill'</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">      {</span></span>
+<span class="line"><span style="color:#E1E4E8">        name: </span><span style="color:#9ECBFF">'addAttributesToSVGElement'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        params: {</span></span>
+<span class="line"><span style="color:#E1E4E8">          attributes: [{ fill: </span><span style="color:#9ECBFF">'currentColor'</span><span style="color:#E1E4E8"> }],</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">      },</span></span>
+<span class="line"><span style="color:#E1E4E8">    ],</span></span>
+<span class="line"><span style="color:#E1E4E8">  });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result.data;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>对 svg 中的内容做一些特殊处理，所有的 svgReact 使用 span 包裹增加相关的样式，支持 <code>disabled, hoverable, active, size, color</code> 等属性</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> convertToReactComponent</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">svgCode</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">componentName</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">iconType</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">  // 提取 svg 内容</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> contentMatch</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> svgCode.</span><span style="color:#B392F0">match</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#DBEDFF">&#x3C;svg</span><span style="color:#79B8FF">[</span><span style="color:#F97583">^</span><span style="color:#79B8FF">>]</span><span style="color:#F97583">*</span><span style="color:#DBEDFF">>(</span><span style="color:#79B8FF">[\s\S]</span><span style="color:#F97583">*</span><span style="color:#DBEDFF">)&#x3C;</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#DBEDFF">svg></span><span style="color:#9ECBFF">/</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> svgContent</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> contentMatch </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> contentMatch[</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ''</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> processedContent </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> svgContent</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#79B8FF">[-:]</span><span style="color:#DBEDFF">(</span><span style="color:#79B8FF">[a-z]</span><span style="color:#F97583">+</span><span style="color:#DBEDFF">)(?=(-</span><span style="color:#F97583">|</span><span style="color:#DBEDFF">=))</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">_</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">a</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#9ECBFF"> `${</span><span style="color:#B392F0">camelCase</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">a</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}`</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    .</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">      /</span><span style="color:#DBEDFF">&#x3C;div</span><span style="color:#79B8FF">[</span><span style="color:#F97583">^</span><span style="color:#79B8FF">>]</span><span style="color:#F97583">*</span><span style="color:#DBEDFF">xmlns="http:</span><span style="color:#85E89D;font-weight:bold">\/\/</span><span style="color:#DBEDFF">www</span><span style="color:#79B8FF">.</span><span style="color:#DBEDFF">w3</span><span style="color:#79B8FF">.</span><span style="color:#DBEDFF">org</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#DBEDFF">1999</span><span style="color:#85E89D;font-weight:bold">\/</span><span style="color:#DBEDFF">xhtml"</span><span style="color:#79B8FF">[</span><span style="color:#F97583">^</span><span style="color:#79B8FF">>]</span><span style="color:#F97583">*</span><span style="color:#DBEDFF">></span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">      '&#x3C;div>'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  processedContent </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> processedContent.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    /</span><span style="color:#DBEDFF">style="(</span><span style="color:#79B8FF">[</span><span style="color:#F97583">^</span><span style="color:#79B8FF">"]</span><span style="color:#F97583">+</span><span style="color:#DBEDFF">)"</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">match</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">styleString</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> styleObj</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> parseStyle</span><span style="color:#E1E4E8">(styleString);</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#9ECBFF"> `style={${</span><span style="color:#79B8FF">JSON</span><span style="color:#9ECBFF">.</span><span style="color:#B392F0">stringify</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">styleObj</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}}`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    },</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#9ECBFF"> `import React from 'react';</span></span>
+<span class="line"><span style="color:#9ECBFF">            import classnames from 'classnames';</span></span>
+<span class="line"><span style="color:#9ECBFF">            import { IconProps } from '../constant';</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9ECBFF">            const ${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">} = ({ disabled, hoverable, active, size, color, className, style, ...restProps }: IconProps) => (</span></span>
+<span class="line"><span style="color:#9ECBFF">                &#x3C;span</span></span>
+<span class="line"><span style="color:#9ECBFF">                    {...restProps}</span></span>
+<span class="line"><span style="color:#9ECBFF">                    style={{ fontSize: typeof size === 'number' ? </span><span style="color:#79B8FF">\`\$</span><span style="color:#9ECBFF">{size}px</span><span style="color:#79B8FF">\`</span><span style="color:#9ECBFF"> : size, color, ...style }}</span></span>
+<span class="line"><span style="color:#9ECBFF">                    className={classnames('dtstack-icon', className, {</span></span>
+<span class="line"><span style="color:#9ECBFF">                        'dtstack-icon--disabled': disabled,</span></span>
+<span class="line"><span style="color:#9ECBFF">                        'dtstack-icon--hoverable': hoverable,</span></span>
+<span class="line"><span style="color:#9ECBFF">                        'dtstack-icon--active': active,</span></span>
+<span class="line"><span style="color:#9ECBFF">                    })}</span></span>
+<span class="line"><span style="color:#9ECBFF">                ></span></span>
+<span class="line"><span style="color:#9ECBFF">                    &#x3C;svg</span></span>
+<span class="line"><span style="color:#9ECBFF">                        width="1em"</span></span>
+<span class="line"><span style="color:#9ECBFF">                        height="1em"</span></span>
+<span class="line"><span style="color:#9ECBFF">                        xmlns="http://www.w3.org/2000/svg"</span></span>
+<span class="line"><span style="color:#9ECBFF">                        viewBox="0 0 64 64"</span></span>
+<span class="line"><span style="color:#9ECBFF">                        ${</span><span style="color:#B392F0">getSvgProps</span><span style="color:#9ECBFF">(</span><span style="color:#E1E4E8">iconType</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">}</span></span>
+<span class="line"><span style="color:#9ECBFF">                    ></span></span>
+<span class="line"><span style="color:#9ECBFF">                        ${</span><span style="color:#E1E4E8">processedContent</span><span style="color:#9ECBFF">}</span></span>
+<span class="line"><span style="color:#9ECBFF">                    &#x3C;/svg></span></span>
+<span class="line"><span style="color:#9ECBFF">                &#x3C;/span></span></span>
+<span class="line"><span style="color:#9ECBFF">            )</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9ECBFF">            ${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">}.displayName = '${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">}';</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9ECBFF">            export default ${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">};</span></span>
+<span class="line"><span style="color:#9ECBFF">        `</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> convertSvgToReact</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">filePath</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> fileName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">basename</span><span style="color:#E1E4E8">(filePath, </span><span style="color:#9ECBFF">'.svg'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> componentName</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> fileName.</span><span style="color:#B392F0">replace</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">/</span><span style="color:#79B8FF">[-_]</span><span style="color:#DBEDFF">(</span><span style="color:#79B8FF">[a-z]</span><span style="color:#DBEDFF">)</span><span style="color:#9ECBFF">/</span><span style="color:#F97583">g</span><span style="color:#E1E4E8">, (</span><span style="color:#FFAB70">_</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">letter</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span></span>
+<span class="line"><span style="color:#E1E4E8">    letter.</span><span style="color:#B392F0">toUpperCase</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> iconType</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getIconType</span><span style="color:#E1E4E8">(fileName);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> outputPath</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">OUTPUT_DIR</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">`${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">}.tsx | pure`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> svgCode </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fs.</span><span style="color:#B392F0">readFileSync</span><span style="color:#E1E4E8">(filePath, </span><span style="color:#9ECBFF">'utf8'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#6A737D">    // 先用 SVGO 优化</span></span>
+<span class="line"><span style="color:#E1E4E8">    svgCode </span><span style="color:#F97583">=</span><span style="color:#B392F0"> optimizeSvg</span><span style="color:#E1E4E8">(svgCode, iconType);</span></span>
+<span class="line"><span style="color:#6A737D">    // 转换为 React 组件</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> componentCode</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> convertToReactComponent</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">      svgCode,</span></span>
+<span class="line"><span style="color:#E1E4E8">      componentName,</span></span>
+<span class="line"><span style="color:#E1E4E8">      iconType,</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#6A737D">    // 写入文件</span></span>
+<span class="line"><span style="color:#E1E4E8">    fs.</span><span style="color:#B392F0">writeFileSync</span><span style="color:#E1E4E8">(outputPath, componentCode);</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">log</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`✅ Generated: ${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">} (${</span><span style="color:#E1E4E8">iconType</span><span style="color:#9ECBFF">})`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> componentName;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (error) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    console.</span><span style="color:#B392F0">error</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">`❌ Error converting ${</span><span style="color:#E1E4E8">fileName</span><span style="color:#9ECBFF">}:`</span><span style="color:#E1E4E8">, error);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>完成 React 代码转换之后，需要集体导出 svgReact 代码</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> convertToIndex</span><span style="color:#F97583"> =</span><span style="color:#F97583"> async</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">componentNames</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> exportString</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> componentNames.</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">res</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">componentName</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    res </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> `export { default as ${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">} } from './icons/${</span><span style="color:#E1E4E8">componentName</span><span style="color:#9ECBFF">}';</span><span style="color:#79B8FF">\r\n</span><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> res;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }, </span><span style="color:#9ECBFF">`import './index.css';</span><span style="color:#79B8FF">\r\n</span><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">  fs.</span><span style="color:#B392F0">writeFileSync</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    path.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">ROOT_DIR</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'src'</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'index.ts'</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">    exportString,</span></span>
+<span class="line"><span style="color:#9ECBFF">    'utf-8'</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p><strong>3.3 执行 build 完成 publish</strong></p>
+<p>完成 icon 仓库的打包已经 npm publish，tag 推到远程仓库</p>
+<p>website 部署完成</p>
+<p><strong>3.4 所有的 PipeLine 运行完毕之后会执行将代码合并到 main 分支</strong></p>
+<p><img src="/blog/imgs/figma/icon-plugin.drawio.png" alt="icon-plugin.drawio.png"></p>
+<h2 id="总结">总结</h2>
+<p>以上已经完成了 Figma Icon 到 npm 包的全部内容</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#创建与使用-plugin"> 创建与使用 Plugin </a><a class="depth-2" href="#代码实现"> 代码实现 </a><a class="depth-3" href="#需求分析"> 需求分析 </a><a class="depth-3" href="#需求规划"> 需求规划 </a><a class="depth-3" href="#需求实现"> 需求实现 </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/engineering/understanding-package/">上一篇：了解 package.json</a> <a href="/blog/engineering/base-babel/">下一篇：babel 基础介绍</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

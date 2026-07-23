@@ -1,15 +1,320 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="常见数据结构、算法思路和刷题复盘。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>十大排序算法 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link is-active" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">数据结构</a> <h1>十大排序算法</h1> </header> <div class="article-grid"> <div class="prose"> <p><del>OMG 子，这里还有坑没有填。</del>
+排序算法中，除了冒泡还会想到啥呢。没了没了，毕业之后甚至连冒泡都快写不出来了。简单记录一下每个算法概念和实现方式。</p>
+<!-- more -->
+<h2 id="算法的概述">算法的概述</h2>
+<h3 id="算法分类">算法分类</h3>
+<ul>
+<li>比较类排序：通过比较来决定元素的相对次序，由于时间复杂度不能突破 O(nlogn)，因此称为非线性时间比较类排序。</li>
+<li>非比较类排序：不通过比较来决定元素的相对次序，它可以突破基于比较排序的时间下界，以线性时间运行，因此也称为线性时间非比较类排序。</li>
+</ul>
+<h3 id="相关概念">相关概念</h3>
+<ul>
+<li>稳定：如果 a 原本在 b 前面，而 a=b，排序之后 a 仍然在 b 的前面。</li>
+<li>不稳定：如果 a 原本在 b 的前面，而 a=b，排序之后 a 可能会出现在 b 的后面。</li>
+<li>时间复杂度：对排序数据的总的操作次数。反映当 n 变化时，操作次数呈现什么规律。</li>
+<li>空间复杂度：是指算法在计算机</li>
+</ul>
+<h2 id="冒泡排序">冒泡排序</h2>
+<h3 id="算法描述">算法描述</h3>
+<p>只会比较相邻的两个数据，看是否满足大小关系，如果不满足则交换。
+一次冒泡至少会让一个元素到达他该到的位置。</p>
+<p>冒泡算法是<strong>稳定</strong>的排序算法</p>
+<p>最好情况时间复杂度为 O(n)，最坏情况时间复杂度为 O(n^2)，平均情况时间复杂度为 O(n^2)</p>
+<h3 id="算法实现">算法实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> bubbleSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; j </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8"> i; j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (arr[j] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> a[j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#F97583">        let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j];</span></span>
+<span class="line"><span style="color:#E1E4E8">        arr[j] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">        arr[j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> bubbleSort2</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> flag </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//标记是否有数据交换</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; j </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8"> i; j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (arr[j] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> a[j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#F97583">        let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j];</span></span>
+<span class="line"><span style="color:#E1E4E8">        arr[j] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">        arr[j </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">        flag </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//有数据交换</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">flag) </span><span style="color:#F97583">break</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">//如果不存在数据交换，提前退出</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="选择排序">选择排序</h2>
+<h3 id="算法描述-1">算法描述</h3>
+<p>每次都会在未排序的区间中找到最小的元素，将其放到已排序的区间末尾。</p>
+<p>选择排序是<strong>不稳定</strong>的排序算法</p>
+<p>最好情况时间复杂度 O(n)，最坏情况时间复杂度 O(n^2)，平均情况时间复杂度 O(n^2)</p>
+<h3 id="算法实现-1">算法实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> selectionSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">n</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> n; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //寻找[i,n)区间内最小值</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> minIndex </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i;</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">var</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; j </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> n; j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (arr[j] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr[minIndex]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        minIndex </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> j;</span></span>
+<span class="line"><span style="color:#E1E4E8">      }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (arr[i] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> arr[minIndex]) {</span></span>
+<span class="line"><span style="color:#F97583">      var</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[i];</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[i] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[minIndex];</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[minIndex] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="插入排序">插入排序</h2>
+<h3 id="算法描述-2">算法描述</h3>
+<p>插入排序也需要元素比较和元素移动，我们需要将元素 a 插入到已排序的区间时，需要用 a 元素与已排序的元素依次比较</p>
+<p>插入排序是<strong>稳定</strong>的排序算法。</p>
+<p>最好情况时间复杂度 O(n)，最坏情况时间复杂度 O(n^2)，平均情况时间复杂度 O(n^2)</p>
+<h3 id="算法实现-2">算法实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> insertSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //寻找i最合适的插入位置</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i; j </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; j</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (arr[j] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr[j </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#F97583">        let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j];</span></span>
+<span class="line"><span style="color:#E1E4E8">        arr[j] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">        arr[j </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">      } </span><span style="color:#F97583">else</span><span style="color:#F97583"> break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> insertSort2</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#6A737D">  //寻找i最合适的插入位置</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> len; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //当前i的值</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[i];</span></span>
+<span class="line"><span style="color:#6A737D">    //要插入的位置</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> j;</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i; j </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> curr </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> arr[j </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]; j</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[j] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    arr[j] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> curr;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="希尔排序">希尔排序</h2>
+<h2 id="归并排序">归并排序</h2>
+<h3 id="算法描述-3">算法描述</h3>
+<p>先把数组先从中间分为前后两个部分，然后对前后两个部分分别排序，再将已经排好序的两个部分合在一起。采用了分治思想。</p>
+<p>归并排序是<strong>稳定</strong>排序算法</p>
+<p>三种情况下的算法复杂度都是 O(nlogn)</p>
+<h3 id="算法实现-3">算法实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> mergeSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">  __mergeSort</span><span style="color:#E1E4E8">(arr, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, len </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __mergeSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (left </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> right) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> mid </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Math.</span><span style="color:#B392F0">floor</span><span style="color:#E1E4E8">((left </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> right) </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">  __mergeSort</span><span style="color:#E1E4E8">(arr, left, mid);</span></span>
+<span class="line"><span style="color:#B392F0">  __mergeSort</span><span style="color:#E1E4E8">(arr, mid </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, right);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (arr[mid] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> arr[mid </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#B392F0">    __merge</span><span style="color:#E1E4E8">(arr, left, mid, right);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __merge</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">mid</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left; i </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> right; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    temp[i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[i];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left,</span></span>
+<span class="line"><span style="color:#E1E4E8">    j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> mid </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left; k </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> right; k</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (i </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> mid) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[k] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp[j </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left];</span></span>
+<span class="line"><span style="color:#E1E4E8">      j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (j </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> right) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[k] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp[i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left];</span></span>
+<span class="line"><span style="color:#E1E4E8">      i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#E1E4E8"> (temp[i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> temp[j </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left]) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[k] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp[i </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left];</span></span>
+<span class="line"><span style="color:#E1E4E8">      i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      arr[k] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp[j </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left];</span></span>
+<span class="line"><span style="color:#E1E4E8">      j</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 归并排序</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> mergeSort2</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> len</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (len </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> mid</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> left</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> arr.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, mid);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> right</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> arr.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(mid);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> __merge2</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">mergeSort2</span><span style="color:#E1E4E8">(left), </span><span style="color:#B392F0">mergeSort2</span><span style="color:#E1E4E8">(right));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __merge2</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [];</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (left.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> right.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //两个数组都还有值的时候</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (left[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> right[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]) {</span></span>
+<span class="line"><span style="color:#6A737D">      //right的最小值更小</span></span>
+<span class="line"><span style="color:#E1E4E8">      result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(right.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(left.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (left.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //right没有数据了</span></span>
+<span class="line"><span style="color:#E1E4E8">    result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(left.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (right.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">    //left没有数据了</span></span>
+<span class="line"><span style="color:#E1E4E8">    result.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(right.</span><span style="color:#B392F0">shift</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> result;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="快速排序">快速排序</h2>
+<h3 id="算法描述-4">算法描述</h3>
+<p>从数组中选择一个 pivot(分区点)，然后将小于 pivot 的放到左边，大于 pivot 的放到右边。</p>
+<p>快速排序是<strong>不稳定</strong>算法</p>
+<p>最坏情况算法复杂度为 O(n^2)，平均情况算法复杂度为 O(nlogn)</p>
+<h3 id="算法实现-4">算法实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> quickSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">  __quickSort</span><span style="color:#E1E4E8">(arr, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, len </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> arr;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//对arr[left,right]部分进行快速排序</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __quickSort</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (left </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> right) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#B392F0"> __partition</span><span style="color:#E1E4E8">(arr, left, right);</span></span>
+<span class="line"><span style="color:#B392F0">  __quickSort</span><span style="color:#E1E4E8">(arr, left, index </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">  __quickSort</span><span style="color:#E1E4E8">(arr, index </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, right);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//对arr[left,right]部分进行partition操作</span></span>
+<span class="line"><span style="color:#6A737D">//返回一个索引值，使得arr[left,index-1]>arr[index],arr[index+1,right]>arr[index]</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __partition</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  //随机生成标准值</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> randomIndex </span><span style="color:#F97583">=</span><span style="color:#B392F0"> parseInt</span><span style="color:#E1E4E8">(Math.</span><span style="color:#B392F0">random</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> (right </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)) </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> left;</span></span>
+<span class="line"><span style="color:#6A737D">  //将标准值交换到第一位</span></span>
+<span class="line"><span style="color:#B392F0">  swap</span><span style="color:#E1E4E8">(arr, left, randomIndex);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> standard </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[left];</span></span>
+<span class="line"><span style="color:#6A737D">  //存储大于standard和小于standard的分割线</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> index </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> right; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (arr[i] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> standard) {</span></span>
+<span class="line"><span style="color:#B392F0">      swap</span><span style="color:#E1E4E8">(arr, i, index </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      index</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  swap</span><span style="color:#E1E4E8">(arr, left, index);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> index;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//双路快排</span></span>
+<span class="line"><span style="color:#6A737D">//从头开始找大于standard的元素，从尾开始找小于standard的元素，交换两者位置。</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> __partition2</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">left</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">right</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#6A737D">  //随机生成标准值</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> randomIndex </span><span style="color:#F97583">=</span><span style="color:#B392F0"> parseInt</span><span style="color:#E1E4E8">(Math.</span><span style="color:#B392F0">random</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">*</span><span style="color:#E1E4E8"> (right </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">)) </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> left;</span></span>
+<span class="line"><span style="color:#6A737D">  //将标准值交换到第一位</span></span>
+<span class="line"><span style="color:#B392F0">  swap</span><span style="color:#E1E4E8">(arr, left, randomIndex);</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> standard </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[left];</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    j </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> right;</span></span>
+<span class="line"><span style="color:#F97583">  while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (i </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> right </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#E1E4E8"> arr[i] </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> standard) i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (j </span><span style="color:#F97583">>=</span><span style="color:#E1E4E8"> left </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> &#x26;&#x26;</span><span style="color:#E1E4E8"> arr[j] </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> standard) j</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (i </span><span style="color:#F97583">></span><span style="color:#E1E4E8"> j) </span><span style="color:#F97583">break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    swap</span><span style="color:#E1E4E8">(arr, i, j);</span></span>
+<span class="line"><span style="color:#E1E4E8">    i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    j</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#B392F0">  swap</span><span style="color:#E1E4E8">(arr, left, j);</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> j;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">//交换值</span></span>
+<span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> swap</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">arr</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">i</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">j</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> temp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[i];</span></span>
+<span class="line"><span style="color:#E1E4E8">  arr[i] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> arr[j];</span></span>
+<span class="line"><span style="color:#E1E4E8">  arr[j] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> temp;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="堆排序">堆排序</h2>
+<h3 id="算法描述-5">算法描述</h3>
+<p>堆一定是一个完全二叉树，堆中每一个节点的值都必须大于等于（或小于等于）其子树中每个节点的值。</p>
+<p>对于每个节点的值都大于等于子树中每个节点值的堆，我们叫作“大顶堆”；对于每个节点的值都小于等于子树中每个节点值的堆，我们叫作“小顶堆”。</p>
+<p>将需要排序的数据构建成为大顶堆，那么堆顶元素就是最大值，在和末尾元素交换，在进行堆化。</p>
+<h3 id="算法实现-5">算法实现</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="js"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> MaxHeap</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.data </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  sort</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__buildHeap</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    let</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getSize</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (len </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__swap</span><span style="color:#E1E4E8">(len, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">      len</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__shiftDown</span><span style="color:#E1E4E8">(len, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  //返回当前大小</span></span>
+<span class="line"><span style="color:#B392F0">  getSize</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  __buildHeap</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#B392F0"> parseInt</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getSize</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">); i </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__shiftDown</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getSize</span><span style="color:#E1E4E8">(), i);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">  //向下堆重构:从堆顶开始,比较当前元素和两个子元素,将若当前元素小于子元素中的一个,则将当前元素与较大的子元素交换,直到当前元素大于其子元素</span></span>
+<span class="line"><span style="color:#B392F0">  __shiftDown</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">len</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">k</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">      let</span><span style="color:#E1E4E8"> maxPos </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> k;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[k] </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k]) maxPos </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> &#x3C;=</span><span style="color:#E1E4E8"> len </span><span style="color:#F97583">&#x26;&#x26;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[maxPos] </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> this</span><span style="color:#E1E4E8">.data[</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">])</span></span>
+<span class="line"><span style="color:#E1E4E8">        maxPos </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> k </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#E1E4E8"> (k </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> maxPos) </span><span style="color:#F97583">break</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">__swap</span><span style="color:#E1E4E8">(maxPos, k);</span></span>
+<span class="line"><span style="color:#E1E4E8">      k </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> maxPos;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  __swap</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">i</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">j</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    [</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[i], </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[j]] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[j], </span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">.data[i]];</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="计数排序">计数排序</h2>
+<h2 id="桶排序">桶排序</h2>
+<h2 id="基数排序">基数排序</h2> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#算法的概述"> 算法的概述 </a><a class="depth-3" href="#算法分类"> 算法分类 </a><a class="depth-3" href="#相关概念"> 相关概念 </a><a class="depth-2" href="#冒泡排序"> 冒泡排序 </a><a class="depth-3" href="#算法描述"> 算法描述 </a><a class="depth-3" href="#算法实现"> 算法实现 </a><a class="depth-2" href="#选择排序"> 选择排序 </a><a class="depth-3" href="#算法描述-1"> 算法描述 </a><a class="depth-3" href="#算法实现-1"> 算法实现 </a><a class="depth-2" href="#插入排序"> 插入排序 </a><a class="depth-3" href="#算法描述-2"> 算法描述 </a><a class="depth-3" href="#算法实现-2"> 算法实现 </a><a class="depth-2" href="#希尔排序"> 希尔排序 </a><a class="depth-2" href="#归并排序"> 归并排序 </a><a class="depth-3" href="#算法描述-3"> 算法描述 </a><a class="depth-3" href="#算法实现-3"> 算法实现 </a><a class="depth-2" href="#快速排序"> 快速排序 </a><a class="depth-3" href="#算法描述-4"> 算法描述 </a><a class="depth-3" href="#算法实现-4"> 算法实现 </a><a class="depth-2" href="#堆排序"> 堆排序 </a><a class="depth-3" href="#算法描述-5"> 算法描述 </a><a class="depth-3" href="#算法实现-5"> 算法实现 </a><a class="depth-2" href="#计数排序"> 计数排序 </a><a class="depth-2" href="#桶排序"> 桶排序 </a><a class="depth-2" href="#基数排序"> 基数排序 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/data-structure/set/">上一篇：集合</a> <a href="/blog/data-structure/collection-of-common-algorithms/">下一篇：常见算法合集</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

@@ -1,15 +1,489 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="Hooks、状态管理、路由、渲染机制与 React 生态实践。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>且或组件实现思路 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link is-active" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">React</a> <h1>且或组件实现思路</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="前言">前言</h2>
+<p>在业务实现中，时常会出现且或关系逻辑的拼接，UI 小姐姐说，加钱，这个组件应该写成这样的展示方式。</p>
+<p><img src="/blog/imgs/andOr/Untitled.png" alt="Untitled"></p>
+<p>前端程序员 🧑‍💻：😯，so easy!!!</p>
+<h2 id="前期分析">前期分析</h2>
+<h3 id="需要确定好数据结构">需要确定好数据结构</h3>
+<p>因为是嵌套结构，可以通过 ➕➖ 来增加层级或者数据，因此采用树形结构来存储数据。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> interface</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> {</span></span>
+<span class="line"><span style="color:#FFAB70">  key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  level</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// 当前节点的层级，用于判断一些按钮的展示</span></span>
+<span class="line"><span style="color:#FFAB70">  type</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// 当前节点的条件关系，1 | 2</span></span>
+<span class="line"><span style="color:#FFAB70">  rowValues</span><span style="color:#F97583">?:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">; </span><span style="color:#6A737D">// Form 节点的相关的信息(子节点无条件节点时才有)</span></span>
+<span class="line"><span style="color:#FFAB70">  children</span><span style="color:#F97583">?:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>[]; </span><span style="color:#6A737D">// 子节点的信息(子节点存在条件节点时才有)</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上述的图片的数据为：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#9ECBFF">    "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"qTipLrlUt"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    "children"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"B6Jrbqcfof"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "type"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "children"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">                {</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "rowValues"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">                        "condition"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                        "rowPermission"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">""</span></span>
+<span class="line"><span style="color:#E1E4E8">                    },</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"deg8x8UgZ"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">2</span></span>
+<span class="line"><span style="color:#E1E4E8">                },</span></span>
+<span class="line"><span style="color:#E1E4E8">                {</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"_sczw_1h8H"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "type"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                    "children"</span><span style="color:#E1E4E8">: [</span></span>
+<span class="line"><span style="color:#E1E4E8">                        {</span></span>
+<span class="line"><span style="color:#9ECBFF">                            "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Z5UkUPJoA"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                            "rowValues"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">                                "condition"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                                "rowPermission"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">""</span></span>
+<span class="line"><span style="color:#E1E4E8">                            },</span></span>
+<span class="line"><span style="color:#9ECBFF">                            "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3</span></span>
+<span class="line"><span style="color:#E1E4E8">                        },</span></span>
+<span class="line"><span style="color:#E1E4E8">                        {</span></span>
+<span class="line"><span style="color:#9ECBFF">                            "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"MbpJILqHGx"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                            "rowValues"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">                                "condition"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                                "rowPermission"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">""</span></span>
+<span class="line"><span style="color:#E1E4E8">                            },</span></span>
+<span class="line"><span style="color:#9ECBFF">                            "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">3</span></span>
+<span class="line"><span style="color:#E1E4E8">                        }</span></span>
+<span class="line"><span style="color:#E1E4E8">                    ]</span></span>
+<span class="line"><span style="color:#E1E4E8">                }</span></span>
+<span class="line"><span style="color:#E1E4E8">            ]</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#9ECBFF">            "rowValues"</span><span style="color:#E1E4E8">: {</span></span>
+<span class="line"><span style="color:#9ECBFF">                "condition"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">                "rowPermission"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">""</span></span>
+<span class="line"><span style="color:#E1E4E8">            },</span></span>
+<span class="line"><span style="color:#9ECBFF">            "key"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"qx6bG0o5H"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#9ECBFF">            "level"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    ],</span></span>
+<span class="line"><span style="color:#9ECBFF">    "type"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">1</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="明确每个操作按钮的实现">明确每个操作按钮的实现</h3>
+<h3 id="明确组件的封装">明确组件的封装</h3>
+<ul>
+<li>组件只希望实现条件节点/线条/操作按钮的展示，因此后面的组件需要作为参数 component 传入</li>
+<li>组件对层级有一个控制，支持 maxLevel 来控制</li>
+<li>每一次新增数据的时候，默认值需要传入 <em>initValues</em></li>
+<li>支持两种模式 编辑状态 和 查看状态</li>
+<li>支持受控和非受控两种模式</li>
+</ul>
+<h2 id="组件封装">组件封装</h2>
+<h3 id="filterrules">FilterRules</h3>
+<p>提供给用户使用的组件，实现数据的增删改查操作。可以采用受控和非受控两种模式。</p>
+<p>它接受的参数如下：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">interface</span><span style="color:#B392F0"> IProps</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> {</span></span>
+<span class="line"><span style="color:#FFAB70">  value</span><span style="color:#F97583">?:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"><span style="color:#FFAB70">  disabled</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  maxLevel</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  initValues</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  notEmpty</span><span style="color:#F97583">?:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">data</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">message</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8"> };</span></span>
+<span class="line"><span style="color:#B392F0">  component</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">props</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IComponentProps</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> React</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">ReactNode</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">  onChange</span><span style="color:#F97583">?:</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">value</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">|</span><span style="color:#79B8FF"> undefined</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> void</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> const</span><span style="color:#B392F0"> FilterRules</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">T</span><span style="color:#E1E4E8">>(props: IProps&#x3C;</span><span style="color:#79B8FF">T</span><span style="color:#E1E4E8">>) => {</span></span>
+<span class="line"><span style="color:#E1E4E8">  const {</span></span>
+<span class="line"><span style="color:#E1E4E8">    component,</span></span>
+<span class="line"><span style="color:#E1E4E8">    maxLevel </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 5</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    disabled </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    notEmpty </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> { data: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">, message: </span><span style="color:#9ECBFF">'必须有一条数据'</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">    value,</span></span>
+<span class="line"><span style="color:#E1E4E8">    initValues,</span></span>
+<span class="line"><span style="color:#E1E4E8">    onChange,</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> props;</span></span>
+<span class="line"><span style="color:#6A737D">  // 查找当前操作的节点</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">finRelationNode</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">    parentData</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>,</span></span>
+<span class="line"><span style="color:#FFAB70">    targetKey</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">    needCurrent</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  )</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">|</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> undefined</span><span style="color:#F97583"> =></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">handleAddCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">keyObj</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">isOut</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8"> }) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#6A737D">  // 增加新的数据，判断是在当前节点下新增或者新生成一个条件节点</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">addCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">    treeNode</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">    keyObj</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">isOut</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#FFAB70">    initRowValue</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  ) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">handleDeleteCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#6A737D">  // 删除节点，删除当前节点下的一条数据或者是删除一个条件节点</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">deleteCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">parentData</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>, </span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#6A737D">  // 删除一个条件节点时，更新当前数据的层级</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">updateLevel</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">node</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#6A737D">  // 更改条件节点的条件</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">handleChangeCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">    key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">    type</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  ) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#6A737D">  // 改变节点的的数据</span></span>
+<span class="line"><span style="color:#E1E4E8">  const </span><span style="color:#B392F0">handleChangeRowValues</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">values</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {};</span></span>
+<span class="line"><span style="color:#B392F0">  return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">RulesController</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#B392F0">      maxLevel</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{maxLevel}</span></span>
+<span class="line"><span style="color:#B392F0">      disabled</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{disabled}</span></span>
+<span class="line"><span style="color:#B392F0">      value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{value}</span></span>
+<span class="line"><span style="color:#B392F0">      component</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{component}</span></span>
+<span class="line"><span style="color:#B392F0">      onAddCondition</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{handleAddCondition}</span></span>
+<span class="line"><span style="color:#B392F0">      onDeleteCondition</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{handleDeleteCondition}</span></span>
+<span class="line"><span style="color:#B392F0">      onChangeCondition</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{handleChangeCondition}</span></span>
+<span class="line"><span style="color:#B392F0">      onChangeRowValues</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{handleChangeRowValues}</span></span>
+<span class="line"><span style="color:#E1E4E8">    /></span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h4 id="编辑情况">编辑情况</h4>
+<h5 id="非受控组件使用">非受控组件使用</h5>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">Form</span><span style="color:#B392F0"> form</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{form}></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Form.Item</span><span style="color:#B392F0"> name</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">'condition'</span><span style="color:#E1E4E8">}></span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">FilterRules</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">IRowValue</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#B392F0">      component</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">        &#x3C;</span><span style="color:#79B8FF">RowColumnConfig</span><span style="color:#B392F0"> columns</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{record?.columns </span><span style="color:#F97583">??</span><span style="color:#E1E4E8"> []} {</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">props} /></span></span>
+<span class="line"><span style="color:#E1E4E8">      )}</span></span>
+<span class="line"><span style="color:#B392F0">      maxLevel</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">MAX_LEVEL</span><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#B392F0">      initValues</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">INIT_ROW_VALUES</span><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#E1E4E8">    /></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#79B8FF">Form.Item</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#79B8FF">Form</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// RowColumnConfig 实现，name 可能是 children[0].formValues</span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">Form.Item</span></span>
+<span class="line"><span style="color:#B392F0">  name</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{[</span><span style="color:#9ECBFF">'condition'</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">...</span><span style="color:#E1E4E8">name, </span><span style="color:#9ECBFF">'column'</span><span style="color:#E1E4E8">]}</span></span>
+<span class="line"><span style="color:#B392F0">  rules</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{[{ message: </span><span style="color:#9ECBFF">'请选择字段'</span><span style="color:#E1E4E8">, required: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8"> }]}</span></span>
+<span class="line"><span style="color:#B392F0">  initialValue</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{column}</span></span>
+<span class="line"><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;</span><span style="color:#79B8FF">Select</span><span style="color:#B392F0"> placeholder</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"请选择字段"</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    {columns.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;</span><span style="color:#79B8FF">Option</span><span style="color:#B392F0"> key</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{item} </span><span style="color:#B392F0">value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{item}></span></span>
+<span class="line"><span style="color:#E1E4E8">        {item}</span></span>
+<span class="line"><span style="color:#E1E4E8">      &#x3C;/</span><span style="color:#79B8FF">Option</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">    ))}</span></span>
+<span class="line"><span style="color:#E1E4E8">  &#x3C;/</span><span style="color:#79B8FF">Select</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;/</span><span style="color:#79B8FF">Form.Item</span><span style="color:#E1E4E8">>;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 最后通过 form.validateFields() 拿到的和上述的数据结构一致</span></span></code></pre>
+<h5 id="受控组件使用">受控组件使用</h5>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> [</span><span style="color:#79B8FF">ruleData</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">setRuleData</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> useState</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  key: </span><span style="color:#B392F0">shortid</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">  level: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  rowValues: {</span></span>
+<span class="line"><span style="color:#E1E4E8">    column: first.column,</span></span>
+<span class="line"><span style="color:#E1E4E8">    condition: first.condition,</span></span>
+<span class="line"><span style="color:#E1E4E8">    rowPermission: first?.value,</span></span>
+<span class="line"><span style="color:#E1E4E8">  },</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">FilterRules</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">IRowValue</span><span style="color:#E1E4E8">></span></span>
+<span class="line"><span style="color:#B392F0">  value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{ruleData}</span></span>
+<span class="line"><span style="color:#B392F0">  component</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">    &#x3C;</span><span style="color:#79B8FF">RowColumnConfig</span><span style="color:#B392F0"> columns</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{record?.columns </span><span style="color:#F97583">??</span><span style="color:#E1E4E8"> []} {</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">props} /></span></span>
+<span class="line"><span style="color:#E1E4E8">  )}</span></span>
+<span class="line"><span style="color:#B392F0">  maxLevel</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">MAX_LEVEL</span><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#B392F0">  initValues</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">INIT_ROW_VALUES</span><span style="color:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#B392F0">  onChange</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{setRuleData}</span></span>
+<span class="line"><span style="color:#E1E4E8">/>;</span></span>
+<span class="line"><span style="color:#6A737D">// 通过 ruleData 就能够拿到最后的结果</span></span></code></pre>
+<h4 id="查看使用">查看使用</h4>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="tsx"><code><span class="line"><span style="color:#E1E4E8">&#x3C;</span><span style="color:#79B8FF">FilterRules</span></span>
+<span class="line"><span style="color:#B392F0">  component</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{(</span><span style="color:#FFAB70">props</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> &#x3C;</span><span style="color:#79B8FF">RowColumnConfig</span><span style="color:#B392F0"> columns</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{[]} {</span><span style="color:#F97583">...</span><span style="color:#E1E4E8">props} />}</span></span>
+<span class="line"><span style="color:#B392F0">  disabled</span></span>
+<span class="line"><span style="color:#B392F0">  value</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{value}</span></span>
+<span class="line"><span style="color:#E1E4E8">/></span></span></code></pre>
+<p><img src="/blog/imgs/andOr/Untitled%201.png" alt="Untitled"></p>
+<h3 id="rulescontroller">RulesController</h3>
+<p>做节点的展示，渲染正确的组件</p>
+<h2 id="具体实现">具体实现</h2>
+<h3 id="编辑时高度计算">编辑时高度计算</h3>
+<h4 id="计算每个节点的高度">计算每个节点的高度</h4>
+<p><img src="/blog/imgs/andOr/Untitled%202.png" alt="Untitled"></p>
+<ul>
+<li>如果是普通节点(蓝色)，它的高度为 ITEM_HEIGHT + MARGIN (输入框的高度 + marginBottom)</li>
+<li>如果是条件节点(灰色)，它的高度为 children 中每一个节点的高度 + 添加节点的高度 ITEM_HEIGHT</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> calculateTreeItemHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">isEdit</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">item?.children)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      height: </span><span style="color:#79B8FF">ITEM_HEIGHT</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> MARGIN</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      lineHeight: </span><span style="color:#79B8FF">ITEM_HEIGHT</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  item.children.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">child</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> calculateTreeItemHeight</span><span style="color:#E1E4E8">(child, disabled));</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> height</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> item.children.</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">prev</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr).height,</span></span>
+<span class="line"><span style="color:#79B8FF">    ITEM_HEIGHT</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">  weakMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, { height });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h4 id="计算每个节点的连线高度">计算每个节点的连线高度</h4>
+<p><img src="/blog/imgs/andOr/Untitled%203.png" alt="Untitled"></p>
+<ul>
+<li>如果是最后一个条件节点
+线条长度(红色线条)为 块级高度 - (第一个节点高度 - MARGIN)/2 - 最后一个节点/2</li>
+<li>如果不是最后一个条件节点
+线条长度为 firstNodeLineHeight + 剩余子节点高度 + 添加节点/2
+<ul>
+<li>第一个子节点是普通节点(蓝色线条)：firstNodeLineHeight = 节点高度/2 + MARGIN</li>
+<li>第一个子节点是条件节点(绿色线条)：firstNodeLineHeight = 子节点线条高度 + 添加节点/2</li>
+</ul>
+</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> calculateTreeItemHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">item</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>, </span><span style="color:#FFAB70">disabled</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">item?.children)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      height: </span><span style="color:#79B8FF">ITEM_HEIGHT</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> MARGIN</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      lineHeight: </span><span style="color:#79B8FF">ITEM_HEIGHT</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  item.children.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">child</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> calculateTreeItemHeight</span><span style="color:#E1E4E8">(child, disabled));</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> isLastCondition</span><span style="color:#F97583"> =</span><span style="color:#F97583"> !</span><span style="color:#E1E4E8">item.children.</span><span style="color:#B392F0">some</span><span style="color:#E1E4E8">(isCondition);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> firstNodeIsCondition</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> isCondition</span><span style="color:#E1E4E8">(item.children[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> height</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> item.children.</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">prev</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr).height,</span></span>
+<span class="line"><span style="color:#79B8FF">    ITEM_HEIGHT</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> lineHeight;</span></span>
+<span class="line"><span style="color:#6A737D">  // 如果当前节点是最后的判断节点</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (isLastCondition) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> firstNodeLineHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(item.children[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]).height </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> MARGIN</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> lastNodeHeight</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> ITEM_HEIGHT</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    lineHeight </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> height </span><span style="color:#F97583">-</span><span style="color:#E1E4E8"> firstNodeLineHeight </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8"> lastNodeHeight </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  } </span><span style="color:#F97583">else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> firstNodeLineHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> firstNodeIsCondition</span></span>
+<span class="line"><span style="color:#F97583">      ?</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(item.children[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]).lineHeight </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> ITEM_HEIGHT</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 2</span></span>
+<span class="line"><span style="color:#F97583">      :</span><span style="color:#79B8FF"> ITEM_HEIGHT</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> MARGIN</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    lineHeight </span><span style="color:#F97583">=</span></span>
+<span class="line"><span style="color:#E1E4E8">      firstNodeLineHeight </span><span style="color:#F97583">+</span></span>
+<span class="line"><span style="color:#E1E4E8">      item.children</span></span>
+<span class="line"><span style="color:#E1E4E8">        ?.</span><span style="color:#B392F0">slice</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        .</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">          (</span><span style="color:#FFAB70">prev</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr).height,</span></span>
+<span class="line"><span style="color:#79B8FF">          ITEM_HEIGHT</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">  weakMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, { height, lineHeight });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="查看时高度计算">查看时高度计算</h3>
+<h4 id="计算每个节点的高度-1">计算每个节点的高度</h4>
+<p>节点高度 等于每一个节点的高度之和</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> calculateTreeItemHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">item</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>, </span><span style="color:#FFAB70">disabled</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">item?.children)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, {</span></span>
+<span class="line"><span style="color:#E1E4E8">      height: </span><span style="color:#79B8FF">ITEM_HEIGHT</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> MARGIN</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      lineHeight: </span><span style="color:#79B8FF">ITEM_HEIGHT</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  item.children.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">child</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> calculateTreeItemHeight</span><span style="color:#E1E4E8">(child, disabled));</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> height</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> item.children.</span><span style="color:#B392F0">reduce</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">prev</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">curr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> prev </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> weakMap.</span><span style="color:#B392F0">get</span><span style="color:#E1E4E8">(curr).height,</span></span>
+<span class="line"><span style="color:#79B8FF">    0</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#E1E4E8">  weakMap.</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(item, { height });</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>具体的高度图如下图所示：</p>
+<p><img src="/blog/imgs/andOr/Untitled%205.png" alt="Untitled"></p>
+<h4 id="计算每个节点的连线高度-1">计算每个节点的连线高度</h4>
+<p>连线高度为 firstNodeLineHeight + 中间节点高度 + lastNodeLineHeight</p>
+<ul>
+<li>
+<p>如果是最后一个条件节点
+lineHeight(红色) = 块级高度(蓝色) - MARGIN - ITEM_HEIGHT/2 - ITEM_HEIGHT/2(紫色)</p>
+<p><img src="/blog/imgs/andOr/Untitled%206.png" alt="Untitled"></p>
+</li>
+<li>
+<p>如果不是最后一个条件节点，需要根据其子节点在做计算</p>
+<p><img src="/blog/imgs/andOr/Untitled%207.png" alt="Untitled"></p>
+</li>
+</ul>
+<p>对于上述这种情况，我们需要递归计算当前条件节点的第一个节点应该减去的高度和最后节点应该减去的高度(蓝色部分)</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> firstNodeLineHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> firstNode.height </span><span style="color:#F97583">-</span><span style="color:#B392F0"> getNodeReduceHeight</span><span style="color:#E1E4E8">(item, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> lastNodeLineHeight</span><span style="color:#F97583"> =</span></span>
+<span class="line"><span style="color:#E1E4E8">  lastNode.height </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> MARGIN</span><span style="color:#F97583"> -</span><span style="color:#B392F0"> getNodeReduceHeight</span><span style="color:#E1E4E8">(item, </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 如果是普通节点，返回值为 ITEM_HEIGHT / 2</span></span>
+<span class="line"><span style="color:#6A737D">// 如果是条件节点，返回值 currentNode.lineHeight /2 + getNodeReduceHeight(currentNode, isFirst)。需要递归遍历对应的节点算出总共要减去的高度</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> getNodeReduceHeight</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">item</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>, </span><span style="color:#FFAB70">isFirst</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> currentNode</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> isFirst</span></span>
+<span class="line"><span style="color:#F97583">    ?</span><span style="color:#E1E4E8"> item?.children?.[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#F97583">    :</span><span style="color:#E1E4E8"> item?.children?.[item?.children?.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">currentNode) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> ITEM_HEIGHT</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> currentNodeIsCondition</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> isCondition</span><span style="color:#E1E4E8">(currentNode);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (currentNodeIsCondition) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#E1E4E8">      currentNode.lineHeight </span><span style="color:#F97583">/</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> +</span><span style="color:#B392F0"> getNodeReduceHeight</span><span style="color:#E1E4E8">(currentNode, isFirst)</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> ITEM_HEIGHT</span><span style="color:#F97583"> /</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="添加新内容">添加新内容</h3>
+<p><img src="/blog/imgs/andOr/Untitled%208.png" alt="Untitled"></p>
+<ul>
+<li>最外层的添加(红色按钮)
+<ul>
+<li>直接操作当前层级(最外层)的 children，添加一组 INIT_ROW_VALUES</li>
+</ul>
+</li>
+<li>嵌套层的最下添加按钮(黄色)
+<ul>
+<li>获取到当前层的 children，添加一组 INIT_ROW_VALUES</li>
+</ul>
+</li>
+<li>嵌套层的每一行添加按钮(紫色)
+<ul>
+<li>会新增一个嵌套关系</li>
+</ul>
+</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#6A737D">// 根据点击的按钮，来获取相关的 Node，对于红色/黄色按钮来说获取当前层级 Node</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> finRelationNode</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">  parentData</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>,</span></span>
+<span class="line"><span style="color:#FFAB70">  targetKey</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">  needCurrent</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> parentDataTemp</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> parentData;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (parentDataTemp.key </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> targetKey) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> parentDataTemp;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">parentDataTemp.children?.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">return</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> parentDataTemp.children.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> current</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> parentDataTemp.children[i];</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (current.key </span><span style="color:#F97583">===</span><span style="color:#E1E4E8"> targetKey)</span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#E1E4E8"> needCurrent </span><span style="color:#F97583">?</span><span style="color:#E1E4E8"> current </span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> parentDataTemp;</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> node</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">|</span><span style="color:#79B8FF"> null</span><span style="color:#F97583"> |</span><span style="color:#79B8FF"> undefined</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> finRelationNode</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">      current,</span></span>
+<span class="line"><span style="color:#E1E4E8">      targetKey,</span></span>
+<span class="line"><span style="color:#E1E4E8">      needCurrent,</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (node) </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> node;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> handleAddCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">keyObj</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">isOut</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8"> }) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> cloneData</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> clone</span><span style="color:#E1E4E8">(value);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> appendNode</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> finRelationNode</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    cloneData </span><span style="color:#F97583">as</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>,</span></span>
+<span class="line"><span style="color:#E1E4E8">    keyObj.key,</span></span>
+<span class="line"><span style="color:#E1E4E8">    keyObj.isOut,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#B392F0">  addCondition</span><span style="color:#E1E4E8">(appendNode, keyObj, initValues </span><span style="color:#F97583">as</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">  onChange</span><span style="color:#E1E4E8">?.(cloneData);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> addCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#FFAB70">  treeNode</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> any</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">  keyObj</span><span style="color:#F97583">:</span><span style="color:#E1E4E8"> { </span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">; </span><span style="color:#FFAB70">isOut</span><span style="color:#F97583">?:</span><span style="color:#79B8FF"> boolean</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#FFAB70">  initRowValue</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> keyObj.key;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (keyObj.isOut)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> treeNode.children.</span><span style="color:#B392F0">push</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">      Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">        {},</span></span>
+<span class="line"><span style="color:#E1E4E8">        { rowValues: initRowValue },</span></span>
+<span class="line"><span style="color:#E1E4E8">        { key: </span><span style="color:#B392F0">shortId</span><span style="color:#E1E4E8">(), level: treeNode.level },</span></span>
+<span class="line"><span style="color:#E1E4E8">      ),</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> children</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> treeNode?.children;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">children) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> newNode</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">      key: treeNode.key,</span></span>
+<span class="line"><span style="color:#E1E4E8">      level: treeNode.level </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      type: </span><span style="color:#79B8FF">ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">AND</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">      children: [</span></span>
+<span class="line"><span style="color:#E1E4E8">        {</span></span>
+<span class="line"><span style="color:#E1E4E8">          rowValues: treeNode.rowValues,</span></span>
+<span class="line"><span style="color:#E1E4E8">          key: </span><span style="color:#B392F0">shortId</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">          level: treeNode?.level </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">        { rowValues: initRowValue, key: </span><span style="color:#B392F0">shortId</span><span style="color:#E1E4E8">(), level: treeNode?.level </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8"> },</span></span>
+<span class="line"><span style="color:#E1E4E8">      ],</span></span>
+<span class="line"><span style="color:#E1E4E8">    };</span></span>
+<span class="line"><span style="color:#F97583">    delete</span><span style="color:#E1E4E8"> treeNode.rowValues;</span></span>
+<span class="line"><span style="color:#E1E4E8">    Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">(treeNode, newNode);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#F97583">  for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">let</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&#x3C;</span><span style="color:#E1E4E8"> children.</span><span style="color:#79B8FF">length</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">+=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (children[i].key </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> key) </span><span style="color:#F97583">continue</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (treeNode?.level </span><span style="color:#F97583">&#x3C;=</span><span style="color:#E1E4E8"> maxLevel) {</span></span>
+<span class="line"><span style="color:#E1E4E8">      children[i] </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        key: children[i].key,</span></span>
+<span class="line"><span style="color:#E1E4E8">        type: </span><span style="color:#79B8FF">ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">AND</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        level: treeNode?.level </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        children: [</span></span>
+<span class="line"><span style="color:#E1E4E8">          Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">({}, children[i], {</span></span>
+<span class="line"><span style="color:#E1E4E8">            key: </span><span style="color:#B392F0">shortId</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">            level: treeNode?.level </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          }),</span></span>
+<span class="line"><span style="color:#E1E4E8">          Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">            key: </span><span style="color:#B392F0">shortId</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#E1E4E8">            rowValues: initRowValue,</span></span>
+<span class="line"><span style="color:#E1E4E8">            level: treeNode?.level </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">          }),</span></span>
+<span class="line"><span style="color:#E1E4E8">        ],</span></span>
+<span class="line"><span style="color:#E1E4E8">      };</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="点击删除内容">点击删除内容</h3>
+<p><img src="/blog/imgs/andOr/Untitled%209.png" alt="Untitled"></p>
+<ul>
+<li>点击紫色按钮，第二个条件节点只剩一个 children，需要删除第二个条件节点，且重新计算每一行的层级</li>
+<li>点击黄色按钮，当前条件节点的 children 删除一行数据</li>
+</ul>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> deleteCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">parentData</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>, </span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> parentDataTemp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> parentData;</span></span>
+<span class="line"><span style="color:#E1E4E8">  parentDataTemp.children </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> parentDataTemp?.children?.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">    (</span><span style="color:#FFAB70">item</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> item.key </span><span style="color:#F97583">!==</span><span style="color:#E1E4E8"> key,</span></span>
+<span class="line"><span style="color:#E1E4E8">  );</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (parentDataTemp?.children?.</span><span style="color:#79B8FF">length</span><span style="color:#F97583"> ===</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> newChild</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> updateLevel</span><span style="color:#E1E4E8">(parentDataTemp.children[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> parentDataTemp.key;</span></span>
+<span class="line"><span style="color:#F97583">    delete</span><span style="color:#E1E4E8"> parentDataTemp.children;</span></span>
+<span class="line"><span style="color:#F97583">    delete</span><span style="color:#E1E4E8"> parentDataTemp.type;</span></span>
+<span class="line"><span style="color:#E1E4E8">    parentDataTemp </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Object.</span><span style="color:#B392F0">assign</span><span style="color:#E1E4E8">(parentDataTemp, {</span></span>
+<span class="line"><span style="color:#F97583">      ...</span><span style="color:#E1E4E8">newChild,</span></span>
+<span class="line"><span style="color:#E1E4E8">      key,</span></span>
+<span class="line"><span style="color:#E1E4E8">      level: newChild.level,</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> updateLevel</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">node</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">>) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  let</span><span style="color:#E1E4E8"> newChildren;</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8"> (node.children)</span></span>
+<span class="line"><span style="color:#E1E4E8">    newChildren </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> node.children.</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">((</span><span style="color:#FFAB70">element</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> updateLevel</span><span style="color:#E1E4E8">(element));</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> newNode</span><span style="color:#F97583">:</span><span style="color:#B392F0"> IFilterValue</span><span style="color:#E1E4E8">&#x3C;</span><span style="color:#B392F0">T</span><span style="color:#E1E4E8">> </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    ...</span><span style="color:#E1E4E8">node,</span></span>
+<span class="line"><span style="color:#E1E4E8">    children: newChildren,</span></span>
+<span class="line"><span style="color:#E1E4E8">    level: (node?.level </span><span style="color:#F97583">as</span><span style="color:#79B8FF"> number</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> newNode;</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="切换条件节点">切换条件节点</h3>
+<p>获取到当前层级的节点，改变对应的 type 值</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> handleChangeCondition</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">type</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> cloneData</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> clone</span><span style="color:#E1E4E8">(value);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> changeNode</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> finRelationNode</span><span style="color:#E1E4E8">(cloneData, key, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  changeNode.type </span><span style="color:#F97583">=</span></span>
+<span class="line"><span style="color:#E1E4E8">    type </span><span style="color:#F97583">===</span><span style="color:#79B8FF"> ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">AND</span></span>
+<span class="line"><span style="color:#F97583">      ?</span><span style="color:#79B8FF"> ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">OR</span></span>
+<span class="line"><span style="color:#F97583">      :</span><span style="color:#79B8FF"> ROW_PERMISSION_RELATION</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">AND</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">  onChange</span><span style="color:#E1E4E8">?.(cloneData);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h3 id="改变组件数据">改变组件数据</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="ts"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> handleChangeRowValues</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">key</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> string</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">values</span><span style="color:#F97583">:</span><span style="color:#B392F0"> T</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">=></span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> cloneData</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> clone</span><span style="color:#E1E4E8">(value);</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> changeNode</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> finRelationNode</span><span style="color:#E1E4E8">(cloneData, key, </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  changeNode.rowValues </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    ...</span><span style="color:#E1E4E8">(changeNode.rowValues </span><span style="color:#F97583">??</span><span style="color:#E1E4E8"> {}),</span></span>
+<span class="line"><span style="color:#F97583">    ...</span><span style="color:#E1E4E8">values,</span></span>
+<span class="line"><span style="color:#E1E4E8">  };</span></span>
+<span class="line"><span style="color:#B392F0">  onChange</span><span style="color:#E1E4E8">?.(cloneData);</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<h2 id="总结">总结</h2>
+<p>该组件已经实现完成，FilterRules 主要是操作数据，RuleController 主要是条件/线条/组件的渲染。支持用户自定义 component 传入 FilterRules。</p>
+<p>目前的局限性为，component 的高度为 32，已经下间距为 16，其他的高度可能会导致线条渲染问题。</p>
+<p>后续期望能够实现，部分节点禁用部分节点可编辑。</p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#前言"> 前言 </a><a class="depth-2" href="#前期分析"> 前期分析 </a><a class="depth-3" href="#需要确定好数据结构"> 需要确定好数据结构 </a><a class="depth-3" href="#明确每个操作按钮的实现"> 明确每个操作按钮的实现 </a><a class="depth-3" href="#明确组件的封装"> 明确组件的封装 </a><a class="depth-2" href="#组件封装"> 组件封装 </a><a class="depth-3" href="#filterrules"> FilterRules </a><a class="depth-3" href="#rulescontroller"> RulesController </a><a class="depth-2" href="#具体实现"> 具体实现 </a><a class="depth-3" href="#编辑时高度计算"> 编辑时高度计算 </a><a class="depth-3" href="#查看时高度计算"> 查看时高度计算 </a><a class="depth-3" href="#添加新内容"> 添加新内容 </a><a class="depth-3" href="#点击删除内容"> 点击删除内容 </a><a class="depth-3" href="#切换条件节点"> 切换条件节点 </a><a class="depth-3" href="#改变组件数据"> 改变组件数据 </a><a class="depth-2" href="#总结"> 总结 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/react/hooks-knowledge-you-should-know/">上一篇：你应该知道的 Hooks 知识</a> <a href="/blog/react/data-flow-management-in--react/">下一篇：React 中的数据流管理</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>

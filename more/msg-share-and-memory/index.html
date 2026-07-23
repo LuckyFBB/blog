@@ -1,15 +1,197 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="shortcut icon" href="/blog/favicon.ico">
-<link rel="stylesheet" href="/blog/umi.85be11c4.css">
-<script src="/blog/preload_helper.d98c41ce.js"></script>
-</head>
-<body>
-<div id="root"></div>
-<script src="/blog/umi.439c355e.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="description" content="阅读笔记、系统知识和一些暂时没归类的内容。"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/blog/favicon.ico"><title>进程间通信之消息队列和内存共享 | FBB Blog</title><link rel="stylesheet" href="/blog/_astro/index.Bo7u-Wkw.css"></head> <body> <header class="site-header"> <a class="brand" href="/blog/"> <img src="/blog/logo.png" alt=""> <span>FBB Blog</span> </a> <nav class="nav" aria-label="主导航"> <a class="nav-link" href="/blog/ai/"> AI </a><a class="nav-link" href="/blog/react/"> React </a><a class="nav-link" href="/blog/node/"> Node </a><a class="nav-link" href="/blog/engineering/"> 工程化 </a><a class="nav-link" href="/blog/base/"> 前端基础 </a><a class="nav-link" href="/blog/data-structure/"> 数据结构 </a><a class="nav-link is-active" href="/blog/more/"> 其他 </a> </nav> <a class="github-link" href="https://github.com/LuckyFBB" target="_blank" rel="noreferrer">
+GitHub
+</a> </header> <main>  <article class="article-layout"> <header class="article-header"> <a class="article-category" href="../">其他</a> <h1>进程间通信之消息队列和内存共享</h1> </header> <div class="article-grid"> <div class="prose"> <h2 id="消息队列">消息队列</h2>
+<p>消息队列是在两个不相关进程间传递数据的一种简单、高效的方式，其独立于发送进程 、接收进程存在。</p>
+<p>消息队列提供了一种一个进程向另一个进程发送一个数据块的方法，数据块具有特定的结构。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">struct</span><span style="color:#B392F0"> msgbuf</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    long</span><span style="color:#E1E4E8"> mtype;</span><span style="color:#6A737D">         /* message type, must be > 0 */</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> mtext[</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">];</span><span style="color:#6A737D">     /* message data */</span></span>
+<span class="line"><span style="color:#E1E4E8">};</span></span></code></pre>
+<p>写消息等于往队列中加入一个消息块，读消息是删除队列中的消息块.</p>
+<p>操作系统中的消息队列都有<strong>一个标识符 key</strong>，每个进程可以通过该标识符打开这个队列，向其添加一个消息块或者读取一个消息块来实现不同进程间的通信，需要通信的进程需要读取。</p>
+<p>消息块是进程双方相互约定好的数据格式，其中会带有消息的类型，进程可以通过类型来判断接受哪个消息块。消息块有固定大小(MSGMAX)，因此不适合传输较大的数据。</p>
+<p>消息队列的生命周期跟随内核，如果没有释放消息队列或者关闭操作系统，<strong>消息队列就一直存在</strong>。</p>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/676aec2c-9583-49fa-b051-6b034e48c6d8" alt="Untitled"></p>
+<h3 id="消息队列实现步骤">消息队列实现步骤</h3>
+<ol>
+<li>
+<p>创建消息队列</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(){</span></span>
+<span class="line"><span style="color:#F97583">	int</span><span style="color:#E1E4E8"> id </span><span style="color:#F97583">=</span><span style="color:#B392F0"> msgget</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">0x</span><span style="color:#79B8FF">121212</span><span style="color:#E1E4E8">, O_CREAT </span><span style="color:#F97583">|</span><span style="color:#E1E4E8"> O_RDWR </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">644</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#E1E4E8">(id </span><span style="color:#F97583">&#x3C;</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">	{</span></span>
+<span class="line"><span style="color:#B392F0">		perror</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"msgget error"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">		return</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>创建 key 为 0x121212 的消息队列，使用<code>ipcs -q</code>来查看对应的消息队列</p>
+<img width="610" alt="Untitled 1" src="https://github.com/LuckyFBB/blog/assets/38368040/b3b452ab-eca2-41a5-aeaa-15463e885e5b">
+</li>
+<li>
+<p>向消息队列写信息</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> text[</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"请输入消息体的内容</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    fgets</span><span style="color:#E1E4E8">(text, </span><span style="color:#F97583">sizeof</span><span style="color:#E1E4E8">(text) </span><span style="color:#F97583">-</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">, stdin);</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> buf_size </span><span style="color:#F97583">=</span><span style="color:#F97583"> sizeof</span><span style="color:#E1E4E8">(text) </span><span style="color:#F97583">+</span><span style="color:#F97583"> sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">long</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    struct</span><span style="color:#B392F0"> msgbuf</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">buf </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (msgbuf </span><span style="color:#F97583">*</span><span style="color:#E1E4E8">)</span><span style="color:#B392F0">malloc</span><span style="color:#E1E4E8">(buf_size);</span></span>
+<span class="line"><span style="color:#E1E4E8">    buf->mtype </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">%</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    strcpy</span><span style="color:#E1E4E8">(buf->mtext, text);</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> snd_ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> msgsnd</span><span style="color:#E1E4E8">(id, buf, buf_size, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#B392F0">    printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"send mtype=</span><span style="color:#79B8FF">%ld</span><span style="color:#9ECBFF">, mtext=</span><span style="color:#79B8FF">%s\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, buf->mtype, buf->mtext);</span></span>
+<span class="line"><span style="color:#E1E4E8">    i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    free</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在写信息的时候，需要设置 type 和 text</p>
+</li>
+<li>
+<p>从消息队列读信息</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (</span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#E1E4E8"> text[</span><span style="color:#79B8FF">50</span><span style="color:#E1E4E8">];</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> buf_size </span><span style="color:#F97583">=</span><span style="color:#F97583"> sizeof</span><span style="color:#E1E4E8">(text) </span><span style="color:#F97583">+</span><span style="color:#F97583"> sizeof</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">long</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    struct</span><span style="color:#B392F0"> msgbuf</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">buf </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (msgbuf </span><span style="color:#F97583">*</span><span style="color:#E1E4E8">)</span><span style="color:#B392F0">malloc</span><span style="color:#E1E4E8">(buf_size);</span></span>
+<span class="line"><span style="color:#B392F0">    bzero</span><span style="color:#E1E4E8">(buf, buf_size);</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> rcv_ret </span><span style="color:#F97583">=</span><span style="color:#B392F0"> msgrcv</span><span style="color:#E1E4E8">(id, buf, buf_size, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (rcv_ret </span><span style="color:#F97583">>=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"rcv rcv_ret=</span><span style="color:#79B8FF">%d</span><span style="color:#9ECBFF">, mtype=</span><span style="color:#79B8FF">%ld</span><span style="color:#9ECBFF">, mtext=</span><span style="color:#79B8FF">%s\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, rcv_ret, buf->mtype, buf->mtext);</span></span>
+<span class="line"><span style="color:#B392F0">        free</span><span style="color:#E1E4E8">(buf);</span></span>
+<span class="line"><span style="color:#E1E4E8">        buf </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> nullptr</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    else</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"rcv rcv_ret=</span><span style="color:#79B8FF">%d</span><span style="color:#79B8FF"> \n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, rcv_ret);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在读取消息的时候，msgrcv 可以根据消息体对应的 type 来读取数据</p>
+</li>
+</ol>
+<h3 id="消息队列-vs-命名管道"><strong>消息队列 vs 命名管道</strong></h3>
+<p><img src="https://github.com/LuckyFBB/blog/assets/38368040/153ec058-5d12-4088-8d2d-50d18f1cd102" alt="Untitled 2"></p>
+<h2 id="共享内存">共享内存</h2>
+<p>各进程之间是独立存在，互不影响的。之所以进程间的内存不共享且为何要采用虚拟内存，可以查看<a href="/blog/more/memory-read-note">操作系统之内存管理读书笔记</a>。</p>
+<p>只有在共享内存的情况下才能够让进程之间产生联系。共享内存是进程间通信中最简单的方式之一。从进程的角度来说，共享的内存就是可以同时被多个进程访问的内存。</p>
+<p>🤔️ 为何又要使用共享内存？</p>
+<p>当两个进程进行数据传输，且数据量很大的时候，再使用上述的管道和消息队列就不方便了。不如将两个进程的某块虚拟内存映射到同一块物理内存中。进程间需要传送的数据就不需要来回拷贝，进程 A 写入之后进程 B 就能够获取到了。</p>
+<img width="745" alt="Untitled 3" src="https://github.com/LuckyFBB/blog/assets/38368040/d34e5a96-75ae-4755-a196-ab57b99cb0dc">
+<h3 id="共享内存的实现步骤">共享内存的实现步骤</h3>
+<img width="898" alt="Untitled 4" src="https://github.com/LuckyFBB/blog/assets/38368040/4e7b8ef5-5892-458a-9a9e-63ff4c0b50e4">
+<ol>
+<li>
+<p>创建共享内存</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> shmid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> shmget</span><span style="color:#E1E4E8">(key, SHM_SIZE, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span></code></pre>
+</li>
+<li>
+<p>共享内存映射到虚拟内存中</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">shmaddr </span><span style="color:#F97583">=</span><span style="color:#F97583"> static_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">shmat</span><span style="color:#E1E4E8">(shmid, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">if</span><span style="color:#E1E4E8"> (shmaddr </span><span style="color:#F97583">==</span><span style="color:#F97583"> reinterpret_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to attach shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>
+<p>进行通信</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D">// 写入共享内存</span></span>
+<span class="line"><span style="color:#B392F0">std</span><span style="color:#E1E4E8">::string message </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "Hello, world!"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">std</span><span style="color:#E1E4E8">::</span><span style="color:#B392F0">memcpy</span><span style="color:#E1E4E8">(shmaddr, message.</span><span style="color:#B392F0">c_str</span><span style="color:#E1E4E8">(), message.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 读取共享内存</span></span>
+<span class="line"><span style="color:#B392F0">std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Message from shared memory: "</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> shmaddr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">;</span></span></code></pre>
+</li>
+</ol>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;iostream></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;cstdlib></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;cstring></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/ipc.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/shm.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> SHM_SIZE</span><span style="color:#79B8FF"> 1024</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    key_t</span><span style="color:#E1E4E8"> key </span><span style="color:#F97583">=</span><span style="color:#B392F0"> ftok</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"."</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'a'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (key </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create key.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> shmid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> shmget</span><span style="color:#E1E4E8">(key, SHM_SIZE, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmid </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">shmaddr </span><span style="color:#F97583">=</span><span style="color:#F97583"> static_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">shmat</span><span style="color:#E1E4E8">(shmid, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmaddr </span><span style="color:#F97583">==</span><span style="color:#F97583"> reinterpret_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to attach shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 写入共享内存</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::string message </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "Hello, world!"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::</span><span style="color:#B392F0">memcpy</span><span style="color:#E1E4E8">(shmaddr, message.</span><span style="color:#B392F0">c_str</span><span style="color:#E1E4E8">(), message.</span><span style="color:#B392F0">size</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;iostream></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;cstdlib></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;cstring></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/ipc.h></span></span>
+<span class="line"><span style="color:#F97583">#include</span><span style="color:#9ECBFF"> &#x3C;sys/shm.h></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">#define</span><span style="color:#B392F0"> SHM_SIZE</span><span style="color:#79B8FF"> 1024</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">int</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">    key_t</span><span style="color:#E1E4E8"> key </span><span style="color:#F97583">=</span><span style="color:#B392F0"> ftok</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"."</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'a'</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (key </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create key.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> shmid </span><span style="color:#F97583">=</span><span style="color:#B392F0"> shmget</span><span style="color:#E1E4E8">(key, SHM_SIZE, IPC_CREAT </span><span style="color:#F97583">|</span><span style="color:#F97583"> 0</span><span style="color:#79B8FF">666</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmid </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to create shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    char</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8">shmaddr </span><span style="color:#F97583">=</span><span style="color:#F97583"> static_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">shmat</span><span style="color:#E1E4E8">(shmid, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (shmaddr </span><span style="color:#F97583">==</span><span style="color:#F97583"> reinterpret_cast&#x3C;char</span><span style="color:#F97583"> *></span><span style="color:#E1E4E8">(</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to attach shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 读取共享内存</span></span>
+<span class="line"><span style="color:#B392F0">    std</span><span style="color:#E1E4E8">::cout </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Message from shared memory: "</span><span style="color:#F97583"> &#x3C;&#x3C;</span><span style="color:#E1E4E8"> shmaddr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> '</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">'</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 删除共享内存</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">shmctl</span><span style="color:#E1E4E8">(shmid, IPC_RMID, </span><span style="color:#79B8FF">nullptr</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">==</span><span style="color:#F97583"> -</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">        std</span><span style="color:#E1E4E8">::cerr </span><span style="color:#F97583">&#x3C;&#x3C;</span><span style="color:#9ECBFF"> "Failed to delete shared memory.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#B392F0">        exit</span><span style="color:#E1E4E8">(EXIT_FAILURE);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>共享内存实际上就是进程调用 shmget 分配了一块共享内存块，其余想要通信的进程使用 shmat 方法将进程中的地址空间指向共享内存块中。</p>
+<p>解决共享内存的映射，当一个进程不再使用共享内存块的时候应该调用 shmdt 方法与该共享内存快脱离。</p>
+<p>如果是释放内存块的进程是最后一个使用该内存块的进程，则调用 shmctl 该内存块将被删除。</p>
+<h3 id="共享内存的特点"><strong>共享内存的特点</strong></h3>
+<ol>
+<li>共享内存是进程间共享数据具有最高的效率。一个进程向共享内存区写入了数据，共享这个内存区域的所有进程就可以立刻看到其中的内容。并不需要通过系统调用或者其它需要切入内核的过程来完成。同时它也避免了对数据的各种不必要的复制</li>
+<li>使用共享内存值得注意的是多个进程之间对共享内存区访问读取的互斥。某个进程正在向共享内存区写入数据时，别的进程不应当去读/写当前数据</li>
+</ol>
+<div class="参考链接"></div>
+<p><a href="https://www.51cto.com/article/693037.html">腾讯二面：大白你了解共享内存吗？-51CTO.COM</a></p> </div> <aside class="toc" aria-label="目录"> <strong>目录</strong> <a class="depth-2" href="#消息队列"> 消息队列 </a><a class="depth-3" href="#消息队列实现步骤"> 消息队列实现步骤 </a><a class="depth-3" href="#消息队列-vs-命名管道"> 消息队列 vs 命名管道 </a><a class="depth-2" href="#共享内存"> 共享内存 </a><a class="depth-3" href="#共享内存的实现步骤"> 共享内存的实现步骤 </a><a class="depth-3" href="#共享内存的特点"> 共享内存的特点 </a> </aside> </div> <nav class="article-pager" aria-label="文章翻页"> <a href="/blog/more/pipe-and-fifo/">上一篇：进程间通信之管道</a> <a href="/blog/more/sem-and-signal/">下一篇：进程间通信之信号量和信号</a> </nav> </article>  </main> <footer class="site-footer">
+Copyright © 2022-2026 Made with care by FBB
+</footer> </body></html>
